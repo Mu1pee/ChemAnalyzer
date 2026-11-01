@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'" />
+<title>ChemAnalyzer</title>
+<style>
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: grid; place-items: center;
+    background: #07101c; color: #cfe0f2;
+    font-family: "Segoe UI", system-ui, sans-serif;
+  }
+  .box { text-align: center; }
+  h1 { margin: 18px 0 6px; font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+  p { margin: 0; color: #6f869d; font-size: 13px; }
+  .spin {
+    width: 34px; height: 34px; margin: 0 auto;
+    border: 3px solid rgba(125,180,235,.2); border-top-color: #5aa9f0;
+    border-radius: 50%; animation: r 0.9s linear infinite;
+  }
+  @keyframes r { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="spin"></div>
+    <h1>ChemAnalyzer</h1>
+    <p>Запуск локального движка RDKit…</p>
+  </div>
+</body>
+</html>

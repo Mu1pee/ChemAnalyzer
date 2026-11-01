@@ -1,0 +1,85 @@
+{
+  "name": "chemanalyzer",
+  "productName": "ChemAnalyzer",
+  "version": "3.2.0",
+  "description": "ChemAnalyzer — рисование, анализ и идентификация химических структур",
+  "author": "ChemAnalyzer",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "electron/main.js",
+  "engines": {
+    "node": ">=24.20.0"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "build:backend": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-backend.ps1",
+    "icon": "python scripts/make_icon.py",
+    "test:electron": "node --test electron/tests/backend.test.js electron/tests/security.test.js electron/tests/store.test.js",
+    "start": "electron .",
+    "dist:win": "npm run build && npm run build:backend && electron-builder --win --x64",
+    "dist:win:package": "electron-builder --win --x64"
+  },
+  "devDependencies": {
+    "electron": "^42.0.0",
+    "electron-builder": "^26.8.0"
+  },
+  "build": {
+    "appId": "local.chemanalyzer.desktop",
+    "productName": "ChemAnalyzer",
+    "copyright": "ChemAnalyzer",
+    "directories": {
+      "output": "dist",
+      "buildResources": "assets"
+    },
+    "files": [
+      "electron/**/*",
+      "assets/icon.png",
+      "package.json",
+      "!electron/tests/**"
+    ],
+    "extraResources": [
+      {
+        "from": "build/backend/chemanalyzer-backend",
+        "to": "backend"
+      },
+      {
+        "from": "frontend/dist",
+        "to": "frontend"
+      }
+    ],
+    "asar": true,
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ChemAnalyzer",
+      "artifactName": "ChemAnalyzer-Setup-${version}.exe",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "deleteAppDataOnUninstall": false
+    },
+    "portable": {
+      "artifactName": "ChemAnalyzer-Portable-${version}.exe"
+    }
+  }
+}

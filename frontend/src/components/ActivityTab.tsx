@@ -1,0 +1,150 @@
+import type { ActivityResponse, AsyncState } from "../types/molecule";
+import ScoreBar from "./ScoreBar";
+
+interface Props {
+  state: AsyncState<ActivityResponse>;
+}
+
+function tone(confidence: string): "high" | "medium" | "low" {
+  if (confidence === "высокая") return "high";
+  if (confidence === "средняя") return "medium";
+  return "low";
+}
+
+function domainTone(domain: string): "high" | "medium" | "low" {
+  if (domain === "в области применимости") return "high";
+  if (domain === "на границе области") return "medium";
+  return "low";
+}
+
+export default function ActivityTab({ state }: Props) {
+  if (state.loading) {
+    return (
+      <div className="tab-state">
+        <div className="spinner" />
+        <p>Сравниваем структуру с библиотекой препаратов…</p>
+      </div>
+    );
+  }
+
+  if (state.error) {
+    return <div className="tab-note tab-note-error">{state.error}</div>;
+  }
+
+  const data = state.data;
+  if (!data) return null;
+
+  const qsar = data.qsar;
+
+  return (
+    <div>
+      <div className="section-label">QSAR: обученные модели по мишеням</div>
+      {qsar.status === "ready" ? (
+        <>
+          <div className="activity-list">
+            {qsar.predictions.map((p) => (
+              <div className="activity-row" key={p.target_id}>
+                <div className="activity-head">
+                  <strong>{p.target_name}</strong>
+                  <span className={`badge badge-${domainTone(p.domain)}`}>
+                    {p.domain}
+                  </span>
+                </div>
+                <div className="activity-bar-line">
+                  <ScoreBar
+                    value={p.probability}
+                    tone={domainTone(p.domain)}
+                  />
+                  <span className="activity-score">
+                    {(p.probability * 100).toFixed(0)}%
+                  </span>
+                </div>
+                <div className="activity-support">
+                  вероятность pChEMBL ≥ {p.active_pchembl} · сходство с
+                  обучающей выборкой {p.max_similarity.toFixed(2)} · ROC-AUC
+                  модели {p.cv_auc.toFixed(2)} · обучено на {p.n_train}
+                </div>
+                {p.model_version && (
+                  <div className="activity-support">
+                    модель: {p.model_version}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="tab-note">
+            Используется моделей: {qsar.models_loaded}. {qsar.disclaimer}
+          </div>
+        </>
+      ) : (
+        <div
+          className={`tab-note ${qsar.status === "error" ? "tab-note-error" : "tab-note-warn"}`}
+        >
+          <strong>
+            {qsar.status === "error"
+              ? "QSAR-модели не удалось загрузить."
+              : "QSAR-модель не обучена."}
+          </strong>{" "}
+          {(qsar.message ?? "").replace(/^QSAR-модель не обучена\.\s*/, "")}
+        </div>
+      )}
+
+      <div className="section-label">Структурная similarity-оценка (не QSAR)</div>
+
+      {data.activities.length === 0 ? (
+        <div className="tab-note">{data.message}</div>
+      ) : (
+        <div className="activity-list">
+          {data.activities.map((activity) => (
+            <div className="activity-row" key={activity.name}>
+              <div className="activity-head">
+                <strong>{activity.name}</strong>
+                <span className={`badge badge-${tone(activity.confidence)}`}>
+                  {activity.confidence}
+                </span>
+              </div>
+              <div className="activity-bar-line">
+                <ScoreBar
+                  value={activity.score}
+                  tone={tone(activity.confidence)}
+                />
+                <span className="activity-score">
+                  {activity.score.toFixed(2)}
+                </span>
+              </div>
+              <div className="activity-support">
+                по аналогии:{" "}
+                {activity.support
+                  .map((s) => `${s.drug} (${s.similarity.toFixed(2)})`)
+                  .join(", ")}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {data.nearest.length > 0 && (
+        <>
+          <div className="section-label">Ближайшие известные препараты</div>
+          <div className="neighbor-list">
+            {data.nearest.map((drug) => (
+              <div className="neighbor-row" key={drug.name}>
+                <div>
+                  <strong>{drug.name}</strong>
+                  <span>{drug.activities.slice(0, 3).join(" · ")}</span>
+                </div>
+                <code>{drug.similarity.toFixed(2)}</code>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      <div className="tab-note">
+        <strong>Как читать:</strong> число — максимальное сходство Tanimoto
+        (0–1) с препаратом, у которого эта активность известна. {data.disclaimer}{" "}
+        Библиотека: {data.reference_size} препаратов.
+      </div>
+    </div>
+  );
+}
