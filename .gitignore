@@ -12,6 +12,8 @@ backend/.venv/
 backend/.venv-build/
 backend/venv/
 backend/models/*.joblib
+backend/models/manifest.json
+backend/models/training_report.json
 backend/training/data/
 backend/.env
 **/__pycache__/

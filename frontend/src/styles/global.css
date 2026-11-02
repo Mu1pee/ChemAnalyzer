@@ -9,18 +9,18 @@
 }
 
 :root {
-  --bg: #07111f;
-  --bar: rgba(7, 17, 31, 0.88);
-  --panel: rgba(12, 25, 42, 0.8);
-  --inset: rgba(3, 9, 17, 0.55);
+  --bg: #111214;
+  --bar: #191b1e;
+  --panel: #202226;
+  --inset: #17191c;
   --raise: rgba(255, 255, 255, 0.03);
   --text: #e5edf7;
   --text-2: #b8c8d8;
   --muted: #8ea3b9;
   --muted-2: #647b92;
-  --accent: #5aa9f0;
-  --body-glow-1: rgba(48, 113, 205, 0.18);
-  --body-glow-2: rgba(18, 185, 170, 0.12);
+  --accent: #b6c85b;
+  --body-glow-1: transparent;
+  --body-glow-2: transparent;
 }
 
 :root[data-theme="light"] {
@@ -1442,10 +1442,34 @@ body {
 
 .desk {
   display: grid;
-  grid-template-columns: minmax(520px, 1.3fr) minmax(430px, 0.9fr);
+  grid-template-columns: 174px minmax(400px, 1.15fr) minmax(340px, 1fr);
   gap: 12px;
   min-height: 0;
-  padding: 12px;
+  padding: 0 12px 0 0;
+}
+
+.workspace-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 16px 8px;
+  background: var(--bar);
+  border-right: 1px solid #ffffff14;
+  overflow-y: auto;
+  min-width: 0;
+}
+.workspace-brand { padding: 4px 8px 22px; font-size: 14px; font-weight: 600; }
+.workspace-brand small { display: block; color: var(--muted); font-size: 11px; margin-top: 6px; }
+.workspace-sidebar button {
+  text-align: left; padding: 9px 10px; border: 0; border-radius: 4px;
+  background: transparent; color: var(--text-2); cursor: pointer; font-size: 12px;
+  min-height: 34px; overflow-wrap: anywhere;
+}
+.workspace-sidebar button:hover { background: var(--raise); }
+.workspace-sidebar button.selected { background: #b6c85b18; color: var(--accent); box-shadow: inset 2px 0 var(--accent); }
+@media (max-width: 1000px) {
+  .workspace-sidebar { flex-direction: row; flex-wrap: wrap; overflow: visible; }
+  .workspace-brand { width: 100%; padding-bottom: 4px; }
 }
 
 .desk-editor {

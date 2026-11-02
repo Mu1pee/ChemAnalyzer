@@ -19,7 +19,7 @@ MAX_RECORDS_PER_TARGET = 30000
 # Фрагмент нужен для защиты от опечатки в ID: перед загрузкой скрипт
 # сверяет реальное название мишени в ChEMBL и пропускает несовпадения.
 TARGETS: list[tuple[str, str, str]] = [
-    ("CHEMBL230", "COX-2", "cyclooxygenase-2"),
+    ("CHEMBL230", "COX-2", "prostaglandin g/h synthase 2"),
     ("CHEMBL221", "COX-1", "cyclooxygenase-1"),
     ("CHEMBL240", "hERG (кардиотоксичность)", "herg"),
     ("CHEMBL203", "EGFR", "epidermal growth factor"),

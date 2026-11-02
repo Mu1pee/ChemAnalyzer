@@ -5,7 +5,7 @@ import AboutDialog from "./components/AboutDialog";
 import EditorToolbar, { EXAMPLES } from "./components/EditorToolbar";
 import KetcherEditor from "./components/KetcherEditor";
 import MenuBar, { type MenuDef } from "./components/MenuBar";
-import ResultsPanel, { type Tab } from "./components/ResultsPanel";
+import ResultsPanel, { TABS, type Tab } from "./components/ResultsPanel";
 import StatusBar, { type ApiStatus } from "./components/StatusBar";
 import {
   analyzeMolecule,
@@ -578,6 +578,15 @@ function App() {
       <MenuBar menus={menus} />
 
       <main className="desk">
+        <nav className="workspace-sidebar" aria-label="Разделы анализа">
+          <div className="workspace-brand">ChemAnalyzer <small>{version}</small></div>
+          {TABS.map((item) => (
+            <button key={item.id} type="button" aria-current={tab === item.id ? "page" : undefined}
+              className={tab === item.id ? "selected" : ""} onClick={() => setTab(item.id)}>
+              {item.label}
+            </button>
+          ))}
+        </nav>
         <section className="desk-editor">
           <EditorToolbar
             ready={Boolean(ketcher)}

@@ -10,7 +10,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: { alias: { events: "events/" } },
   // Версия приложения берётся из package.json — не дублируется в коде.
-  define: { __APP_VERSION__: JSON.stringify(pkg.version) },
+  define: { __APP_VERSION__: JSON.stringify(pkg.version), global: "globalThis" },
   // Интерфейс раздаёт backend из корня (http://127.0.0.1:<порт>/), поэтому
   // пути к ресурсам Ketcher/Vite абсолютные от "/". Не используйте file://.
   base: "/",
@@ -19,6 +19,7 @@ export default defineConfig({
     strictPort: true // npm run dev (Electron) ожидает именно этот порт
   },
   build: {
+    commonjsOptions: { transformMixedEsModules: true },
     // Ketcher и 3Dmol — крупные пакеты, предупреждение о размере не актуально.
     chunkSizeWarningLimit: 6000
   }
