@@ -2,6 +2,12 @@ node_modules/
 dist/
 build/
 frontend/dist/
+frontend/public/ketcher-assets/
+.pytest_cache/
+*.tsbuildinfo
+**/.env
+**/.env.*
+!**/.env.example
 backend/.venv/
 backend/.venv-build/
 backend/venv/

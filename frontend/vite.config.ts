@@ -8,6 +8,7 @@ const pkg = JSON.parse(
 
 export default defineConfig({
   plugins: [react()],
+  resolve: { alias: { events: "events/" } },
   // Версия приложения берётся из package.json — не дублируется в коде.
   define: { __APP_VERSION__: JSON.stringify(pkg.version) },
   // Интерфейс раздаёт backend из корня (http://127.0.0.1:<порт>/), поэтому
