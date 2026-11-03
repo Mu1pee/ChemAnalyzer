@@ -16,7 +16,7 @@ Working branch: feature/windows-desktop-stabilization. Backup remains c0b4b5e on
 
 ## Limitations
 
-- Automatic execution of the frozen backend smoke-test command was rejected by the tool policy (blocked by policy). Frozen backend/installer runtime is not verified.
+- Subsequent frozen backend execution succeeded on this Windows machine: /health returned healthy, and ethanol, benzene and aspirin analysis requests completed. The initial health request preceded backend readiness. Installer and full Electron runtime still require verification.
 - No clean Windows machine test or installation acceptance test has been completed.
 - No signing certificate is configured.
 - Dependency audit findings and miew-react peer compatibility concerns remain documented in AUDIT_REPORT.md.
