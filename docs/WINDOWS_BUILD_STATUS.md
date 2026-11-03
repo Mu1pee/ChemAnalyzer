@@ -4,6 +4,8 @@ Working branch: feature/windows-desktop-stabilization. Backup remains c0b4b5e on
 
 ## Verified
 
+- Packaging completed successfully; verified on 2026-11-03. Setup EXE: 232822622 bytes, SHA256 EDAE3BEECD7AD4B6142E10A3C18580BAC3C169215A8DA5FD40A253B5A8EC9E0B. Portable EXE: 203435519 bytes, SHA256 F2D471676608D8033D83974A920B95D0F21DCF6C5A02AE80AC0E6DE7B2A990B7. Both exist in dist/ and were copied with matching hashes to the Codex outputs directory.
+
 - PyInstaller produced build/backend/chemanalyzer-backend/chemanalyzer-backend.exe with Python and RDKit dependencies.
 - Backend tests: 113 passed; Electron tests: 17 passed.
 - TypeScript/Vite production build passed.
