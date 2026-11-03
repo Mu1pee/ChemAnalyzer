@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "id": "apap_rescue",
+      "domain": "antidote",
+      "toxicant": "acetaminophen",
+      "endpoint": "rescue_from_acetaminophen_injury",
+      "status": "not_trained",
+      "required_context": ["species", "cell_or_tissue", "toxicant_concentration", "compound_concentration", "exposure_duration", "pretreatment_or_posttreatment", "readout", "control_definition"],
+      "exclude": ["docking_only", "gene_knockout", "toxicant_only", "unmeasured_negative", "mixtures_without_component_attribution"]
+    },
+    {
+      "id": "arabidopsis_primary_root",
+      "domain": "growth_regulating",
+      "species": "Arabidopsis thaliana",
+      "endpoint": "primary_root_length_relative_to_control",
+      "status": "not_trained",
+      "required_context": ["ecotype", "seedling_age", "compound_concentration", "exposure_duration", "medium", "light_cycle", "control_definition", "replicates"],
+      "preferred_target": "treated_root_length / matched_control_root_length",
+      "exclude": ["lateral_root_count_only", "other_species", "unmeasured_negative", "incompatible_dose_or_time"]
+    }
+  ]
+}

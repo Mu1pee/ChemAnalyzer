@@ -4,6 +4,8 @@ Working branch: feature/windows-desktop-stabilization. Backup remains c0b4b5e on
 
 ## Verified
 
+- Follow-up Electron smoke test: initial packaged frontend was blank because paper-full used dynamic Function compilation blocked by strict CSP. Replacing the paper import with paper-core fixed startup without relaxing CSP. The unpacked Windows app then displayed Ketcher, backend-ready status and ethanol results C2H6O / 46.069. Setup/Portable are being repackaged with this correction; earlier hashes identify the superseded build.
+
 - Packaging completed successfully; verified on 2026-11-03. Setup EXE: 232822622 bytes, SHA256 EDAE3BEECD7AD4B6142E10A3C18580BAC3C169215A8DA5FD40A253B5A8EC9E0B. Portable EXE: 203435519 bytes, SHA256 F2D471676608D8033D83974A920B95D0F21DCF6C5A02AE80AC0E6DE7B2A990B7. Both exist in dist/ and were copied with matching hashes to the Codex outputs directory.
 
 - PyInstaller produced build/backend/chemanalyzer-backend/chemanalyzer-backend.exe with Python and RDKit dependencies.

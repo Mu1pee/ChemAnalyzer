@@ -8,7 +8,12 @@ const pkg = JSON.parse(
 
 export default defineConfig({
   plugins: [react()],
-  resolve: { alias: { events: "events/" } },
+  resolve: {
+    alias: [
+      { find: "events", replacement: "events/" },
+      { find: /^paper$/, replacement: "paper/dist/paper-core.js" }
+    ]
+  },
   // Версия приложения берётся из package.json — не дублируется в коде.
   define: { __APP_VERSION__: JSON.stringify(pkg.version), global: "globalThis" },
   // Интерфейс раздаёт backend из корня (http://127.0.0.1:<порт>/), поэтому
