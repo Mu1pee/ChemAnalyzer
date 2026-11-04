@@ -272,3 +272,19 @@ def test_scheduler_reports_offline_without_training(tmp_path, task, monkeypatch)
     scheduler.tick(now=1)
     state = read_json(tmp_path / "schedules" / identifier / "state.json")
     assert "offline" in state["error"]
+
+
+def test_scheduler_new_approval_does_not_reuse_old_run(tmp_path, task, provenance, monkeypatch):
+    from app.ai_research_agent.scheduler import Schedule, Scheduler
+    agent = ResearchAgent(tmp_path)
+    identifier = agent.create(task)["id"]
+    manifest = agent.import_csv(identifier, "smiles,value\nCCO,2\n", provenance)
+    scheduler = Scheduler(agent)
+    scheduler.save(Schedule(task_id=identifier, enabled=True, approved_dataset_sha256=manifest["dataset_sha256"]))
+    write_json(tmp_path / "schedules" / identifier / "state.json",
+               dict(approved_dataset_sha256="0" * 64, run_id="old_completed", trained_sha256="0" * 64))
+    started = []
+    monkeypatch.setattr(agent, "start", lambda task_id: (started.append(task_id) or {"id": "new"}))
+    monkeypatch.setattr(agent, "run", lambda run_id: pytest.fail("Old dataset run must not be reused"))
+    scheduler.tick(now=1)
+    assert started == [identifier]

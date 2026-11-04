@@ -43,7 +43,8 @@ class Scheduler:
             state = read_json(state_path) if state_path.exists() else {}
             if not policy.enabled or state.get("next_check", 0) > now:
                 continue
-            result = dict(at=utcnow(), next_check=now + policy.interval_seconds)
+            result = dict(at=utcnow(), next_check=now + policy.interval_seconds,
+                          approved_dataset_sha256=policy.approved_dataset_sha256)
             try:
                 if policy.check_freesolv:
                     text, provenance, raw, license_data, evidence = fetch_freesolv()
@@ -53,9 +54,9 @@ class Scheduler:
                     digest = read_json(folder / "dataset.json")["dataset_sha256"]
                     if digest != policy.approved_dataset_sha256:
                         result["training"] = "Skipped: changed data require new explicit approval"
-                    elif state.get("run_id") and self.agent.run(state["run_id"])["status"] in ("queued", "running"):
+                    elif state.get("approved_dataset_sha256") == digest and state.get("run_id") and self.agent.run(state["run_id"])["status"] in ("queued", "running"):
                         result.update(run_id=state["run_id"], training="Previous scheduled run still active")
-                    elif state.get("run_id") and self.agent.run(state["run_id"])["status"] == "completed":
+                    elif state.get("approved_dataset_sha256") == digest and state.get("run_id") and self.agent.run(state["run_id"])["status"] == "completed":
                         result.update(trained_sha256=digest, training="Approved dataset completed")
                     elif state.get("trained_sha256") != digest:
                         run = self.agent.start(policy.task_id)
