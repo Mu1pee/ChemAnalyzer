@@ -3,8 +3,8 @@
 ## Verified behavior
 
 - Original backend suite before integration: 117 passed.
-- Final combined backend suite: 145 passed in 49.87 seconds.
-- New research suite: 28 passed. Technical synthetic fixtures are explicitly
+- Final combined backend suite: 146 passed in 50.37 seconds.
+- New research suite: 29 passed. Technical synthetic fixtures are explicitly
   labelled and never presented as scientific models.
 - Electron Node tests: 17 passed, including process supervision and URL security.
 - Frontend TypeScript project build passed; Vite production build passed.
@@ -29,6 +29,8 @@ review/approval gates, applicability, forbidden antidote training, cancellation,
 worker failure, RAM termination, restart recovery, path traversal, default-off
 API and foreign-origin rejection, changed-data schedule authorization, offline
 schedule reports, and not reusing old runs for newly approved datasets.
+The final integrity test also rejects locally modified CSV bytes under an old
+dataset checksum/approval before a worker can start.
 
 ## Reproduction
 

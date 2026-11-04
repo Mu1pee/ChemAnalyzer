@@ -288,3 +288,14 @@ def test_scheduler_new_approval_does_not_reuse_old_run(tmp_path, task, provenanc
     monkeypatch.setattr(agent, "run", lambda run_id: pytest.fail("Old dataset run must not be reused"))
     scheduler.tick(now=1)
     assert started == [identifier]
+
+
+def test_tampered_dataset_cannot_train_under_old_approval(tmp_path, task, provenance):
+    agent = ResearchAgent(tmp_path)
+    identifier = agent.create(task)["id"]
+    manifest = agent.import_csv(identifier, "smiles,value\nCCO,1\n", provenance)
+    path = tmp_path / "tasks" / identifier / manifest["version_id"] / "dataset.csv"
+    path.write_text("smiles,value\nCCO,2\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="checksum mismatch"):
+        agent.start(identifier)
+    assert agent.jobs == {}

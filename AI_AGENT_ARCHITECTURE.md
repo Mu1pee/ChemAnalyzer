@@ -26,6 +26,8 @@ development. `tasks/<id>/<version>/` contains CSV/provenance/evidence;
 result.json and report.md. FreeSolv source bytes and license remain in task data.
 `models/<id>/` holds agent-generated joblib and metadata. JSON replacement is atomic.
 Interrupted runs are marked on restart; start a new run explicitly to recover.
+Use one backend/CLI owner per storage root; cross-process storage locking is
+not implemented. Use --root for isolated CLI experiments alongside the app.
 Cancellation terminates the worker, preserves evidence, and prevents publication.
 The supervisor publishes a model only after successful process exit and quota checks.
 

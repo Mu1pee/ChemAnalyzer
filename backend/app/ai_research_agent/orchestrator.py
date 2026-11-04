@@ -129,6 +129,8 @@ class ResearchAgent:
             run.mkdir(parents=True)
             for name in ("dataset.csv", "provenance.json", "evidence.json"):
                 shutil.copyfile(source / name, run / name)
+            if checksum((run / "dataset.csv").read_bytes()) != manifest["dataset_sha256"]:
+                raise ValueError("Dataset checksum mismatch; reimport and review the source")
             write_json(run / "task.json", task.model_dump())
             write_json(run / "request.json", dict(task_id=identifier, action=action))
             update(run, "queued", status="queued", id=run_id, task_id=identifier)
