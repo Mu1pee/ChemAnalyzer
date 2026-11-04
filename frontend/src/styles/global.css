@@ -2500,3 +2500,12 @@ body {
     align-self: flex-start;
   }
 }
+.research-lab { display: grid; gap: 12px; min-width: 0; }
+.research-lab label { display: grid; gap: 6px; }
+.research-lab textarea, .research-lab select, .research-lab input:not([type=checkbox]) { width: 100%; max-width: 100%; box-sizing: border-box; padding: 8px; color: inherit; background: transparent; border: 1px solid #8888; border-radius: 6px; }
+.research-lab button { padding: 7px 10px; margin: 4px; cursor: pointer; }
+.research-lab button:disabled { opacity: .5; cursor: default; }
+.research-lab article { padding: 12px; border: 1px solid #8885; border-radius: 8px; overflow-wrap: anywhere; }
+.research-lab pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 450px; overflow: auto; font-size: 12px; }
+.research-actions { display: flex; flex-wrap: wrap; }
+.research-error { color: #e65b67; }

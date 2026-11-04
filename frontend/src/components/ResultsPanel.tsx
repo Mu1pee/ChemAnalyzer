@@ -19,6 +19,7 @@ import IdentificationTab from "./IdentificationTab";
 import PropertiesTab from "./PropertiesTab";
 import StructureTab from "./StructureTab";
 import AntidotePredictionTab from "./AntidotePredictionTab";
+import ResearchLabTab from "./ResearchLabTab";
 
 export type Tab =
   | "props"
@@ -30,6 +31,7 @@ export type Tab =
   | "chembl"
   | "3d"
   | "history"
+  | "research"
   | "assistant";
 
 export const TABS: { id: Tab; label: string }[] = [
@@ -42,6 +44,7 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "chembl", label: "ChEMBL" },
   { id: "3d", label: "3D" },
   { id: "history", label: "История" },
+  { id: "research", label: "AI Research Lab" },
   { id: "assistant", label: "Ассистент" }
 ];
 
@@ -94,6 +97,7 @@ export default function ResultsPanel({
     id?.found && id.match_type === "connectivity" ? id.title : null;
 
   function body() {
+    if (tab === "research") return <ResearchLabTab />;
     if (tab === "history") {
       return (
         <HistoryTab

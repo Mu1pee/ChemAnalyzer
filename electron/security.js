@@ -8,6 +8,8 @@ const path = require("node:path");
 const EXTERNAL_HOSTS = new Set([
   "pubchem.ncbi.nlm.nih.gov",
   "www.ebi.ac.uk",
+  "github.com",
+  "zenodo.org",
   "alphafold.ebi.ac.uk",
   "www.rcsb.org",
   "console.anthropic.com",

@@ -12,7 +12,9 @@ datas, binaries, hiddenimports = [], [], []
 
 # Пакеты с нативными библиотеками и данными собираем целиком.
 for package in ("rdkit", "sklearn", "scipy", "numpy", "joblib", "threadpoolctl"):
-    d, b, h = collect_all(package)
+    d, b, h = collect_all(package, filter_submodules=lambda name: not any(
+        part in ("tests", "test", "conftest") for part in name.split(".")
+    ))
     datas += d
     binaries += b
     hiddenimports += h
@@ -20,6 +22,8 @@ for package in ("rdkit", "sklearn", "scipy", "numpy", "joblib", "threadpoolctl")
 # uvicorn подгружает протоколы и циклы по имени строки.
 hiddenimports += collect_submodules("uvicorn")
 hiddenimports += collect_submodules("anyio")
+hiddenimports += collect_submodules("app.ai_research_agent")
+hiddenimports += collect_submodules("psutil")
 hiddenimports += ["dotenv", "anthropic", "httpx", "multipart"]
 
 a = Analysis(
