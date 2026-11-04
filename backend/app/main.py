@@ -1,4 +1,5 @@
 import os
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,11 +10,26 @@ from app import __version__, config
 from app.api.assistant import router as assistant_router
 from app.api.molecules import router as molecules_router
 from app.api.structure import router as structure_router
+from app.ai_research_agent.api import router as research_router, enabled as research_enabled, agent as research_agent, scheduler as research_scheduler
 
 DESKTOP = config.is_desktop()
 FRONTEND = config.frontend_dist()
 
+
+@asynccontextmanager
+async def lifespan(application):
+    if research_enabled():
+        research_scheduler().start()
+    try:
+        yield
+    finally:
+        if research_scheduler.cache_info().currsize:
+            research_scheduler().stop()
+        if research_agent.cache_info().currsize:
+            research_agent().shutdown()
+
 app = FastAPI(
+    lifespan=lifespan,
     title="ChemAnalyzer API",
     description=(
         "Анализ химических структур (RDKit), идентификация в PubChem, "
@@ -48,6 +64,7 @@ app.include_router(
 )
 app.include_router(assistant_router)
 app.include_router(structure_router)
+app.include_router(research_router)
 
 
 @app.get("/health")
