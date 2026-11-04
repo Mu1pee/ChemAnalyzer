@@ -23,7 +23,8 @@ import joblib
 import numpy as np
 import sklearn
 from rdkit import Chem
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     balanced_accuracy_score,
     matthews_corrcoef,
@@ -46,6 +47,20 @@ MODEL_MIN_SCAFFOLDS_PER_CLASS = 5
 MODEL_MIN_AUC_DEFAULT = 0.70
 MODEL_MIN_BALANCED_ACC = 0.60
 MODEL_MIN_MCC = 0.10
+
+ALGORITHMS = ("random_forest", "logistic_regression", "gradient_boosting")
+
+
+def create_model(algorithm: str, seed: int, final: bool = False):
+    if algorithm == "logistic_regression":
+        return LogisticRegression(class_weight="balanced", max_iter=2000, random_state=seed)
+    if algorithm == "gradient_boosting":
+        return GradientBoostingClassifier(n_estimators=100, max_depth=2, random_state=seed)
+    if algorithm != "random_forest":
+        raise ValueError(f"Unknown algorithm: {algorithm}")
+    return RandomForestClassifier(n_estimators=400 if final else 200,
+                                  class_weight="balanced_subsample", n_jobs=-1,
+                                  random_state=seed, min_samples_leaf=2)
 
 
 def parse_label(value: str) -> int:
@@ -132,7 +147,7 @@ def read_dataset(path: Path) -> tuple[dict, list[str]]:
     return {"report": report, "tasks": prepared}, []
 
 
-def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, seed: int) -> tuple[tuple[str, dict] | None, str | None, dict]:
+def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, seed: int, algorithm: str = "random_forest") -> tuple[tuple[str, dict] | None, str | None, dict]:
     rows = task["rows"]
     y = np.asarray([row["label"] for row in rows], dtype=np.int8)
     n_active = int(y.sum())
@@ -178,13 +193,7 @@ def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, se
             if len(np.unique(y[train_idx])) != 2:
                 cv_failures.append(f"fold {fold}: обучающая часть содержит один класс")
                 continue
-            model = RandomForestClassifier(
-                n_estimators=200,
-                class_weight="balanced_subsample",
-                n_jobs=-1,
-                random_state=seed + fold,
-                min_samples_leaf=2,
-            )
+            model = create_model(algorithm, seed + fold)
             model.fit(X[train_idx], y[train_idx])
             classes = list(model.classes_)
             if 1 not in classes:
@@ -223,13 +232,7 @@ def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, se
         report["reasons"] = reasons
         return None, "; ".join(reasons), report
 
-    final_model = RandomForestClassifier(
-        n_estimators=400,
-        class_weight="balanced_subsample",
-        n_jobs=-1,
-        random_state=seed,
-        min_samples_leaf=2,
-    )
+    final_model = create_model(algorithm, seed, final=True)
     final_model.fit(X, y)
     packed = core.pack_bits(X)
     source_values = sorted({source for row in rows for source in row["sources"]})
@@ -240,6 +243,7 @@ def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, se
         "endpoint": task["endpoint"],
         "context": task["context"],
         "model_version": "1.0",
+        "algorithm": algorithm,
         "trained_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "sklearn_version": sklearn.__version__,
         "n_train": int(len(y)),
@@ -268,6 +272,7 @@ def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, se
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--domain", choices=["all", *DOMAINS], default="all")
+    parser.add_argument("--algorithm", choices=ALGORITHMS, default="random_forest")
     parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
     parser.add_argument("--models-dir", type=Path, default=config.models_dir() / "specialized_activity")
     parser.add_argument("--min-per-class", type=int, default=MODEL_MIN_PER_CLASS)
@@ -298,7 +303,7 @@ def main() -> int:
         for task in loaded["tasks"]:
             try:
                 result, reason, task_report = fit_endpoint(
-                    domain, task, args.min_per_class, args.min_auc, args.seed
+                    domain, task, args.min_per_class, args.min_auc, args.seed, args.algorithm
                 )
             except Exception as error:
                 result, reason = None, f"ошибка обучения: {error}"

@@ -1,5 +1,11 @@
 # Endpoint-specific research models
 
+## Candidate algorithms (2026-11-04)
+
+The existing trainer now accepts --algorithm random_forest, logistic_regression or gradient_boosting. Each uses the same scaffold splits and quality gates. Use a separate --models-dir for each candidate: model filenames identify endpoint/context, so running different algorithms into one directory replaces that endpoint's model. Model metadata records the algorithm. Candidate evaluation is not a validated model release; selecting the best CV score requires subsequent independent validation.
+
+Additional source leads: https://pmc.ncbi.nlm.nih.gov/articles/PMC10793101/ screens TFEB agonists, not direct APAP rescue for every screened compound. https://academic.oup.com/jxb/article/59/10/2757/436620 reports 13 root-inhibiting hits, below the existing 30-positive gate. Rodriguez-Furlan et al. (2016), High throughput selection of novel plant growth regulators, is another lead requiring primary-root endpoint and data-license verification. None has been converted into training labels.
+
 Scope agreed 2026-11-03: acetaminophen injury rescue and Arabidopsis thaliana primary-root growth relative to a matched control. Both models remain not trained. Profiles in backend/training/specialized_data/research_profiles.json describe curation requirements; they are metadata, not an automatic data-quality validator.
 
 ## Data acceptance
