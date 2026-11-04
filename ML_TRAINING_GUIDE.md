@@ -1,5 +1,32 @@
 # Endpoint-specific research models
 
+## AI Research Agent first cycle (2026-11-04)
+
+The independent `app.ai_research_agent` pipeline is now available; see
+AI_AGENT_USER_GUIDE.md for commands. It does not overwrite this legacy trainer's
+artifacts. FreeSolv regression compares Random Forest, standardized Ridge and
+Gradient Boosting; binary tasks compare RF, standardized Logistic Regression and
+Gradient Boosting. Seeds are fixed, estimators/native pools use one thread.
+GridSearchCV has three scaffold folds on training only. Validation selects the
+algorithm; held-out test evaluates only the selected candidate and dummy baseline.
+
+Largest scaffold groups are allocated first against 64/16/20 molecule-count
+targets using seeded ties, without labels. All acyclic molecules share one group;
+exact proportions are therefore not guaranteed. Each partition needs >=10
+molecules; dataset needs >=60 molecules and >=10 groups. Classification additionally
+requires binary 0/1 labels, >=30 compounds per class, >=3 per class in holdouts
+and both classes in each CV fold. These are technical minimums, not scientific
+sufficiency. Regression requires varying labels. Fold scores and all parameters
+are recorded. R², MAE/RMSE or classification ROC/PR-AUC, F1, precision/recall and
+balanced accuracy are saved with dependency versions and split indices.
+
+Source/prepared CSV, features, exclusions, transformations, model checksum and
+training-support applicability domain are preserved. Test scores must not be
+used to tune repeated releases. Passing baseline does not auto-validate or approve.
+Independent external/prospective assessment remains required. The current domain
+rule (Tanimoto >=0.35 plus descriptor ranges) is heuristic and uncalibrated.
+No universal antidote training is allowed in the new agent.
+
 ## Candidate algorithms (2026-11-04)
 
 The existing trainer now accepts --algorithm random_forest, logistic_regression or gradient_boosting. Each uses the same scaffold splits and quality gates. Use a separate --models-dir for each candidate: model filenames identify endpoint/context, so running different algorithms into one directory replaces that endpoint's model. Model metadata records the algorithm. Candidate evaluation is not a validated model release; selecting the best CV score requires subsequent independent validation.

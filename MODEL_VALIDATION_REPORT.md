@@ -18,3 +18,36 @@ Reproduce from backend using its Python environment:
 ```
 
 Before broader scientific use: preserve assay identifiers and source version, stratify compatible endpoints/species, audit contradictory measurements, and evaluate a locked external test set.
+
+# AI Research Agent: FreeSolv experiment, 2026-11-04
+
+Status: **experimental**, no external scientific validation and no activation.
+This section supplements the existing COX-2 report above.
+
+Dataset: 642 experimental FreeSolv hydration free energies; no calculated GAFF
+labels. Normalized CSV SHA256:
+`a489cf3153d616abb7072e07ad4470b9ac4e96f3ff944d192ae23504a7ec3575`.
+Pinned source commit: `6c7d19b4b565537365ffd22006aa2cd4643200c6`.
+Seed 42; train 399, validation 91, test 152. Scaffold groups never overlap;
+acyclic molecules share a single group. Three-fold training-only CV and a small
+parameter grid per algorithm; validation selects Gradient Boosting, max_depth=3,
+80 estimators. Final exact parameters are recorded in local metadata.
+
+| Held-out measure | Selected model | Dummy mean baseline |
+|---|---:|---:|
+| MAE, kcal/mol | 1.3207 | 2.9055 |
+| RMSE, kcal/mol | 1.7042 | 3.4012 |
+| R² | 0.6929 | -0.2233 |
+
+The initial development split used group counts and produced 122/13/507;
+it was replaced with size-balanced scaffold allocation before the reported
+experiment. Both development artifacts are retained locally as experimental.
+The split algorithm changed for size balance, not based on prediction scores.
+These development metrics are not an untouched prospective benchmark claim.
+Source-specific conditions/uncertainties are heterogeneous; validation is small.
+No confidence interval, prospective experiment or external test has been run.
+No new plant, antidote or ADMET model has been trained in this increment.
+
+Dependencies used: Python 3.12.14, RDKit 2026.9.1, sklearn 1.9.1, numpy 2.5.4,
+scipy 1.18.1, joblib 1.6.0. Registry status remains experimental unless a user
+records a documented review and separately confirms activation.
