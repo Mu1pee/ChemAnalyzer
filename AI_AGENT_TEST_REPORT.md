@@ -1,5 +1,16 @@
 # AI Research Agent — test report, 2026-11-04
 
+## Final frozen verification, 2026-11-05
+
+Rebuilt source revision `2fe128aa680ddae4a704c7a837f265963a2a12b1` passed
+`validate_research_exe.py` against the retained real FreeSolv dataset in a fresh
+`build/research-smoke-final` storage. Health, aspirin analysis, spawned training,
+registry loading/prediction and cancellation all passed. MAE 1.3207097634,
+RMSE 1.7042176528 and R² 0.6928807889 match the Python pipeline exactly.
+The final SHA256 input-integrity fix is included in this executable.
+Model status is experimental; no activation or release was performed.
+Machine-readable evidence: ignored `build/research-smoke-final/smoke_result.json`.
+
 ## Verified behavior
 
 - Original backend suite before integration: 117 passed.
