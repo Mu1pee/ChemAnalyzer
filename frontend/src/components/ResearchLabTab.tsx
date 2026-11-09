@@ -12,7 +12,12 @@ async function request(path: string, body?: unknown): Promise<any> {
   return data;
 }
 
-export default function ResearchLabTab() {
+const QSAR_TASK = {
+  name: "QSAR: экспериментальная активность по одной мишени",
+  domain: "qsar", kind: "classification", endpoint: "", units: "0/1", context: ""
+};
+
+export default function ResearchLabTab({ initialPreset = "default" }: { initialPreset?: "default" | "qsar" }) {
   const [status, setStatus] = useState<Json | null>(null);
   const [config, setConfig] = useState("");
   const [tasks, setTasks] = useState<Json[]>([]);
@@ -40,11 +45,11 @@ export default function ResearchLabTab() {
     let mounted = true;
     request("/status").then(async s => {
       if (!mounted) return;
-      setStatus(s); setConfig(JSON.stringify(s.default_task, null, 2));
+      setStatus(s); setConfig(JSON.stringify(initialPreset === "qsar" ? QSAR_TASK : s.default_task, null, 2));
       if (s.enabled) await refresh();
     }).catch(e => mounted && setError(String(e.message)));
     return () => { mounted = false; };
-  }, []);
+  }, [initialPreset]);
   useEffect(() => {
     if (!status?.enabled) return;
     const timer = window.setInterval(() => refresh().catch(e => setError(String(e.message))), 2000);
@@ -66,7 +71,13 @@ export default function ResearchLabTab() {
     {message && <p role="status">{message}</p>}
     {!status ? <p>Подключение к исследовательскому движку…</p> : !status.enabled ?
       <p>Режим выключен. Для включения установите CHEMANALYZER_RESEARCH_ENABLED=1 в окружении backend и перезапустите приложение. Датасеты автоматически не загружаются.</p> : <>
-      <details><summary>Создать исследовательскую задачу</summary>
+      <details open={initialPreset === "qsar" ? true : undefined}><summary>Создать исследовательскую задачу</summary>
+        <div className="research-actions">
+          <button disabled={busy} onClick={() => setConfig(JSON.stringify(QSAR_TASK, null, 2))}>QSAR: обучение активности</button>
+          <button disabled={busy} onClick={() => setConfig(JSON.stringify(status.default_task, null, 2))}>FreeSolv: гидратация</button>
+        </div>
+        <p>Для QSAR заполните endpoint и context: мишень, организм, assay, тип измерения и заранее обоснованное правило меток 0/1. Импортируйте экспериментальный CSV с provenance. Для непрерывных измерений задайте kind: regression и соответствующие units.</p>
+        <p>Для классификации требуется минимум 30 уникальных молекул каждого класса и достаточное число scaffold-групп. Обученная в лаборатории модель проходит отдельную проверку и утверждение; её создание не снимает сообщение об отсутствии рабочих QSAR-моделей.</p>
         <p>Укажите один endpoint, единицы и сопоставимые условия. Режимы автоматизации описаны в руководстве.</p>
         <textarea aria-label="Конфигурация задачи JSON" rows={10} value={config} onChange={e => setConfig(e.target.value)} />
         <button disabled={busy} onClick={() => act(async () => {

@@ -78,6 +78,7 @@ export default function ResultsPanel({
   onClearHistory
 }: Props) {
   const [copied, setCopied] = useState(false);
+  const [researchPreset, setResearchPreset] = useState<"default" | "qsar">("default");
 
   async function copySmiles(value: string) {
     try {
@@ -97,7 +98,7 @@ export default function ResultsPanel({
     id?.found && id.match_type === "connectivity" ? id.title : null;
 
   function body() {
-    if (tab === "research") return <ResearchLabTab />;
+    if (tab === "research") return <ResearchLabTab initialPreset={researchPreset} />;
     if (tab === "history") {
       return (
         <HistoryTab
@@ -154,7 +155,10 @@ export default function ResultsPanel({
       case "drug":
         return <DruglikenessTab result={result} state={activity} />;
       case "activity":
-        return <ActivityTab state={activity} />;
+        return <ActivityTab state={activity} onTrainQsar={() => {
+          setResearchPreset("qsar");
+          onTab("research");
+        }} />;
       case "antidote":
         return <AntidotePredictionTab smiles={result.canonical_smiles} />;
       case "chembl":

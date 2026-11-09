@@ -3,6 +3,7 @@ import ScoreBar from "./ScoreBar";
 
 interface Props {
   state: AsyncState<ActivityResponse>;
+  onTrainQsar?: () => void;
 }
 
 function tone(confidence: string): "high" | "medium" | "low" {
@@ -17,7 +18,7 @@ function domainTone(domain: string): "high" | "medium" | "low" {
   return "low";
 }
 
-export default function ActivityTab({ state }: Props) {
+export default function ActivityTab({ state, onTrainQsar }: Props) {
   if (state.loading) {
     return (
       <div className="tab-state">
@@ -86,6 +87,11 @@ export default function ActivityTab({ state }: Props) {
               : "QSAR-модель не обучена."}
           </strong>{" "}
           {(qsar.message ?? "").replace(/^QSAR-модель не обучена\.\s*/, "")}
+          {qsar.status === "not_trained" && onTrainQsar && (
+            <p><button type="button" className="ghost-button" onClick={onTrainQsar}>
+              Обучить QSAR-модель в AI Research Lab
+            </button></p>
+          )}
         </div>
       )}
 
