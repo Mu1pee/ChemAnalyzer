@@ -66,6 +66,7 @@ class AgentDesk(tk.Tk):
         self.navigate(0)
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.after(100, self.pump)
+        self.after(300, self.discover_chemistry)
 
     def setup_theme(self):
         self.option_add("*Text.background", "#181e26")
@@ -147,7 +148,10 @@ class AgentDesk(tk.Tk):
         row = ttk.Frame(frame)
         row.pack(fill="x")
         ttk.Button(row, text="▶  Запустить движок", style="Accent.TButton", command=self.start_chemistry).pack(side="left")
+        ttk.Button(row, text="Найти ChemAnalyzer", command=self.discover_chemistry).pack(side="left", padx=6)
         ttk.Button(row, text="Обновить список", command=self.refresh).pack(side="left", padx=6)
+        self.connection_status = tk.StringVar(value="Поиск работающего ChemAnalyzer…")
+        ttk.Label(frame, textvariable=self.connection_status, style="Muted.TLabel", wraplength=800).pack(anchor="w", pady=(9, 0))
         self.task = tk.StringVar()
         ttk.Label(frame, text="01  /  ДАННЫЕ И ОБУЧЕНИЕ", style="Muted.TLabel").pack(anchor="w", pady=(22, 10))
         ttk.Label(frame, text="Исследовательская задача").pack(anchor="w", pady=(0, 6))
@@ -187,11 +191,36 @@ class AgentDesk(tk.Tk):
         return text
 
     def start_chemistry(self):
-        if self.agent.process:
+        self.status.set("Подключение к ChemAnalyzer…")
+        def connected(_):
+            if self.agent.process:
+                message = f"Исследовательский движок запущен · {self.agent.base}"
+                if self.agent.connections:
+                    message += f" · ChemAnalyzer найден: {self.agent.connections[0]['base']}"
+            else:
+                message = f"Подключено к работающему ChemAnalyzer · {self.agent.base}"
+            self.connection_status.set(message)
+            self.status.set("ChemAnalyzer готов")
             self.refresh()
-            return
-        self.status.set("Запуск научного движка…")
-        self.work(self.agent.start, lambda _: (self.status.set("ChemAnalyzer готов"), self.refresh()), chemistry=True)
+        self.work(self.agent.start, connected, chemistry=True)
+
+    def discover_chemistry(self):
+        def display(connections):
+            if connections:
+                descriptions = []
+                for connection in connections:
+                    capability = "Research Lab включён" if connection["research_enabled"] else "Research Lab недоступен в этом экземпляре"
+                    descriptions.append(f"ChemAnalyzer {connection['version']} · {connection['base']} · {capability}")
+                self.connection_status.set("\n".join(descriptions))
+                if not self.agent.base:
+                    research = next((connection for connection in connections if connection["research_enabled"]), None)
+                    if research:
+                        self.agent.base = research["base"]
+                if self.agent.base:
+                    self.refresh()
+            else:
+                self.connection_status.set("Работающий ChemAnalyzer не найден. Нажмите «Запустить движок».")
+        self.work(self.agent.discover, display, chemistry=True)
 
     def refresh(self):
         def load():
