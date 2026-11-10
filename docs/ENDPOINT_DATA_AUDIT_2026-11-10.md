@@ -2,29 +2,32 @@
 
 This is a bounded audit of specific sources, not a claim that no suitable data
 exist anywhere. No labels or measurements from the sources below have yet been
-integrated into training. Inspection of supplementary tables remains necessary.
+integrated into training. One root-growth supplement has now been downloaded
+and its actual rows inspected.
 
 ## Arabidopsis primary-root growth relative to control
 
 Primary source: Chuprov–Netochin et al., BMC Plant Biology 16, 192 (2016),
 https://link.springer.com/article/10.1186/s12870-016-0875-4
 
-The publisher identifies a 1,040-compound pollen screen, Table S3 listing 65
-compounds evaluated in pollen/root assays, and Table S4 reporting root length
-relative to control for 22 selected compounds. The 1,040-compound library cannot
-be treated as 1,040 quantitative root measurements. The reported 22-compound
-quantitative subset alone is below the current 60-compound training floor and
-is selected for hits. Unmeasured compounds must not be labelled inactive.
+The publisher identifies a 1,040-compound pollen screen and 22 quantitative root
+hits. Its attachment description mentions 65 compounds, but direct extraction
+of MOESM3 found **23 table rows: one header and 22 compound IDs**. Columns contain
+ID, chemical family, root length with uncertainty, and growth/control percentage.
+The family names do not uniquely identify molecular structures. The 22 rows
+are below the 60-compound training floor and are selected hits. Unmeasured
+library compounds must not be labelled inactive.
 
 The article is CC BY 4.0; its data are covered by a CC0 waiver unless stated
 otherwise. Per-file exceptions and compound-library rights still require review.
-Table S3 is the next concrete candidate to inspect, rather than assuming all 65
-rows supply numerical primary-root values and resolvable molecular structures:
+Downloaded supplement:
 
 https://static-content.springer.com/esm/art%3A10.1186%2Fs12870-016-0875-4/MediaObjects/12870_2016_875_MOESM3_ESM.docx
 
-The web reader identified this attachment but could not decode its binary format.
-No structural identities or root labels have been inferred from that failure.
+The retained original DOCX and extraction JSON are in the research data archive
+under `root-source-2016`, including the download checksum. Molecular identity
+mapping from the structural supplement and additional compatible measurements
+are still needed. No model was trained from these insufficient rows.
 
 ## Rescue from acetaminophen injury
 
