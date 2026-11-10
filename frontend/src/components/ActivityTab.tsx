@@ -44,7 +44,7 @@ export default function ActivityTab({ state, onTrainQsar }: Props) {
         <>
           <div className="activity-list">
             {qsar.predictions.map((p) => (
-              <div className="activity-row" key={p.target_id}>
+              <div className="activity-row" key={p.model_id ?? p.target_id}>
                 <div className="activity-head">
                   <strong>{p.target_name}</strong>
                   <span className={`badge badge-${domainTone(p.domain)}`}>

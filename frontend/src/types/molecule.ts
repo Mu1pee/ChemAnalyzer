@@ -158,6 +158,7 @@ export interface AsyncState<T> {
 // ---------- QSAR и ассистент ----------
 
 export interface QsarPrediction {
+  model_id: string | null;
   model_version: string | null;
   target_id: string;
   target_name: string;

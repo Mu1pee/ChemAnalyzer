@@ -5,6 +5,8 @@
 """
 
 import json
+import hashlib
+import os
 from functools import lru_cache
 from pathlib import Path
 
@@ -32,19 +34,36 @@ DISCLAIMER = (
 
 @lru_cache(maxsize=1)
 def _load_models() -> tuple[list[dict], str | None]:
-    manifest = MODELS_DIR / "manifest.json"
-    if not manifest.exists():
+    sources = [MODELS_DIR]
+    bundled = os.environ.get("CHEMANALYZER_BUNDLED_QSAR_DIR", "").strip()
+    if bundled and Path(bundled).resolve() != MODELS_DIR.resolve():
+        sources.append(Path(bundled))
+    manifests = [(root, root / "manifest.json") for root in sources if (root / "manifest.json").is_file()]
+    if not manifests:
         return [], None
 
     try:
         import joblib  # импорт здесь: без моделей зависимость не нужна
 
-        entries = json.loads(manifest.read_text(encoding="utf-8"))["models"]
         bundles = []
-        for entry in entries:
-            path = MODELS_DIR / f"{entry['target_id']}.joblib"
-            if path.exists():
-                bundles.append(joblib.load(path))
+        seen = set()
+        for root, manifest in manifests:
+            for entry in json.loads(manifest.read_text(encoding="utf-8"))["models"]:
+                name = entry.get("model_file", f"{entry['target_id']}.joblib")
+                path = root / name
+                if Path(name).name != name or path.suffix != ".joblib" or path.resolve().parent != root.resolve():
+                    raise ValueError("Invalid model artifact path")
+                if not path.is_file():
+                    continue
+                expected_hash = entry.get("artifact_sha256")
+                if expected_hash and hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash:
+                    raise ValueError("Model checksum mismatch")
+                bundle = joblib.load(path)
+                meta = bundle["meta"]
+                key = meta.get("model_id", f"{meta['target_id']}:{meta.get('assay_id', 'legacy')}")
+                if key not in seen:
+                    bundles.append(bundle)
+                    seen.add(key)
     except Exception as error:
         return [], f"Не удалось загрузить модели: {error}"
 
@@ -103,6 +122,7 @@ def predict_qsar(smiles: str) -> dict:
         predictions.append(
             {
                 "model_version": _version(meta),
+                "model_id": meta.get("model_id", meta["target_id"]),
                 "target_id": meta["target_id"],
                 "target_name": meta["label"],
                 "chembl_name": meta.get("chembl_name"),

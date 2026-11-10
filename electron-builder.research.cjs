@@ -15,8 +15,11 @@ module.exports = {
     { from: "frontend/dist", to: "frontend" },
     { from: path.resolve(seed), to: "research-seed" },
     { from: "LICENSE_NOTICES.md", to: "LICENSE_NOTICES.md" },
+    ...(process.env.CHEMANALYZER_QSAR_RELEASE_DIR ? [
+      { from: path.resolve(process.env.CHEMANALYZER_QSAR_RELEASE_DIR), to: "qsar-models" }
+    ] : []),
   ],
   compression: "store",
   win: { ...original.win, target: [{ target: "portable", arch: ["x64"] }] },
-  portable: { ...original.portable, useZip: true, artifactName: "ChemAnalyzer-Bioactivity-3.2.0-Portable.exe" },
+  portable: { ...original.portable, useZip: true, artifactName: "ChemAnalyzer-${version}-QSAR-Portable.exe" },
 };

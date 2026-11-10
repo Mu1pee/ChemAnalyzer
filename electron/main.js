@@ -98,6 +98,7 @@ async function startBackend() {
       CHEMANALYZER_DATA_DIR: dataDir(),
       CHEMANALYZER_FRONTEND_DIST: DEV_URL ? "" : launch.frontendDist,
       CHEMANALYZER_RESEARCH_ENABLED: process.env.CHEMANALYZER_RESEARCH_ENABLED ?? (RESEARCH_BUNDLE ? "1" : "0"),
+      CHEMANALYZER_BUNDLED_QSAR_DIR: app.isPackaged ? path.join(process.resourcesPath, "qsar-models") : "",
       PYTHONUNBUFFERED: "1",
       PYTHONIOENCODING: "utf-8",
     },

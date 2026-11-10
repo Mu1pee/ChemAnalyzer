@@ -1,7 +1,7 @@
 {
   "name": "chemanalyzer",
   "productName": "ChemAnalyzer",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "ChemAnalyzer — рисование, анализ и идентификация химических структур",
   "author": "ChemAnalyzer",
   "license": "UNLICENSED",

@@ -95,6 +95,7 @@ class Druglikeness(BaseModel):
 
 
 class QsarPrediction(BaseModel):
+    model_id: str | None = None
     model_version: str | None = None
     target_id: str
     target_name: str
