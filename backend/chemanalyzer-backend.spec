@@ -7,8 +7,17 @@
 # Режим onedir (папка, а не один файл): быстрее стартует и реже вызывает
 # ложные срабатывания антивируса, чем onefile.
 from PyInstaller.utils.hooks import collect_all, collect_submodules
+from pathlib import Path
+import ssl
 
 datas, binaries, hiddenimports = [], [], []
+
+# This Python distribution augments SSLContext with a public CA rejection list.
+# Frozen ssl.__file__ lives in _internal; preserve its adjacent runtime resource.
+# Normal Python distributions have no such file. Never disable verification.
+runtime_ca = Path(ssl.__file__).with_name("codex-rejected-cas.pem")
+if runtime_ca.is_file():
+    datas.append((str(runtime_ca), "."))
 
 # Пакеты с нативными библиотеками и данными собираем целиком.
 for package in ("rdkit", "sklearn", "scipy", "numpy", "joblib", "threadpoolctl"):

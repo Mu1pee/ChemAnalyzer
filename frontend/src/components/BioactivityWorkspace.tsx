@@ -7,7 +7,8 @@ import type { Tab } from "./ResultsPanel";
 import type { ActivityResponse, AsyncState } from "../types/molecule";
 import iconUrl from "../../../assets/icon.png";
 
-type AgentModel = { id: string; task: { endpoint: string; name: string }; status: string };
+type AgentModel = { id: string; task: { endpoint: string; name: string }; status: string;
+  quality?: { passed: boolean; metric: string; value: number | null; reasons: string[] } };
 type AgentSummary = { enabled: boolean; models: AgentModel[]; error: string };
 const groupIcons = { pharmacology: Activity, admet: FlaskConical, science: BookOpen, sources: Database };
 const statusNames = { calculation: "Доступен расчёт", qsar: "Локальные модели", dataset: "Нужны данные", key: "API-ассистент", source: "Внешний источник" };
@@ -70,7 +71,7 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
       && (!onlyReady || ["calculation", "source"].includes(item.status) || (item.status === "qsar" && activity.data?.qsar.status === "ready"));
   }), [query, category, onlyReady, activity.data]);
   const localCount = activity.data?.qsar.models_loaded;
-  const liveModels = agent.models.filter(model => model.status === "approved");
+  const liveModels = agent.models.filter(model => model.status === "approved" && model.quality?.passed);
   const matchingModels = (item: BioModule) => item.preset ? agent.models.filter(model => model.task?.endpoint === item.preset?.endpoint) : [];
 
   function open(item: BioModule) {
@@ -99,6 +100,12 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
       <span className={`bio-agent-state ${agent.enabled ? "online" : ""}`}><i />{loading ? "Проверка агента" : agent.error ? "Нет связи с агентом" : agent.enabled ? "Агент подключён" : "Агент выключен"}</span>
     </div>
     {agent.error && <div className="bio-message" role="alert">{agent.error}</div>}
+    <div className="bio-message">
+      Допуск прогнозных моделей: сбалансированная точность &gt; 60% на отложенных структурах;
+      для регрессии — R² &gt; 0,60 и ошибка ниже базовой модели.
+      R², вероятность активности и сходство структуры — разные показатели.
+      Наличие раздела в каталоге не означает, что его модель обучена.
+    </div>
     {!hasMolecule && <div className="bio-context"><Atom size={16} /><span>Структура не выбрана</span><button type="button" onClick={() => onTab("props")}>Открыть редактор <ArrowRight size={14} /></button></div>}
     <div className="bio-filterbar">
       <label className="bio-search"><Search size={16} /><input aria-label="Поиск модулей биоактивности" placeholder="Найти модуль, мишень или метод…" value={query} onChange={e => setQuery(e.target.value)} /></label>

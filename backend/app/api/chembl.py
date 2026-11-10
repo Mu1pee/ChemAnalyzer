@@ -5,16 +5,18 @@ https://www.ebi.ac.uk/chembl/api/data
 """
 
 import asyncio
+import math
 from urllib.parse import quote
 
 import httpx
+from .chembl_transport import ChemblClient, cache_key, read_cache, write_cache, timestamp, FRESH_SECONDS
 
 CHEMBL_BASE = "https://www.ebi.ac.uk/chembl/api/data"
 CHEMBL_COMPOUND_URL = "https://www.ebi.ac.uk/chembl/compound_report_card"
-TIMEOUT = httpx.Timeout(25.0, connect=8.0)
+TIMEOUT = httpx.Timeout(12.0, connect=5.0)
 HEADERS = {
     "Accept": "application/json",
-    "User-Agent": "ChemAnalyzerModern/2.1 (+local app)",
+    "User-Agent": "ChemAnalyzerModern/3.2 (+local app)",
 }
 
 SIMILARITY_CUTOFF = 70
@@ -26,22 +28,16 @@ ACTIVITY_TYPES = "IC50,Ki,Kd,EC50,Potency"
 
 def _to_float(value) -> float | None:
     try:
-        return float(value)
+        number = float(value)
+        return number if math.isfinite(number) else None
     except (TypeError, ValueError):
         return None
 
 
 async def _get_json(
-    client: httpx.AsyncClient, path: str, params: dict | None = None
+    client: ChemblClient, path: str, params: dict | None = None
 ) -> dict | None:
-    try:
-        response = await client.get(f"{CHEMBL_BASE}/{path}", params=params)
-        if response.status_code == 200:
-            data = response.json()
-            return data if isinstance(data, dict) else None
-    except (httpx.HTTPError, ValueError, TypeError):
-        pass
-    return None
+    return await client.fetch(path, params)
 
 
 # ---------- чистые функции обработки ответов (без сети) ----------
@@ -169,7 +165,7 @@ def parse_similar(payload: dict | None, exclude_id: str | None) -> list[dict]:
 
 
 async def _fetch_mechanisms(
-    client: httpx.AsyncClient, ids: list[str]
+    client: ChemblClient, ids: list[str]
 ) -> list[dict]:
     if not ids:
         return []
@@ -180,7 +176,7 @@ async def _fetch_mechanisms(
         {"molecule_chembl_id__in": joined, "limit": 50},
     )
     mechanisms = parse_mechanisms(payload)
-    if not mechanisms:
+    if payload is not None and not mechanisms:
         # Механизмы индексируются по родительской молекуле (соли/пролекарства).
         payload = await _get_json(
             client,
@@ -192,7 +188,7 @@ async def _fetch_mechanisms(
 
 
 async def _fetch_target_names(
-    client: httpx.AsyncClient, ids: list[str]
+    client: ChemblClient, ids: list[str]
 ) -> dict[str, str]:
     ids = [i for i in dict.fromkeys(ids) if i]
     if not ids:
@@ -206,6 +202,12 @@ async def _fetch_target_names(
 
 
 async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
+    key = cache_key(smiles, inchikey)
+    cached = read_cache(key)
+    if cached and cached[1] < (300 if cached[0]["partial"] else FRESH_SECONDS):
+        result = cached[0]
+        result["cached"] = True
+        return result
     profile: dict = {
         "available": False,
         "found": False,
@@ -219,13 +221,20 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
         "similar": [],
         "message": None,
         "source": "ChEMBL",
+        "cached": False,
+        "stale": False,
+        "partial": False,
+        "retrieved_at": None,
+        "warnings": [],
     }
 
-    async with httpx.AsyncClient(timeout=TIMEOUT, headers=HEADERS) as client:
+    async with ChemblClient(timeout=TIMEOUT, headers=HEADERS) as client:
         # 1. Точное совпадение по InChIKey.
         molecule = None
-        if inchikey:
-            payload = await _get_json(
+        async def exact():
+            if not inchikey:
+                return None
+            return await _get_json(
                 client,
                 "molecule.json",
                 {
@@ -233,17 +242,14 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
                     "limit": 1,
                 },
             )
-            profile["available"] = payload is not None
-            molecule = parse_molecule(payload)
-
-        own_id = molecule["chembl_id"] if molecule else None
-
-        # 2. Похожие соединения (работает и без точного совпадения).
-        similar_payload = await _get_json(
-            client,
-            f"similarity/{quote(smiles, safe='')}/{SIMILARITY_CUTOFF}.json",
-            {"limit": SIMILAR_LIMIT + 2},
+        payload, similar_payload = await asyncio.gather(
+            exact(),
+            _get_json(client, f"similarity/{quote(smiles, safe='')}/{SIMILARITY_CUTOFF}.json",
+                      {"limit": SIMILAR_LIMIT + 2}),
         )
+        profile["available"] = payload is not None
+        molecule = parse_molecule(payload)
+        own_id = molecule["chembl_id"] if molecule else None
         if similar_payload is not None:
             profile["available"] = True
         similar = parse_similar(similar_payload, own_id)
@@ -291,6 +297,7 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
             client,
             [m["target_id"] for m in own_mechanisms + similar_mechanisms],
         )
+        profile["warnings"] = list(client.failures)
 
     for mechanism in own_mechanisms + similar_mechanisms:
         mechanism["target_name"] = names.get(mechanism["target_id"])
@@ -305,11 +312,20 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
     for item in similar:
         item["mechanisms"] = by_molecule.get(item["chembl_id"], [])[:3]
     profile["similar"] = similar
+    profile["partial"] = bool(profile["warnings"])
 
     if not profile["available"]:
+        if cached:
+            result = cached[0]
+            result.update(cached=True, stale=True,
+                          message="ChEMBL сейчас не отвечает. Показана сохранённая копия; проверьте дату получения.",
+                          warnings=profile["warnings"])
+            return result
         profile["message"] = (
-            "ChEMBL временно недоступен. Проверьте подключение к интернету."
+            "Не удалось получить ответ ChEMBL: " + "; ".join(profile["warnings"]) + ". Повторите запрос позже."
         )
+    elif profile["partial"]:
+        profile["message"] = "ChEMBL ответил частично. Некоторые разделы не загрузились: " + "; ".join(profile["warnings"])
     elif not profile["found"] and not similar:
         profile["message"] = (
             "Соединение и близкие аналоги в ChEMBL не найдены."
@@ -319,4 +335,7 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
             "Точного совпадения в ChEMBL нет — показаны близкие аналоги."
         )
 
+    if profile["available"]:
+        profile["retrieved_at"] = timestamp()
+        write_cache(key, profile)
     return profile

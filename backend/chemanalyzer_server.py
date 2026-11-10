@@ -13,10 +13,31 @@ import sys
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="ChemAnalyzer backend")
-    parser.add_argument("--port", type=int, required=True)
+    parser.add_argument("--port", type=int)
+    parser.add_argument("--check-network", action="store_true", help="Check bundled TLS certificates and the public ChEMBL status endpoint")
     args = parser.parse_args()
 
-    if not (1024 <= args.port <= 65535):
+    if args.check_network:
+        import json
+        import traceback
+        from pathlib import Path
+        import certifi
+        import httpx
+        result = {"frozen": bool(getattr(sys, "frozen", False)),
+                  "ca_file_exists": Path(certifi.where()).is_file(),
+                  "certificate_env": {key: bool(os.environ.get(key)) for key in ("SSL_CERT_FILE", "SSL_CERT_DIR")}}
+        try:
+            with httpx.Client(timeout=20) as client:
+                response = client.get("https://www.ebi.ac.uk/chembl/api/data/status.json")
+                response.raise_for_status()
+                result.update(ok=True, chembl_version=response.json().get("chembl_db_version"))
+        except Exception as error:
+            result.update(ok=False, error=type(error).__name__)
+            traceback.print_exc()
+        print(json.dumps(result))
+        return 0 if result["ok"] else 1
+
+    if args.port is None or not (1024 <= args.port <= 65535):
         print("Некорректный порт", file=sys.stderr)
         return 2
 

@@ -145,6 +145,11 @@ def test_registry_integrity_and_explicit_approval(tmp_path, trained_fixture):
     with pytest.raises(ValueError, match="confirmation"):
         registry.approve(identifier, approval.model_copy(update={"confirm_activation": False}))
     assert registry.approve(identifier, approval)["status"] == "approved"
+    # This synthetic numeric fixture has descriptor ranges 0..1; real ethanol
+    # is deliberately outside them. Do not expose an uninterpretable value.
+    prediction = registry.predict(identifier, "CCO")
+    assert not prediction["applicability"]["in_domain"]
+    assert prediction["value"] is None and prediction["quality"]["passed"]
     path = tmp_path / "models" / identifier / "model.joblib"
     path.write_bytes(path.read_bytes() + b"tampered")
     with pytest.raises(ValueError, match="checksum"):

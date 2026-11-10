@@ -1,5 +1,9 @@
 # Bioactivity workspace checkpoint
 
+The current correction and retraining checkpoint is documented in
+`VALIDATION_3.2.2.md` and `MODEL_QUALITY_POLICY.md`. Historical results below are
+retained for provenance; they are not the newly bundled model's evaluation.
+
 Implemented 2026-11-09; Windows packaging verified separately on 2026-11-10.
 
 ## Implemented

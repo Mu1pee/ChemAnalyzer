@@ -33,6 +33,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import StratifiedGroupKFold
 
 from app import config
+from app.model_quality import classification_reasons
 from app.chemistry import fingerprints as fp
 from app.chemistry import qsar_core as core
 
@@ -222,12 +223,9 @@ def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, se
         "cv_folds": n_splits,
     }
     report["metrics"] = metrics
-    if metrics["roc_auc"] < min_auc:
-        reasons.append(f"ROC-AUC {metrics['roc_auc']} ниже порога {min_auc}")
-    if metrics["balanced_accuracy"] < MODEL_MIN_BALANCED_ACC:
-        reasons.append(f"balanced accuracy {metrics['balanced_accuracy']} ниже {MODEL_MIN_BALANCED_ACC}")
-    if metrics["mcc"] < MODEL_MIN_MCC:
-        reasons.append(f"MCC {metrics['mcc']} ниже {MODEL_MIN_MCC}")
+    reasons += classification_reasons(metrics, max(min_auc, MODEL_MIN_AUC_DEFAULT), MODEL_MIN_MCC)
+    if not mask.all() or cv_failures:
+        reasons += ["Incomplete out-of-fold evaluation", *cv_failures]
     if reasons:
         report["reasons"] = reasons
         return None, "; ".join(reasons), report

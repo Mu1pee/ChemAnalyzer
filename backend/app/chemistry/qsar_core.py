@@ -5,6 +5,7 @@
 """
 
 import numpy as np
+from app.model_quality import classification_reasons, finite
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
@@ -169,12 +170,11 @@ def quality_gate(
     if metrics is None:
         reasons.append("не удалось провести кросс-валидацию")
         return reasons
-    if metrics["roc_auc"] < min_auc:
-        reasons.append(f"ROC-AUC {metrics['roc_auc']} < {min_auc}")
-    if metrics["mcc"] < min_mcc:
-        reasons.append(f"MCC {metrics['mcc']} < {min_mcc}")
-    if y_random_auc is not None and y_random_auc > 0.60:
+    reasons += classification_reasons(metrics, min_auc, min_mcc)
+    if metrics.get("n_evaluated") != n_active + n_inactive:
+        reasons.append("Incomplete out-of-fold evaluation")
+    if not finite(y_random_auc) or not 0 <= y_random_auc <= 0.60:
         reasons.append(
-            f"Y-рандомизация дала AUC {y_random_auc} > 0.60 (подозрение на утечку)"
+            f"Y-рандомизация: недопустимый AUC {y_random_auc} (нужно 0–0.60)"
         )
     return reasons

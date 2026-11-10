@@ -141,11 +141,16 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
       {models.map(m => <article key={m.id}>
         <strong>{m.task.name}</strong> · {m.status} · {m.evaluation.selected} · {m.id.slice(0, 8)}
         <p>Test: {JSON.stringify(m.evaluation.test)} · Baseline: {JSON.stringify(m.evaluation.baseline_test)}</p>
-        <button disabled={busy} onClick={() => act(async () => { setPrediction(await request(`/models/${m.id}/predict`, { smiles })); })}>Исследовательский прогноз</button>
-        {m.status === "experimental" && <button disabled={busy || reviewer.length < 3 || evidence.length < 30} onClick={() => act(async () => {
+        <p>{m.quality?.passed ? "Порог качества пройден" : "Порог качества не пройден"}
+          {" · "}{m.quality?.metric}: {m.quality?.value ?? "нет оценки"}
+          {m.quality?.metric === "r2" ? " · R² не является процентом точности" : " · Требуется сбалансированная точность > 60%"}
+        </p>
+        {m.quality?.reasons?.length > 0 && <p>{m.quality.reasons.join("; ")}</p>}
+        <button disabled={busy || !m.quality?.passed} onClick={() => act(async () => { setPrediction(await request(`/models/${m.id}/predict`, { smiles })); })}>Исследовательский прогноз</button>
+        {m.status === "experimental" && <button disabled={busy || !m.quality?.passed || reviewer.length < 3 || evidence.length < 30} onClick={() => act(async () => {
           await request(`/models/${m.id}/review`, { reviewer, evidence });
         })}>Сохранить рецензию</button>}
-        {m.status === "validated" && <button disabled={busy || !confirmed || reviewer.length < 3 || evidence.length < 30} onClick={() => act(async () => {
+        {m.status === "validated" && <button disabled={busy || !m.quality?.passed || !confirmed || reviewer.length < 3 || evidence.length < 30} onClick={() => act(async () => {
           await request(`/models/${m.id}/approve`, { reviewer, evidence, confirm_activation: confirmed }); setConfirmed(false);
         })}>Утвердить эту модель</button>}
       </article>)}

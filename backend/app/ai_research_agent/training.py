@@ -8,6 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from threadpoolctl import threadpool_limits
 
 from .evaluation import metrics, scaffold_split
+from app.model_quality import held_out_quality
 
 
 def train(X, y, groups, task, checkpoint=lambda stage: None):
@@ -64,4 +65,11 @@ def train(X, y, groups, task, checkpoint=lambda stage: None):
                   split={"train": tr.tolist(), "validation": va.tolist(), "test": te.tolist()},
                   split_method="scaffold groups; acyclic molecules share one group; train-only 3-fold CV",
                   scientific_status="experimental; no external validation", test_used_for_selection=False)
+    report["support"] = {}
+    for name, indices in (("train", tr), ("validation", va), ("test", te)):
+        support = dict(molecules=len(indices), scaffolds=len(np.unique(groups[indices])))
+        if task.kind == "classification":
+            support.update(negative=int((y[indices] == 0).sum()), positive=int((y[indices] == 1).sum()))
+        report["support"][name] = support
+    report["quality"] = held_out_quality(task.kind, report)
     return model, X[tr], report

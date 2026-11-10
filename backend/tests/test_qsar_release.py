@@ -34,7 +34,9 @@ def test_assay_curation_rejects_wrong_context_and_nonfinite_labels():
 def save_bundle(root, name, model_id):
     root.mkdir()
     file = root / name
-    joblib.dump({"meta": {"target_id": "CHEMBL230", "model_id": model_id}}, file)
+    joblib.dump({"meta": {"target_id": "CHEMBL230", "model_id": model_id,
+                         "n_active": 50, "n_inactive": 50, "y_random_auc": .5,
+                         "metrics": dict(roc_auc=.8, balanced_accuracy=.7, mcc=.4, n_evaluated=100)}}, file)
     entry = {"target_id": "CHEMBL230", "model_file": name,
              "artifact_sha256": hashlib.sha256(file.read_bytes()).hexdigest()}
     (root / "manifest.json").write_text(json.dumps({"models": [entry]}))

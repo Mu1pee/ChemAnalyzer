@@ -15,6 +15,7 @@ import numpy as np
 from rdkit import Chem
 
 from app import config
+from app.model_quality import classification_reasons
 from app.chemistry import fingerprints as fp
 from app.chemistry import qsar_core as core
 
@@ -69,6 +70,7 @@ def _load_bundles() -> tuple[dict[str, list[dict[str, Any]]], str | None]:
         import joblib
 
         missing_model_files: list[str] = []
+        rejected: dict[str, list[str]] = {key: [] for key in DOMAINS}
         for record in records:
             if not isinstance(record, dict):
                 continue
@@ -92,7 +94,19 @@ def _load_bundles() -> tuple[dict[str, list[dict[str, Any]]], str | None]:
             meta = bundle["meta"]
             if not isinstance(meta, dict) or meta.get("domain") != domain:
                 continue
+            reasons = classification_reasons(meta.get("metrics"), min_mcc=0.10)
+            if (meta.get("metrics") or {}).get("n_evaluated") != meta.get("n_train"):
+                reasons.append("Incomplete out-of-fold evaluation")
+            if min(meta.get("n_active", 0), meta.get("n_inactive", 0)) < 30:
+                reasons.append("At least 30 compounds per class required")
+            if reasons:
+                rejected[domain] += reasons
+                continue
             grouped[domain].append(bundle)
+        for domain, reasons in rejected.items():
+            if reasons and not grouped[domain]:
+                # Domain-specific failure must not suppress a valid model in another domain.
+                grouped[domain] = [{"rejected": "; ".join(dict.fromkeys(reasons))}]
         if missing_model_files:
             return grouped, "В manifest.json указаны отсутствующие файлы моделей: " + ", ".join(missing_model_files[:5])
     except Exception as error:
@@ -125,6 +139,9 @@ def predict_specialized_activity(smiles: str) -> dict:
             continue
         if not bundles:
             results[domain] = _empty_domain(domain)
+            continue
+        if "rejected" in bundles[0]:
+            results[domain] = _empty_domain(domain, "error", "Модель не прошла контроль качества: " + bundles[0]["rejected"])
             continue
 
         predictions = []

@@ -51,7 +51,7 @@ export default function ActivityTab({ state, onTrainQsar }: Props) {
                     {p.domain}
                   </span>
                 </div>
-                <div className="activity-bar-line">
+                {p.probability !== null ? <div className="activity-bar-line">
                   <ScoreBar
                     value={p.probability}
                     tone={domainTone(p.domain)}
@@ -59,12 +59,14 @@ export default function ActivityTab({ state, onTrainQsar }: Props) {
                   <span className="activity-score">
                     {(p.probability * 100).toFixed(0)}%
                   </span>
-                </div>
+                </div> : <div className="tab-note">Вне области применимости: численный прогноз скрыт.</div>}
                 <div className="activity-support">
                   вероятность pChEMBL ≥ {p.active_pchembl} · сходство с
                   обучающей выборкой {p.max_similarity.toFixed(2)} · ROC-AUC
                   модели {p.cv_auc.toFixed(2)} · обучено на {p.n_train}
+                  {" · Сбалансированная точность CV: "}{(p.cv_balanced_accuracy * 100).toFixed(1)}%
                 </div>
+                <div className="activity-support">{p.validation_method}</div>
                 {p.model_version && (
                   <div className="activity-support">
                     модель: {p.model_version}
@@ -75,6 +77,7 @@ export default function ActivityTab({ state, onTrainQsar }: Props) {
           </div>
           <div className="tab-note">
             Используется моделей: {qsar.models_loaded}. {qsar.disclaimer}
+            {qsar.message && <p>{qsar.message}</p>}
           </div>
         </>
       ) : (

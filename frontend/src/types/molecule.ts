@@ -147,6 +147,11 @@ export interface ChemblResponse {
   similar: ChemblSimilar[];
   message: string | null;
   source: string;
+  cached: boolean;
+  stale: boolean;
+  partial: boolean;
+  retrieved_at: string | null;
+  warnings: string[];
 }
 
 export interface AsyncState<T> {
@@ -163,10 +168,12 @@ export interface QsarPrediction {
   target_id: string;
   target_name: string;
   chembl_name: string | null;
-  probability: number;
+  probability: number | null;
   domain: string;
   max_similarity: number;
   cv_auc: number;
+  cv_balanced_accuracy: number;
+  validation_method: string;
   n_train: number;
   active_pchembl: number;
 }

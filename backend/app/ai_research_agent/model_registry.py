@@ -2,6 +2,7 @@ from uuid import uuid4
 
 import joblib
 from pydantic import BaseModel, Field
+from app.model_quality import held_out_quality
 
 from .applicability_domain import assess
 from .molecular_features import molecule, vector
@@ -32,10 +33,16 @@ class Registry:
         return meta
 
     def list(self):
-        return [read_json(p) for p in sorted(self.root.glob("*/metadata.json"))]
+        return [self.metadata(p.parent.name) for p in sorted(self.root.glob("*/metadata.json"))]
 
     def metadata(self, identifier):
-        return read_json(safe_child(self.root, identifier) / "metadata.json")
+        meta = read_json(safe_child(self.root, identifier) / "metadata.json")
+        meta["quality"] = held_out_quality(meta["task"]["kind"], meta.get("evaluation"))
+        return meta
+
+    def require_quality(self, meta):
+        if not meta["quality"]["passed"]:
+            raise ValueError("Model failed quality policy: " + "; ".join(meta["quality"]["reasons"]))
 
     def load(self, identifier):
         folder = safe_child(self.root, identifier)
@@ -50,8 +57,7 @@ class Registry:
         meta = self.metadata(identifier)
         if meta["status"] != "experimental":
             raise ValueError("Only experimental models can be reviewed")
-        if not meta["evaluation"]["beats_baseline"]:
-            raise ValueError("Model failed baseline comparison")
+        self.require_quality(meta)
         self.load(identifier)
         meta.update(status="validated", review=dict(review.model_dump(), at=utcnow()))
         write_json(safe_child(self.root, identifier) / "metadata.json", meta)
@@ -63,6 +69,7 @@ class Registry:
         meta = self.metadata(identifier)
         if meta["status"] != "validated":
             raise ValueError("Documented review required before approval")
+        self.require_quality(meta)
         self.load(identifier)
         meta.update(status="approved", approval=dict(approval.model_dump(), at=utcnow()))
         write_json(safe_child(self.root, identifier) / "metadata.json", meta)
@@ -72,15 +79,20 @@ class Registry:
         return meta
 
     def predict(self, identifier, smiles):
-        meta, bundle = self.metadata(identifier), self.load(identifier)
+        meta = self.metadata(identifier)
+        self.require_quality(meta)
+        bundle = self.load(identifier)
         if meta["status"] == "archived":
             raise ValueError("Archived model cannot be used for prediction")
         x = vector(molecule(smiles))
+        applicability = assess(bundle["domain"], x)
+        in_domain = applicability["in_domain"]
         result = dict(model_id=identifier, status=meta["status"], endpoint=meta["task"]["endpoint"],
-                      units=meta["task"]["units"], value=float(bundle["model"].predict(x.reshape(1, -1))[0]),
-                      applicability=assess(bundle["domain"], x), disclaimer="Research prediction, not experimental confirmation.")
+                      units=meta["task"]["units"], value=float(bundle["model"].predict(x.reshape(1, -1))[0]) if in_domain else None,
+                      applicability=applicability, quality=meta["quality"],
+                      disclaimer="Research prediction, not experimental confirmation. Values are withheld outside the applicability domain.")
         if meta["task"]["kind"] == "classification":
-            result["probability"] = float(bundle["model"].predict_proba(x.reshape(1, -1))[0, 1])
+            result["probability"] = float(bundle["model"].predict_proba(x.reshape(1, -1))[0, 1]) if in_domain else None
         return result
 
     def archive(self, identifier):

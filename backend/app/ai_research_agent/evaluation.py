@@ -14,11 +14,18 @@ def scaffold_split(y, groups, seed):
     rng = np.random.default_rng(seed)
     order = sorted(rng.permutation(len(unique)), key=lambda i: -counts[i])
     targets, allocated, buckets = np.array([.64, .16, .20]) * len(y), np.zeros(3), [[], [], []]
-    for i in order:
-        partition = int(np.argmax(targets - allocated))
+    group_counts = np.zeros(3, dtype=int)
+    for position, i in enumerate(order):
+        needed = np.maximum(3 - group_counts, 0)
+        # Reserve whole groups for every partition, without consulting labels.
+        if len(order) - position <= needed.sum():
+            partition = int(np.argmax(needed))
+        else:
+            partition = int(np.argmax(targets - allocated))
         indices = np.flatnonzero(groups == unique[i]).tolist()
         buckets[partition].extend(indices)
         allocated[partition] += len(indices)
+        group_counts[partition] += 1
     train, valid, test = (np.array(sorted(indices), dtype=int) for indices in buckets)
     if min(map(len, (train, valid, test))) < 10:
         raise ValueError("Scaffold split too small: need at least 10 molecules per partition")

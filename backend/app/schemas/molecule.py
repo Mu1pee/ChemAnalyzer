@@ -100,10 +100,12 @@ class QsarPrediction(BaseModel):
     target_id: str
     target_name: str
     chembl_name: str | None = None
-    probability: float
+    probability: float | None
     domain: str
     max_similarity: float
     cv_auc: float
+    cv_balanced_accuracy: float
+    validation_method: str
     n_train: int
     active_pchembl: float
 
@@ -171,6 +173,11 @@ class ChemblResponse(BaseModel):
     similar: list[ChemblSimilar] = []
     message: str | None = None
     source: str = "ChEMBL"
+    cached: bool = False
+    stale: bool = False
+    partial: bool = False
+    retrieved_at: str | None = None
+    warnings: list[str] = Field(default_factory=list)
 
 
 class ConformerRequest(BaseModel):

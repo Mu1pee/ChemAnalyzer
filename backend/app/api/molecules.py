@@ -1,3 +1,4 @@
+import logging
 from fastapi import APIRouter, HTTPException, Response
 from fastapi.concurrency import run_in_threadpool
 
@@ -101,11 +102,13 @@ async def chembl(molecule: MoleculeRequest):
 
     try:
         return await fetch_chembl_profile(keys["smiles"], keys["inchikey"])
-    except Exception:
+    except Exception as error:
+        logging.getLogger(__name__).error("ChEMBL profile processing failed: %s", type(error).__name__)
         return {
             "available": False,
             "found": False,
-            "message": "ChEMBL временно недоступен.",
+            "message": "Ошибка обработки ответа ChEMBL. Подробности записаны в журнал приложения.",
+            "warnings": ["processing_error"],
         }
 
 

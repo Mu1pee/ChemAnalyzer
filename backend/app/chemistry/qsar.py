@@ -47,6 +47,7 @@ def _load_models() -> tuple[list[dict], str | None]:
 
         bundles = []
         seen = set()
+        rejected = []
         for root, manifest in manifests:
             for entry in json.loads(manifest.read_text(encoding="utf-8"))["models"]:
                 name = entry.get("model_file", f"{entry['target_id']}.joblib")
@@ -60,6 +61,11 @@ def _load_models() -> tuple[list[dict], str | None]:
                     raise ValueError("Model checksum mismatch")
                 bundle = joblib.load(path)
                 meta = bundle["meta"]
+                reasons = core.quality_gate(meta.get("metrics"), meta.get("n_active", 0),
+                                            meta.get("n_inactive", 0), meta.get("y_random_auc"))
+                if reasons:
+                    rejected.append(str(meta.get("model_id", entry["target_id"])) + ": " + "; ".join(reasons))
+                    continue
                 key = meta.get("model_id", f"{meta['target_id']}:{meta.get('assay_id', 'legacy')}")
                 if key not in seen:
                     bundles.append(bundle)
@@ -67,6 +73,8 @@ def _load_models() -> tuple[list[dict], str | None]:
     except Exception as error:
         return [], f"Не удалось загрузить модели: {error}"
 
+    if rejected:
+        return bundles, "Не прошли контроль качества: " + " | ".join(rejected)
     if not bundles:
         return [], "Манифест есть, но файлы моделей не найдены."
     return bundles, None
@@ -85,7 +93,7 @@ def reload_models() -> None:
 def predict_qsar(smiles: str) -> dict:
     bundles, problem = _load_models()
     if bundles:
-        status, message = "ready", None
+        status, message = "ready", problem
     elif problem:
         status, message = "error", f"{problem} {NOT_TRAINED_MESSAGE}"
     else:
@@ -126,10 +134,12 @@ def predict_qsar(smiles: str) -> dict:
                 "target_id": meta["target_id"],
                 "target_name": meta["label"],
                 "chembl_name": meta.get("chembl_name"),
-                "probability": round(probability, 3),
+                "probability": round(probability, 3) if similarity >= core.DOMAIN_EDGE else None,
                 "domain": core.domain_label(similarity),
                 "max_similarity": round(similarity, 3),
                 "cv_auc": meta["metrics"]["roc_auc"],
+                "cv_balanced_accuracy": meta["metrics"]["balanced_accuracy"],
+                "validation_method": "Внутренняя scaffold CV; внешняя валидация не выполнена",
                 "n_train": meta["n_train"],
                 "active_pchembl": meta["active_pchembl"],
             }
@@ -138,7 +148,7 @@ def predict_qsar(smiles: str) -> dict:
     # Сначала в области применимости, затем по вероятности.
     order = {"в области применимости": 0, "на границе области": 1}
     predictions.sort(
-        key=lambda p: (order.get(p["domain"], 2), -p["probability"])
+            key=lambda p: (order.get(p["domain"], 2), -(p["probability"] or 0))
     )
     base["predictions"] = predictions[:TOP_N]
     return base
