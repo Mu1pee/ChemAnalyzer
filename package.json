@@ -15,7 +15,7 @@
     "build": "npm --prefix frontend install && npm --prefix frontend run build",
     "build:backend": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-backend.ps1",
     "icon": "python scripts/make_icon.py",
-    "test:electron": "node --test electron/tests/backend.test.js electron/tests/security.test.js electron/tests/store.test.js",
+    "test:electron": "node --test electron/tests/backend.test.js electron/tests/security.test.js electron/tests/store.test.js electron/tests/research-seed.test.js",
     "start": "electron .",
     "dist:win": "npm run build && npm run build:backend && electron-builder --win --x64",
     "dist:win:package": "electron-builder --win --x64"

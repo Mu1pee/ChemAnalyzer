@@ -20,8 +20,11 @@ import PropertiesTab from "./PropertiesTab";
 import StructureTab from "./StructureTab";
 import AntidotePredictionTab from "./AntidotePredictionTab";
 import ResearchLabTab from "./ResearchLabTab";
+import BioactivityWorkspace from "./BioactivityWorkspace";
+import type { ResearchPreset } from "../lib/bioactivity";
 
 export type Tab =
+  | "bioactivity"
   | "props"
   | "adme"
   | "ident"
@@ -35,6 +38,7 @@ export type Tab =
   | "assistant";
 
 export const TABS: { id: Tab; label: string }[] = [
+  { id: "bioactivity", label: "Биоактивность" },
   { id: "props", label: "Свойства" },
   { id: "adme", label: "ADME" },
   { id: "ident", label: "Идентификация" },
@@ -79,6 +83,13 @@ export default function ResultsPanel({
 }: Props) {
   const [copied, setCopied] = useState(false);
   const [researchPreset, setResearchPreset] = useState<"default" | "qsar">("default");
+  const [researchTask, setResearchTask] = useState<ResearchPreset | undefined>();
+
+  function openResearch(preset?: ResearchPreset) {
+    setResearchTask(preset);
+    setResearchPreset("default");
+    onTab("research");
+  }
 
   async function copySmiles(value: string) {
     try {
@@ -98,7 +109,7 @@ export default function ResultsPanel({
     id?.found && id.match_type === "connectivity" ? id.title : null;
 
   function body() {
-    if (tab === "research") return <ResearchLabTab initialPreset={researchPreset} />;
+    if (tab === "research") return <ResearchLabTab initialPreset={researchPreset} initialTask={researchTask} />;
     if (tab === "history") {
       return (
         <HistoryTab
@@ -156,6 +167,7 @@ export default function ResultsPanel({
         return <DruglikenessTab result={result} state={activity} />;
       case "activity":
         return <ActivityTab state={activity} onTrainQsar={() => {
+          setResearchTask(undefined);
           setResearchPreset("qsar");
           onTab("research");
         }} />;
@@ -175,6 +187,8 @@ export default function ResultsPanel({
         return null;
     }
   }
+
+  if (tab === "bioactivity") return <BioactivityWorkspace onTab={onTab} onResearch={openResearch} activity={activity} hasMolecule={Boolean(result)} />;
 
   return (
     <aside className="results-panel">

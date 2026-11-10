@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Ketcher } from "ketcher-core";
+import { Activity, Atom, BookOpen, Database, FlaskConical, History, Layers3, Microscope, Network, ScanLine, ShieldCheck, Sparkles } from "lucide-react";
 
 import AboutDialog from "./components/AboutDialog";
 import EditorToolbar, { EXAMPLES } from "./components/EditorToolbar";
@@ -47,6 +48,8 @@ import type {
 } from "./types/molecule";
 
 const FALLBACK_VERSION = __APP_VERSION__;
+const TAB_ICONS = { bioactivity: Layers3, props: Atom, adme: FlaskConical, ident: ScanLine, drug: ShieldCheck,
+  activity: Activity, antidote: Microscope, chembl: Database, "3d": Network, history: History, research: Sparkles, assistant: BookOpen };
 
 // Пустой molfile надёжнее, чем setMolecule("").
 const EMPTY_MOLFILE =
@@ -96,7 +99,7 @@ function App() {
   const [activity, setActivity] = useState<AsyncState<ActivityResponse>>(idle);
   const [chembl, setChembl] = useState<AsyncState<ChemblResponse>>(idle);
 
-  const [tab, setTab] = useState<Tab>("props");
+  const [tab, setTab] = useState<Tab>("bioactivity");
   const [theme, setTheme] = useState<Theme>("dark");
   const [apiStatus, setApiStatus] = useState<ApiStatus>("checking");
   const [version, setVersion] = useState(FALLBACK_VERSION);
@@ -526,6 +529,7 @@ function App() {
       {
         label: "Analysis",
         entries: [
+          { type: "item", label: "Каталог биоактивности", onClick: goTab("bioactivity") },
           { type: "item", label: "Свойства", onClick: goTab("props") },
           { type: "item", label: "ADME / BOILED-Egg", onClick: goTab("adme") },
           { type: "item", label: "Идентификация", onClick: goTab("ident") },
@@ -577,15 +581,17 @@ function App() {
     <div className="app-shell">
       <MenuBar menus={menus} />
 
-      <main className="desk">
+      <main className={`desk${tab === "bioactivity" || tab === "research" ? " desk-catalog" : ""}`}>
         <nav className="workspace-sidebar" aria-label="Разделы анализа">
           <div className="workspace-brand">ChemAnalyzer <small>{version}</small></div>
-          {TABS.map((item) => (
+          {TABS.map((item) => {
+            const TabIcon = TAB_ICONS[item.id];
+            return (
             <button key={item.id} type="button" aria-current={tab === item.id ? "page" : undefined}
               className={tab === item.id ? "selected" : ""} onClick={() => setTab(item.id)}>
-              {item.label}
+              <TabIcon size={16} /><span>{item.label}</span>
             </button>
-          ))}
+          ); })}
         </nav>
         <section className="desk-editor">
           <EditorToolbar

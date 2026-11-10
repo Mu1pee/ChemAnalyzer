@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { API_ORIGIN } from "../api/base";
+import type { ResearchPreset } from "../lib/bioactivity";
 
 type Json = Record<string, any>;
 
@@ -17,7 +18,7 @@ const QSAR_TASK = {
   domain: "qsar", kind: "classification", endpoint: "", units: "0/1", context: ""
 };
 
-export default function ResearchLabTab({ initialPreset = "default" }: { initialPreset?: "default" | "qsar" }) {
+export default function ResearchLabTab({ initialPreset = "default", initialTask }: { initialPreset?: "default" | "qsar"; initialTask?: ResearchPreset }) {
   const [status, setStatus] = useState<Json | null>(null);
   const [config, setConfig] = useState("");
   const [tasks, setTasks] = useState<Json[]>([]);
@@ -45,11 +46,11 @@ export default function ResearchLabTab({ initialPreset = "default" }: { initialP
     let mounted = true;
     request("/status").then(async s => {
       if (!mounted) return;
-      setStatus(s); setConfig(JSON.stringify(initialPreset === "qsar" ? QSAR_TASK : s.default_task, null, 2));
+      setStatus(s); setConfig(JSON.stringify(initialTask ?? (initialPreset === "qsar" ? QSAR_TASK : s.default_task), null, 2));
       if (s.enabled) await refresh();
     }).catch(e => mounted && setError(String(e.message)));
     return () => { mounted = false; };
-  }, [initialPreset]);
+  }, [initialPreset, initialTask]);
   useEffect(() => {
     if (!status?.enabled) return;
     const timer = window.setInterval(() => refresh().catch(e => setError(String(e.message))), 2000);
@@ -71,7 +72,7 @@ export default function ResearchLabTab({ initialPreset = "default" }: { initialP
     {message && <p role="status">{message}</p>}
     {!status ? <p>Подключение к исследовательскому движку…</p> : !status.enabled ?
       <p>Режим выключен. Для включения установите CHEMANALYZER_RESEARCH_ENABLED=1 в окружении backend и перезапустите приложение. Датасеты автоматически не загружаются.</p> : <>
-      <details open={initialPreset === "qsar" ? true : undefined}><summary>Создать исследовательскую задачу</summary>
+      <details open={initialTask || initialPreset === "qsar" ? true : undefined}><summary>Создать исследовательскую задачу</summary>
         <div className="research-actions">
           <button disabled={busy} onClick={() => setConfig(JSON.stringify(QSAR_TASK, null, 2))}>QSAR: обучение активности</button>
           <button disabled={busy} onClick={() => setConfig(JSON.stringify(status.default_task, null, 2))}>FreeSolv: гидратация</button>

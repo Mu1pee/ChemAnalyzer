@@ -18,6 +18,8 @@ const path = require("node:path");
 const { BackendManager } = require("./backend");
 const security = require("./security");
 const { createStore } = require("./store");
+const { seedResearchData } = require("./research-seed");
+const RESEARCH_BUNDLE = require("../package.json").chemanalyzerResearchBundle === true;
 
 const ROOT = path.resolve(__dirname, "..");
 const DEV_URL = process.env.CHEMANALYZER_DEV_URL || ""; // например http://localhost:5173
@@ -60,6 +62,9 @@ function ensureDataFiles() {
   const dir = dataDir();
   fs.mkdirSync(path.join(dir, "models"), { recursive: true });
   fs.mkdirSync(path.join(dir, "logs"), { recursive: true });
+  if (app.isPackaged && RESEARCH_BUNDLE) {
+    seedResearchData(path.join(process.resourcesPath, "research-seed"), dir);
+  }
 
   const envFile = path.join(dir, ".env");
   if (!fs.existsSync(envFile)) {
@@ -92,6 +97,7 @@ async function startBackend() {
       CHEMANALYZER_DESKTOP: DEV_URL ? "0" : "1",
       CHEMANALYZER_DATA_DIR: dataDir(),
       CHEMANALYZER_FRONTEND_DIST: DEV_URL ? "" : launch.frontendDist,
+      CHEMANALYZER_RESEARCH_ENABLED: process.env.CHEMANALYZER_RESEARCH_ENABLED ?? (RESEARCH_BUNDLE ? "1" : "0"),
       PYTHONUNBUFFERED: "1",
       PYTHONIOENCODING: "utf-8",
     },

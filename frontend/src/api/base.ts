@@ -20,6 +20,7 @@ function resolveOrigin(): string {
       // некорректное значение — используем адрес по умолчанию
     }
   }
+  if (import.meta.env.PROD && ["http:", "https:"].includes(window.location.protocol)) return window.location.origin;
   return "http://127.0.0.1:8000";
 }
 
