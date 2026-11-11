@@ -78,6 +78,8 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
           <button disabled={busy} onClick={() => setConfig(JSON.stringify(status.default_task, null, 2))}>FreeSolv: гидратация</button>
           {Object.entries(status.cyp_tasks ?? {}).map(([isoform, task]) =>
             <button key={isoform} disabled={busy} onClick={() => setConfig(JSON.stringify(task, null, 2))}>{isoform}: ингибирование</button>)}
+          {Object.entries(status.screening_tasks ?? {}).map(([key, task]) =>
+            <button key={key} disabled={busy} onClick={() => setConfig(JSON.stringify(task, null, 2))}>{key === "hiv" ? "ВИЧ: NCI" : "HepG2: 24 часа"}</button>)}
         </div>
         <p>Для QSAR заполните endpoint и context: мишень, организм, assay, тип измерения и заранее обоснованное правило меток 0/1. Импортируйте экспериментальный CSV с provenance. Для непрерывных измерений задайте kind: regression и соответствующие units.</p>
         <p>Для классификации требуется минимум 30 уникальных молекул каждого класса и достаточное число scaffold-групп. Обученная в лаборатории модель проходит отдельную проверку и утверждение; её создание не снимает сообщение об отсутствии рабочих QSAR-моделей.</p>
@@ -104,6 +106,10 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
           const result = await request(`/tasks/${selected}/tdc-cyp`, {});
           setMessage(`TDC CYP импортирован: ${result.measurements} исходных записей. SHA256 ${result.dataset_sha256}`);
         })}>Импорт TDC CYP</button>
+        {(["hiv", "hepg2"] as const).map(key => <button key={key} disabled={busy || !selected || tasks.find(t => t.id === selected)?.endpoint !== status.screening_tasks?.[key]?.endpoint} onClick={() => act(async () => {
+          const result = await request(`/tasks/${selected}/tdc-${key}`, {});
+          setMessage(`${key === "hiv" ? "NCI HIV" : "ToxCast HepG2"}: импортировано ${result.measurements} измерений. SHA256 ${result.dataset_sha256}`);
+        })}>Импорт {key === "hiv" ? "NCI HIV" : "ToxCast HepG2"}</button>)}
         <button disabled={busy || running || !selected} onClick={() => act(async () => {
           await request(`/tasks/${selected}/prepare`, {}); setMessage("Подготовка запущена в отдельном процессе");
         })}>Подготовить данные</button>

@@ -55,7 +55,10 @@ def call(function, *args):
 @router.get("/status")
 def status():
     from .tdc_cyp import FILES, task_config
+    from .tdc_hiv import task_config as hiv_task
+    from .tdc_hepg2 import task_config as hepg2_task
     return dict(enabled=enabled(), default_task=FREESOLV_TASK,
+                screening_tasks={"hiv": hiv_task(), "hepg2": hepg2_task()},
                 cyp_tasks={key: task_config(key) for key in FILES}, api_cost_limit=0, worker_limit=1)
 
 
@@ -92,6 +95,16 @@ def freesolv(identifier: str):
 @router.post("/tasks/{identifier}/tdc-cyp")
 def tdc_cyp(identifier: str):
     return call(lambda: agent().import_tdc_cyp(identifier))
+
+
+@router.post("/tasks/{identifier}/tdc-hiv")
+def tdc_hiv(identifier: str):
+    return call(lambda: agent().import_tdc_hiv(identifier))
+
+
+@router.post("/tasks/{identifier}/tdc-hepg2")
+def tdc_hepg2(identifier: str):
+    return call(lambda: agent().import_tdc_hepg2(identifier))
 
 
 @router.post("/tasks/{identifier}/{action}")

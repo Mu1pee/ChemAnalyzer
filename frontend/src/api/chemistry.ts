@@ -4,6 +4,7 @@ import type {
   IdentificationResult,
   ChemblResponse,
   CypResponse,
+  ScreeningResponse,
   MoleculeResponse,
   SpecializedActivityResponse
 } from "../types/molecule";
@@ -128,6 +129,10 @@ export function fetchChembl(smiles: string): Promise<ChemblResponse> {
 
 export function fetchCyp(smiles: string): Promise<CypResponse> {
   return postSmiles("cyp", smiles, "Не удалось получить прогноз CYP");
+}
+
+export function fetchScreening(smiles: string): Promise<ScreeningResponse> {
+  return postSmiles("screening", smiles, "Не удалось получить прогноз отдельных скрининговых тестов");
 }
 
 /** ПК «Антидот-Прогноз»: endpoint-specific models, if trained and validated. */

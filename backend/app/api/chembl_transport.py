@@ -39,7 +39,9 @@ class ChemblClient(httpx.AsyncClient):
             delay = 0.35
             try:
                 # Includes DNS resolution in the wall-clock limit.
-                response = await asyncio.wait_for(self.get(f"{BASE}/{path}", params=params), min(12, remaining))
+                # Live EBI responses can take ~15 s even for a successful exact hit.
+                # Allow those responses while retaining the shared 55 s deadline.
+                response = await asyncio.wait_for(self.get(f"{BASE}/{path}", params=params), min(22, remaining))
                 if response.status_code == 200:
                     data = response.json()
                     if isinstance(data, dict):

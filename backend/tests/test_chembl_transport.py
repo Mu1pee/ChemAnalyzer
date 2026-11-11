@@ -103,3 +103,20 @@ def test_deadline_bounds_wait_even_if_transport_hangs():
 
 def test_nonfinite_activity_is_excluded():
     assert chembl.aggregate_targets({"activities": [dict(target_chembl_id="CHEMBL230", pchembl_value="nan")]}) == []
+
+
+def test_successful_fifteen_second_response_is_not_reported_unavailable(monkeypatch):
+    # Virtual elapsed time represents the measured EBI latency, without sleeping.
+    async def simulated_wait(awaitable, timeout):
+        if timeout < 15:
+            awaitable.close()
+            raise asyncio.TimeoutError
+        return await awaitable
+    monkeypatch.setattr(transport.asyncio, "wait_for", simulated_wait)
+    async def scenario():
+        async with transport.ChemblClient(timeout=chembl.TIMEOUT, transport=httpx.MockTransport(
+                lambda request: httpx.Response(200, json={"molecules": []}))) as client:
+            assert client.timeout.read >= 15
+            assert await client.fetch("molecule.json") == {"molecules": []}
+            assert not client.failures
+    asyncio.run(scenario())

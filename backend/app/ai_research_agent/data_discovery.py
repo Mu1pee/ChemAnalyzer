@@ -1,4 +1,4 @@
-"""Read-only discovery with reviewed FreeSolv and TDC CYP text adapters."""
+"""Read-only discovery with reviewed, context-specific text adapters."""
 import csv
 import io
 
@@ -8,6 +8,12 @@ from .config import FREESOLV_TASK
 from .security import checksum, utcnow
 
 CATALOG = [
+    {"id": "tdc_hiv", "name": "TDC / NCI MoleculeNet — HIV replication screen",
+     "url": "https://tdcommons.ai/single_pred_tasks/hts/", "license": "CC-BY-4.0",
+     "endpoint": "hiv_replication_inhibition_nci", "status": "supported_primary_reference_crosschecked_text_adapter"},
+    {"id": "tdc_hepg2", "name": "TDC / EPA ToxCast — HepG2 proliferation decrease, 24 h",
+     "url": "https://tdcommons.ai/single_pred_tasks/tox/", "license": "CC-BY-4.0",
+     "endpoint": "hepg2_cellloss_24h_toxcast", "status": "supported_single_assay_text_adapter_missing_excluded"},
     {"id": "tdc_cyp", "name": "TDC / Harvard Dataverse — Veith CYP inhibition",
      "url": "https://tdcommons.ai/single_pred_tasks/adme/", "license": "CC-BY-4.0",
      "status": "supported_isoform_specific_text_adapter"},
@@ -25,7 +31,7 @@ CATALOG = [
 
 def discover(endpoint: str):
     return {"endpoint": endpoint, "sources": CATALOG,
-            "message": "FreeSolv and TDC Veith CYP have reviewed text import adapters. Other sources are leads, not verified datasets."}
+            "message": "FreeSolv, TDC Veith CYP, NCI/MoleculeNet HIV and one ToxCast HepG2 24-hour assay have reviewed text adapters. Other sources are leads, not verified datasets."}
 
 
 def _fetch(url, limit=4_000_000):

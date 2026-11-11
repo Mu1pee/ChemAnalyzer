@@ -121,6 +121,27 @@ class ResearchAgent:
         (folder / "source-metadata.json").write_bytes(metadata)
         return result
 
+    def import_tdc_hiv(self, identifier):
+        from .tdc_hiv import fetch_hiv, validate_task
+        validate_task(self.task(identifier))
+        text, provenance, raw, metadata, reference, evidence = fetch_hiv()
+        result = self.import_csv(identifier, text, Provenance(**provenance), evidence)
+        folder = safe_child(self.root / "tasks", identifier) / result["version_id"]
+        (folder / "source.tab").write_bytes(raw)
+        (folder / "source-metadata.json").write_bytes(metadata)
+        (folder / "reference.csv").write_bytes(reference)
+        return result
+
+    def import_tdc_hepg2(self, identifier):
+        from .tdc_hepg2 import fetch_hepg2, validate_task
+        validate_task(self.task(identifier))
+        text, provenance, raw, metadata, evidence = fetch_hepg2()
+        result = self.import_csv(identifier, text, Provenance(**provenance), evidence)
+        folder = safe_child(self.root / "tasks", identifier) / result["version_id"]
+        (folder / "source.tab").write_bytes(raw)
+        (folder / "source-metadata.json").write_bytes(metadata)
+        return result
+
     def start(self, identifier, action="train"):
         if action not in ("prepare", "train"):
             raise ValueError("Unknown action")

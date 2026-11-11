@@ -334,3 +334,27 @@ class CypResponse(BaseModel):
     canonical_smiles: str
     predictions: list[CypPrediction]
     disclaimer: str
+
+
+class ScreeningPrediction(BaseModel):
+    key: str
+    title: str
+    context: str
+    status: str
+    model_id: str | None = None
+    model_status: str | None = None
+    probability: float | None = None
+    max_similarity: float | None = None
+    metrics: dict[str, float] = Field(default_factory=dict)
+    n_train: int = 0
+    n_test: int = 0
+    test_positive: int = 0
+    test_negative: int = 0
+    trained_at: str | None = None
+    message: str | None = None
+
+
+class ScreeningResponse(BaseModel):
+    canonical_smiles: str
+    predictions: list[ScreeningPrediction]
+    disclaimer: str

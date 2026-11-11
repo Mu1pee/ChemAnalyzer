@@ -13,11 +13,13 @@ from app.chemistry.druglikeness import assess_druglikeness, structure_keys
 from app.chemistry.qsar import predict_qsar
 from app.chemistry.specialized_activity import predict_specialized_activity
 from app.chemistry.cyp_activity import predict_cyp
+from app.chemistry.screening_activity import predict_screening
 from app.schemas.molecule import (
     ActivityResponse,
     AdmeResponse,
     ChemblResponse,
     CypResponse,
+    ScreeningResponse,
     ConformerRequest,
     ConformerResponse,
     DepictRequest,
@@ -149,6 +151,14 @@ async def adme(molecule: MoleculeRequest):
 async def cyp(molecule: MoleculeRequest):
     try:
         return await run_in_threadpool(predict_cyp, molecule.smiles)
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error)) from error
+
+
+@router.post("/screening", response_model=ScreeningResponse)
+async def screening(molecule: MoleculeRequest):
+    try:
+        return await run_in_threadpool(predict_screening, molecule.smiles)
     except ValueError as error:
         raise HTTPException(status_code=400, detail=str(error)) from error
 

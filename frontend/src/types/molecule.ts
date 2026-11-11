@@ -364,3 +364,17 @@ export interface CypResponse {
   predictions: CypPrediction[];
   disclaimer: string;
 }
+
+export interface ScreeningPrediction extends Omit<CypPrediction, "isoform"> {
+  key: "hiv" | "hepg2";
+  title: string;
+  context: string;
+  test_positive: number;
+  test_negative: number;
+}
+
+export interface ScreeningResponse {
+  canonical_smiles: string;
+  predictions: ScreeningPrediction[];
+  disclaimer: string;
+}

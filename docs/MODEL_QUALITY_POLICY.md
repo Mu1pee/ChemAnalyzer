@@ -37,7 +37,9 @@ not claim that all catalog entries meet that goal.
 | Hydration free energy | Real FreeSolv data; updated split and model evaluated separately in the release report. Experimental; not antidote or plant activity. |
 | Antidote: acetaminophen rescue | No eligible curated training table has been integrated. Remains not_trained. General liver toxicity is not an antidote label. |
 | Arabidopsis primary-root growth/control | No eligible curated training table has been integrated. Remains not_trained. Auxin receptor binding is not root growth. |
-| Antibacterial, antiviral, cytotoxicity | Endpoint-specific datasets, organisms/strains/cell lines, exposure and label rules still required. No trained predictions claimed. |
+| Antibacterial and general antiviral/cytotoxicity | Broader organism/strain/cell-line and exposure-specific datasets still required; the two narrow screening tasks below do not validate these general claims. |
+| HIV replication, NCI/MoleculeNet | Experimental classifier, 38,027 accepted molecules; internal held-out balanced accuracy 65.50%, ROC-AUC 0.7614. Recall only 32.07%; no external validation. |
+| HepG2 proliferation decrease, 24 h | Experimental single-assay ToxCast classifier, 924 accepted molecules; internal held-out balanced accuracy 71.25%, ROC-AUC 0.7704. No clinical toxicity claim or external validation. |
 | CYP inhibition | Version 3.2.3 adds five separate TDC/Veith models; internal held-out balanced accuracy 72.76–78.62%. Full evidence and class-specific limitations: CYP_VALIDATION_3.2.3.md. No external validation. |
 | Metabolic stability, toxicity | Separate endpoint datasets and validation required. No trained predictions claimed. |
 | Gene expression, publication entity extraction | Planned pipelines without trained artifacts. |
@@ -46,6 +48,17 @@ not claim that all catalog entries meet that goal.
 | 3D molecule/protein viewer | Conformer generation and structure visualization; evaluate geometry/provenance, not classification accuracy. |
 | Literature assistant | Requires configured API access; generated text needs source checking and is not QSAR validation. |
 | PubChem, ChEMBL, registry, history | Data retrieval/storage: availability, exact identity, provenance and failure handling are relevant; model accuracy does not apply. |
+
+## Additional screening endpoints in 3.2.4
+
+As of 3.2.4, two further separate experimental screening endpoints pass this
+policy: NCI/MoleculeNet HIV replication inhibition (balanced accuracy 65.50%,
+ROC-AUC 0.7614) and ToxCast HepG2 proliferation decrease at 24 h (71.25%, 0.7704).
+Their held-out test sets contain 7,606 and 185 compounds respectively. HIV recall
+is only 32.07%, and the interface explicitly discloses this limitation. These
+results do not validate general antiviral/cytotoxicity, APAP rescue or plant
+growth. Missing ToxCast outcomes are excluded, never inactive. See
+SCREENING_VALIDATION_3.2.4.md for source rights, counts, intervals and reproduction.
 
 ## ChEMBL reliability
 
@@ -71,6 +84,21 @@ An unavailable service is never interpreted as lack of bioactivity.
 Live source check after correction: aspirin CHEMBL25, 15 targets, 8 analogs, no
 failed sections; 30.12 seconds live, 0.30 seconds from cache on this computer.
 External service latency can vary.
+
+On 2026-11-11, the frozen build imported both new TDC sources successfully, but
+ChEMBL returned a similarity HTTP 500 and exact-query timeout. An independent
+official molecule endpoint returned HTTP 200 in 15.3 seconds, exceeding the old
+12-second per-attempt ceiling. Version 3.2.4 raises that ceiling/read timeout to
+22 seconds while retaining the shared 55-second deadline, retries, certificate
+verification and explicit partial/unavailable states. This does not guarantee
+availability of upstream EBI services. The first failed live request is retained
+in the release verification evidence.
+
+With the revised limits, a fresh source run retrieved aspirin CHEMBL25, 15
+targets and 8 similar compounds in 55.2 seconds; cache retrieval took 0.328
+seconds. The response was explicitly partial: EBI returned drug-indication and
+mechanism HTTP 500 errors, and target-name lookup exceeded the shared deadline.
+This demonstrates recovery of useful data, not universal upstream availability.
 
 Primary references:
 - https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html

@@ -13,7 +13,7 @@ from .chembl_transport import ChemblClient, cache_key, read_cache, write_cache, 
 
 CHEMBL_BASE = "https://www.ebi.ac.uk/chembl/api/data"
 CHEMBL_COMPOUND_URL = "https://www.ebi.ac.uk/chembl/compound_report_card"
-TIMEOUT = httpx.Timeout(12.0, connect=5.0)
+TIMEOUT = httpx.Timeout(22.0, connect=5.0)
 HEADERS = {
     "Accept": "application/json",
     "User-Agent": "ChemAnalyzerModern/3.2 (+local app)",

@@ -60,6 +60,23 @@ and brain penetration of small molecules.* ChemMedChem 2016, 11, 1117–1121.
 названия SwissADME (SIB) не воспроизводятся. Если будете распространять
 приложение, проверьте условия использования публикации и данных.
 
+## NCI/MoleculeNet HIV и ToxCast HepG2 — сборка 3.2.4
+
+Источники TDC HIV и ToxCast распространяются под CC BY 4.0 согласно
+https://tdcommons.ai/single_pred_tasks/hts/ и
+https://tdcommons.ai/single_pred_tasks/tox/ . Harvard Dataverse
+doi:10.7910/DVN/21LKWG указывает CC0 1.0; запись лицензии сохранена.
+Предоставляемые производные наборы и веса этих моделей — CC BY 4.0.
+Сохраняйте уведомление и атрибуцию: NCI DTP AIDS Antiviral Screen;
+Wu et al., MoleculeNet (2018), doi:10.1039/C7SC02664A; US EPA ToxCast;
+Richard et al. (2016), doi:10.1021/acs.chemrestox.6b00135; TDC contributors.
+Лицензия: https://creativecommons.org/licenses/by/4.0/ .
+Изменения: проверка HIV по первичному файлу DeepChem, исключение пяти
+несогласованных структур, отбор одного HepG2-теста и исключение пропусков,
+подготовка структур, scaffold-разбиение, признаки RDKit, обучение Random Forest.
+Исходные бинарные метки сохранены. Оригинальный код ChemAnalyzer имеет
+собственные условия; лицензия данных их не заменяет.
+
 ## ChemCanvas
 
 Проект ChemCanvas (https://github.com/ksharindam/chemcanvas, GPL-3.0)
