@@ -103,20 +103,24 @@ class QsarPrediction(BaseModel):
     probability: float | None
     domain: str
     max_similarity: float
-    cv_auc: float
-    cv_balanced_accuracy: float
+    metrics: dict[str, float]
     validation_method: str
     n_train: int
+    n_test: int
+    test_positive: int
+    test_negative: int
+    active_threshold_nM: float
     active_pchembl: float
 
 
 class QsarResult(BaseModel):
-    status: str = "not_trained"  # ready | not_trained | error
+    status: str = "not_trained"  # ready | not_trained | quality_failed | error
     available: bool
     message: str | None = None
     models_loaded: int = 0
     predictions: list[QsarPrediction] = []
     disclaimer: str = ""
+    rejected_models: list[dict] = []
 
 
 class ActivityResponse(BaseModel):

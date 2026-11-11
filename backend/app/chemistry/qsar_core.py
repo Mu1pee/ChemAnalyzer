@@ -21,6 +21,7 @@ POPCOUNT = np.array([bin(i).count("1") for i in range(256)], dtype=np.int64)
 # Пороги области применимости (макс. сходство Tanimoto с обучающей выборкой).
 DOMAIN_IN = 0.50
 DOMAIN_EDGE = 0.30
+DEFAULT_TREES = 200
 
 
 # ---------- область применимости ----------
@@ -59,13 +60,13 @@ def _forest(n_estimators: int, seed: int) -> RandomForestClassifier:
     return RandomForestClassifier(
         n_estimators=n_estimators,
         class_weight="balanced_subsample",
-        n_jobs=-1,
+        n_jobs=1,
         random_state=seed,
     )
 
 
 def fit_model(
-    X: np.ndarray, y: np.ndarray, n_estimators: int, seed: int
+    X: np.ndarray, y: np.ndarray, n_estimators: int, seed: int, groups=None
 ):
     """Случайный лес + калибровка вероятностей (сигмоида).
 
@@ -76,12 +77,19 @@ def fit_model(
     """
     forest = _forest(n_estimators, seed)
     folds = int(min(3, np.bincount(y).min()))
+    calibration_cv = folds
+    if groups is not None:
+        if folds < 2 or len(np.unique(groups)) < 3:
+            raise ValueError("Insufficient scaffold groups/classes for train-only calibration")
+        calibration_cv = list(StratifiedGroupKFold(n_splits=3, shuffle=True, random_state=seed).split(X, y, groups))
+        if any(len(np.unique(y[indices])) != 2 for pair in calibration_cv for indices in pair):
+            raise ValueError("Calibration folds require both classes")
     if folds >= 2:
         # ensemble=False: хранится ОДИН лес (обученный на всех данных),
         # калибратор подбирается по внеобучающим предсказаниям. Это втрое
         # компактнее ансамбля по умолчанию — важно для размера моделей.
         model = CalibratedClassifierCV(
-            estimator=forest, method="sigmoid", cv=folds, ensemble=False
+            estimator=forest, method="sigmoid", cv=calibration_cv, ensemble=False
         )
         model.fit(X, y)
         return model
@@ -90,14 +98,17 @@ def fit_model(
 
 
 def classification_metrics(y_true: np.ndarray, y_prob: np.ndarray) -> dict:
-    y_pred = (y_prob >= 0.5).astype(int)
+    y_true, y_prob = np.asarray(y_true), np.asarray(y_prob)
+    if (y_true.shape != y_prob.shape or y_true.ndim != 1 or set(y_true) != {0, 1}
+            or not np.isfinite(y_prob).all() or (y_prob < 0).any() or (y_prob > 1).any()):
+        raise ValueError("Binary labels and finite matching probabilities in [0,1] required")
+    # All fitted estimators use classes [0,1] and choose class 0 on a tie.
+    y_pred = (y_prob > 0.5).astype(int)
     return {
-        "roc_auc": round(float(roc_auc_score(y_true, y_prob)), 4),
-        "pr_auc": round(float(average_precision_score(y_true, y_prob)), 4),
-        "balanced_accuracy": round(
-            float(balanced_accuracy_score(y_true, y_pred)), 4
-        ),
-        "mcc": round(float(matthews_corrcoef(y_true, y_pred)), 4),
+        "roc_auc": float(roc_auc_score(y_true, y_prob)),
+        "pr_auc": float(average_precision_score(y_true, y_prob)),
+        "balanced_accuracy": float(balanced_accuracy_score(y_true, y_pred)),
+        "mcc": float(matthews_corrcoef(y_true, y_pred)),
     }
 
 
@@ -107,7 +118,7 @@ def cross_validate(
     groups: np.ndarray,
     n_splits: int = 5,
     seed: int = 0,
-    n_estimators: int = 200,
+    n_estimators: int = DEFAULT_TREES,
 ) -> dict | None:
     """Кросс-валидация с разбиением по скаффолдам.
 
@@ -122,7 +133,7 @@ def cross_validate(
     for train_idx, test_idx in cv.split(X, y, groups):
         if len(np.unique(y[train_idx])) < 2:
             continue
-        model = fit_model(X[train_idx], y[train_idx], n_estimators, seed)
+        model = fit_model(X[train_idx], y[train_idx], n_estimators, seed, groups[train_idx])
         oof[test_idx] = model.predict_proba(X[test_idx])[:, 1]
 
     mask = ~np.isnan(oof)
@@ -141,14 +152,14 @@ def y_randomization_auc(
     rng = np.random.default_rng(seed)
     shuffled = rng.permutation(y)
     result = cross_validate(
-        X, shuffled, groups, seed=seed, n_estimators=100
+        X, shuffled, groups, seed=seed, n_estimators=DEFAULT_TREES
     )
     return result["roc_auc"] if result else None
 
 
-def train_final(X: np.ndarray, y: np.ndarray, seed: int = 0):
+def train_final(X: np.ndarray, y: np.ndarray, seed: int = 0, groups=None):
     """Финальная модель (тот же конвейер, что и в кросс-валидации)."""
-    return fit_model(X, y, 300, seed)
+    return fit_model(X, y, DEFAULT_TREES, seed, groups)
 
 
 def quality_gate(

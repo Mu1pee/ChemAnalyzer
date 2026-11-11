@@ -171,20 +171,24 @@ export interface QsarPrediction {
   probability: number | null;
   domain: string;
   max_similarity: number;
-  cv_auc: number;
-  cv_balanced_accuracy: number;
+  metrics: Record<string, number>;
   validation_method: string;
   n_train: number;
+  n_test: number;
+  test_positive: number;
+  test_negative: number;
+  active_threshold_nM: number;
   active_pchembl: number;
 }
 
 export interface QsarResult {
-  status: "ready" | "not_trained" | "error";
+  status: "ready" | "not_trained" | "quality_failed" | "error";
   available: boolean;
   message: string | null;
   models_loaded: number;
   predictions: QsarPrediction[];
   disclaimer: string;
+  rejected_models: Array<Record<string, unknown>>;
 }
 
 export interface ChatMessage {

@@ -62,9 +62,13 @@ export default function ActivityTab({ state, onTrainQsar }: Props) {
                 </div> : <div className="tab-note">Вне области применимости: численный прогноз скрыт.</div>}
                 <div className="activity-support">
                   вероятность pChEMBL ≥ {p.active_pchembl} · сходство с
-                  обучающей выборкой {p.max_similarity.toFixed(2)} · ROC-AUC
-                  модели {p.cv_auc.toFixed(2)} · обучено на {p.n_train}
-                  {" · Сбалансированная точность CV: "}{(p.cv_balanced_accuracy * 100).toFixed(1)}%
+                  обучающей выборкой {p.max_similarity.toFixed(2)} · порог IC50 ≤
+                  {p.active_threshold_nM} нМ · обучено на {p.n_train} · тест
+                  {" "}{p.n_test} (активных {p.test_positive}, неактивных {p.test_negative})
+                </div>
+                <div className="activity-support">
+                  Тест по каркасам: BA {(p.metrics.balanced_accuracy * 100).toFixed(1)}% ·
+                  ROC-AUC {p.metrics.roc_auc.toFixed(2)} · PR-AUC {p.metrics.pr_auc.toFixed(2)}
                 </div>
                 <div className="activity-support">{p.validation_method}</div>
                 {p.model_version && (
@@ -85,8 +89,8 @@ export default function ActivityTab({ state, onTrainQsar }: Props) {
           className={`tab-note ${qsar.status === "error" ? "tab-note-error" : "tab-note-warn"}`}
         >
           <strong>
-            {qsar.status === "error"
-              ? "QSAR-модели не удалось загрузить."
+            {qsar.status === "error" ? "QSAR-модели не удалось загрузить."
+              : qsar.status === "quality_failed" ? "QSAR-модель скрыта: проверка качества не пройдена."
               : "QSAR-модель не обучена."}
           </strong>{" "}
           {(qsar.message ?? "").replace(/^QSAR-модель не обучена\.\s*/, "")}

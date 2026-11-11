@@ -161,7 +161,9 @@ def main():
             reasons.append("Label randomization evaluation unavailable")
         report.update(metrics=metrics, y_random_auc=randomized, reasons=reasons)
         if not reasons:
-            model = core.train_final(X, y, seed=args.seed)
+            # Keep the final calibration folds scaffold-disjoint, matching the
+            # inner fitting procedure used by the scaffold CV above.
+            model = core.train_final(X, y, seed=args.seed, groups=groups)
             packed = core.pack_bits(X)
             label = "COX-2" if args.target == "CHEMBL230" else target["pref_name"]
             meta = dict(target_id=args.target, label=label + " · IC50 · " + args.assay, chembl_name=target["pref_name"],

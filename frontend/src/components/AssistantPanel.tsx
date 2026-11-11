@@ -109,7 +109,8 @@ function buildContext(
         probability: p.probability,
         domain: p.domain,
         max_similarity: p.max_similarity,
-        cv_auc: p.cv_auc
+        held_out_metrics: p.metrics,
+        n_test: p.n_test
       }))
     },
     druglikeness: activity && {

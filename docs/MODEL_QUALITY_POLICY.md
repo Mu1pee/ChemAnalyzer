@@ -1,4 +1,4 @@
-# Model admission policy, 2026-11-11
+# Model admission policy, 2026-11-11 (ChemAnalyzer 3.2.9)
 
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
@@ -60,7 +60,7 @@ remain not_trained until eligible real data and a passing model are available.
 
 | Application system | Evidence / status |
 | --- | --- |
-| Target QSAR, human COX-2 IC50 | Real ChEMBL 37 model, 2,776 unique compounds; 5-fold scaffold CV balanced accuracy 0.7081, ROC-AUC 0.7867, MCC 0.4160, randomized AUC 0.4913. Internal CV only; no external/assay-held-out test. |
+| Target QSAR, human COX-2 IC50 | Previous ChEMBL 37 bundle: 2,776 compounds and historical 5-fold scaffold CV BA 0.7081, ROC-AUC 0.7867, MCC 0.4160; not evidence for the shipped final object. Fixed-seed scaffold holdout revalidation selected RF on validation but test ROC-AUC was 0.733 (<0.75 gate); replacement withheld and legacy artifact rejected. See COX2_REVALIDATION_2026-11-11.md. |
 | Hydration free energy | Real FreeSolv data; updated split and model evaluated separately in the release report. Experimental; not antidote or plant activity. |
 | Antidote: acetaminophen rescue | No eligible curated training table has been integrated. Remains not_trained. General liver toxicity is not an antidote label. |
 | Arabidopsis primary-root growth/control | No eligible curated training table has been integrated. Remains not_trained. Auxin receptor binding is not root growth. |

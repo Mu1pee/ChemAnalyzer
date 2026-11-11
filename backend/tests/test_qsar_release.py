@@ -51,9 +51,10 @@ def test_bundled_models_merge_without_overwriting_user_models(tmp_path, monkeypa
     monkeypatch.setenv("CHEMANALYZER_BUNDLED_QSAR_DIR", str(bundle))
     qsar.reload_models()
     try:
-        models, error = qsar._load_models()
-        assert error is None
-        assert {m["meta"]["model_id"] for m in models} == {"user-model", "new-model"}
+        models, error, rejected = qsar._load_models()
+        assert not models
+        assert len(rejected) == 2
+        assert error is not None
         assert (user / "manifest.json").read_bytes() == original
     finally:
         qsar.reload_models()
@@ -67,8 +68,9 @@ def test_model_checksum_mismatch_is_rejected(tmp_path, monkeypatch):
     monkeypatch.delenv("CHEMANALYZER_BUNDLED_QSAR_DIR", raising=False)
     qsar.reload_models()
     try:
-        models, error = qsar._load_models()
+        models, error, rejected = qsar._load_models()
         assert not models
+        assert not rejected
         assert "checksum" in error
     finally:
         qsar.reload_models()
