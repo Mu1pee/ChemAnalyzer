@@ -47,3 +47,21 @@ document actual co-treatment rescue, matched controls, compound identity, dose,
 time and organism/cell system, plus usable redistribution/training terms.
 
 Both target models remain not_trained while these requirements are unresolved.
+
+## Additional source review, 2026-11-11
+
+Burrell et al., Microphenotron, doi:10.1186/s13007-017-0158-6:
+https://link.springer.com/article/10.1186/s13007-017-0158-6 . The article is CC BY
+4.0, with a CC0 data waiver unless otherwise stated. It describes 800 compounds,
+70 qualitative root-phenotype hits, and possible replicate loss. Its data
+availability statement requires requesting the datasets from the corresponding
+author. The public supplements concern hardware/software, not a complete
+structure-linked table of primary-root length/control measurements. No values
+or inactive labels were reconstructed from the article's aggregate counts.
+
+Rodriguez-Furlan et al., doi:10.1016/j.plantsci.2016.01.001, is a further lead:
+https://pubmed.ncbi.nlm.nih.gov/26940491/ . The abstract describes a 10,000-compound
+plant-growth screen. The publisher returned HTTP 403; the university repository
+showed an access challenge. Full row-level outcomes and redistribution terms
+remain unverified. Neither access protection was bypassed. This is not yet an
+eligible training dataset, and the abstract does not supply missing outcomes.

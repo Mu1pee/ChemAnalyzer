@@ -55,13 +55,16 @@ export default function ChemblTab({ state }: Props) {
       </div>}
       {!data.found &&
         data.available &&
+        !data.partial &&
+        !data.stale &&
+        !data.message &&
         data.similar.length === 0 && (
           <div className="tab-note">
-            <strong>Экспериментальные данные не найдены.</strong> Соединение
-            отсутствует в ChEMBL.
+            <strong>Точное совпадение и близкие аналоги не найдены.</strong>
+            {" "}Ответ ChEMBL получен полностью.
           </div>
         )}
-      {data.message && (data.found || data.similar.length > 0 || !data.available) && (
+      {data.message && (
         <div className="tab-note">{data.message}</div>
       )}
 

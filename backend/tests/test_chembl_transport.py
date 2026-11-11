@@ -120,3 +120,23 @@ def test_successful_fifteen_second_response_is_not_reported_unavailable(monkeypa
             assert await client.fetch("molecule.json") == {"molecules": []}
             assert not client.failures
     asyncio.run(scenario())
+
+
+def test_empty_similarity_cannot_mask_failed_exact_search(monkeypatch):
+    def handler(request):
+        if request.url.path.endswith("molecule.json"):
+            return httpx.Response(500)
+        return httpx.Response(200, json={"molecules": []})
+    result = run_fetch(handler, monkeypatch)
+    assert result["available"] and result["partial"] and not result["found"]
+    assert "molecule: http_500" in result["warnings"]
+    assert "частично" in result["message"] and "не найдены" not in result["message"]
+
+
+def test_http_200_error_envelope_is_not_an_empty_success():
+    async def scenario():
+        async with transport.ChemblClient(transport=httpx.MockTransport(
+                lambda request: httpx.Response(200, json={"error": "database unavailable"}))) as client:
+            assert await client.fetch("molecule.json") is None
+            assert client.failures == ["molecule: invalid_response"]
+    asyncio.run(scenario())

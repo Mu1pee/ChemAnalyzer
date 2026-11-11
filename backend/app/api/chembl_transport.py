@@ -44,9 +44,12 @@ class ChemblClient(httpx.AsyncClient):
                 response = await asyncio.wait_for(self.get(f"{BASE}/{path}", params=params), min(22, remaining))
                 if response.status_code == 200:
                     data = response.json()
-                    if isinstance(data, dict):
+                    collection = {"molecule": "molecules", "similarity": "molecules",
+                                  "mechanism": "mechanisms", "drug_indication": "drug_indications",
+                                  "activity": "activities", "target": "targets"}.get(endpoint)
+                    if isinstance(data, dict) and (collection is None or isinstance(data.get(collection), list)):
                         return data
-                    code = "invalid_json"
+                    code = "invalid_response"
                 else:
                     code = f"http_{response.status_code}"
                     retry = response.status_code in (408, 429, 500, 502, 503, 504)
