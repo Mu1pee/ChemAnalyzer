@@ -1,4 +1,4 @@
-# Model admission policy, 2026-11-10
+# Model admission policy, 2026-11-11
 
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
@@ -18,6 +18,8 @@ not claim that all catalog entries meet that goal.
   evaluated afterwards. At least 20 test molecules and 3 distinct scaffold groups
   are required; classifiers also require >= 10 test compounds/class. Every
   partition reserves at least 3 entire groups using group sizes only.
+  Support counts must be finite nonnegative integers; scaffolds cannot exceed
+  molecules and the two class counts must sum to the test molecule count.
 - Regression: held-out R² **strictly > 0.60** and MAE below the baseline. R² is an
   explained-variance score, not a percentage of correct predictions. Units and
   baseline errors remain visible. These thresholds are admission criteria, not
@@ -26,6 +28,9 @@ not claim that all catalog entries meet that goal.
   artifacts. A previous approval cannot bypass current evidence requirements.
   Existing user artifacts are preserved. Numerical values are withheld outside
   the heuristic applicability domain.
+  Malformed evidence fails closed. Unreadable model records are shown as invalid
+  in the research registry and excluded from inference; other records remain
+  available. Existing records are not deleted or silently repaired.
 - Internal CV and internal held-out tests remain explicitly distinct from
   independent external or prospective validation; none is claimed here.
 

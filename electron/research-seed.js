@@ -14,10 +14,19 @@ function seedResearchData(seedRoot, userData) {
       const target = path.join(userData, "research_agent", category, entry.name);
       if (fs.existsSync(target)) continue;
       fs.mkdirSync(path.dirname(target), { recursive: true });
-      fs.cpSync(path.join(source, entry.name), target, {
-        recursive: true, force: false, errorOnExist: true,
-        filter: file => !fs.lstatSync(file).isSymbolicLink(),
-      });
+      // Publish a complete record atomically. An interrupted copy must not leave
+      // a partial UUID directory that every subsequent launch would skip.
+      const staging = fs.mkdtempSync(path.join(path.dirname(target), ".seed-"));
+      try {
+        const record = path.join(staging, entry.name);
+        fs.cpSync(path.join(source, entry.name), record, {
+          recursive: true, force: false, errorOnExist: true,
+          filter: file => !fs.lstatSync(file).isSymbolicLink(),
+        });
+        fs.renameSync(record, target);
+      } finally {
+        fs.rmSync(staging, { recursive: true, force: true });
+      }
       copied++;
     }
   }

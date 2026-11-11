@@ -16,6 +16,20 @@ const EXTERNAL_HOSTS = new Set([
   "docs.claude.com",
 ]);
 
+// Compare parsed origins: a textual prefix also matches a different port or
+// a URL with userinfo (http://127.0.0.1:1234@another-host/).
+function isSameOrigin(raw, expected) {
+  if (!raw || !expected) return false;
+  try {
+    const url = new URL(raw);
+    const base = new URL(expected);
+    return ["http:", "https:"].includes(url.protocol) &&
+      !url.username && !url.password && url.origin === base.origin;
+  } catch {
+    return false;
+  }
+}
+
 function isAllowedExternalUrl(raw) {
   try {
     const url = new URL(String(raw));
@@ -74,7 +88,9 @@ function sanitizeFileName(name, fallbackBase = "chemanalyzer") {
     .trim()
     .slice(0, 100);
 
-  if (!base || RESERVED.test(base)) base = fallbackBase;
+  // Windows also reserves device names followed by another extension, e.g.
+  // CON.backup.pdf or LPT1.results.csv.
+  if (!base || RESERVED.test(base.split(".")[0].trimEnd())) base = fallbackBase;
   if (!ALLOWED_EXTENSIONS.has(ext)) ext = ".txt";
   return base + ext;
 }
@@ -84,6 +100,7 @@ function isAllowedExtension(name) {
 }
 
 module.exports = {
+  isSameOrigin,
   EXTERNAL_HOSTS,
   ALLOWED_EXTENSIONS,
   isAllowedExternalUrl,

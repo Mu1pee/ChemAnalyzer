@@ -1,4 +1,5 @@
 """Explicit allow-list scheduling, driven by FastAPI lifespan; never activates models."""
+import logging
 import threading
 import time
 
@@ -6,6 +7,8 @@ from pydantic import BaseModel, Field
 
 from .data_discovery import fetch_freesolv
 from .security import checksum, read_json, safe_child, utcnow, write_json
+
+logger = logging.getLogger(__name__)
 
 
 class Schedule(BaseModel):
@@ -38,36 +41,45 @@ class Scheduler:
     def tick(self, now=None):
         now = time.time() if now is None else now
         for path in self.agent.root.glob("schedules/*/policy.json"):
-            policy = Schedule.model_validate(read_json(path))
-            state_path = path.parent / "state.json"
-            state = read_json(state_path) if state_path.exists() else {}
-            if not policy.enabled or state.get("next_check", 0) > now:
-                continue
-            result = dict(at=utcnow(), next_check=now + policy.interval_seconds,
-                          approved_dataset_sha256=policy.approved_dataset_sha256)
             try:
-                if policy.check_freesolv:
-                    text, provenance, raw, license_data, evidence = fetch_freesolv()
-                    result["source_check"] = dict(dataset_sha256=checksum(text.encode()), provenance=provenance, evidence=evidence)
-                if policy.approved_dataset_sha256:
-                    folder = safe_child(self.agent.root / "tasks", policy.task_id)
-                    digest = read_json(folder / "dataset.json")["dataset_sha256"]
-                    if digest != policy.approved_dataset_sha256:
-                        result["training"] = "Skipped: changed data require new explicit approval"
-                    elif state.get("approved_dataset_sha256") == digest and state.get("run_id") and self.agent.run(state["run_id"])["status"] in ("queued", "running"):
-                        result.update(run_id=state["run_id"], training="Previous scheduled run still active")
-                    elif state.get("approved_dataset_sha256") == digest and state.get("run_id") and self.agent.run(state["run_id"])["status"] == "completed":
-                        result.update(trained_sha256=digest, training="Approved dataset completed")
-                    elif state.get("trained_sha256") != digest:
-                        run = self.agent.start(policy.task_id)
-                        result.update(run_id=run["id"])
-                    else:
-                        result["training"] = "No new approved data"
-            except Exception as error:
-                result["error"] = f"{type(error).__name__}: {error}"
-            if "trained_sha256" not in result and state.get("trained_sha256"):
-                result["trained_sha256"] = state["trained_sha256"]
-            write_json(state_path, result)
+                self._tick_policy(path, now)
+            except Exception:
+                # A damaged policy/state or an unwritable file must not stop
+                # other schedules or kill the daemon. Preserve corrupt evidence
+                # rather than treating it as an empty state and retraining.
+                logger.exception("Unable to process research schedule %s", path)
+
+    def _tick_policy(self, path, now):
+        policy = Schedule.model_validate(read_json(path))
+        state_path = path.parent / "state.json"
+        state = read_json(state_path) if state_path.exists() else {}
+        if not policy.enabled or state.get("next_check", 0) > now:
+            return
+        result = dict(at=utcnow(), next_check=now + policy.interval_seconds,
+                      approved_dataset_sha256=policy.approved_dataset_sha256)
+        try:
+            if policy.check_freesolv:
+                text, provenance, raw, license_data, evidence = fetch_freesolv()
+                result["source_check"] = dict(dataset_sha256=checksum(text.encode()), provenance=provenance, evidence=evidence)
+            if policy.approved_dataset_sha256:
+                folder = safe_child(self.agent.root / "tasks", policy.task_id)
+                digest = read_json(folder / "dataset.json")["dataset_sha256"]
+                if digest != policy.approved_dataset_sha256:
+                    result["training"] = "Skipped: changed data require new explicit approval"
+                elif state.get("approved_dataset_sha256") == digest and state.get("run_id") and self.agent.run(state["run_id"])["status"] in ("queued", "running"):
+                    result.update(run_id=state["run_id"], training="Previous scheduled run still active")
+                elif state.get("approved_dataset_sha256") == digest and state.get("run_id") and self.agent.run(state["run_id"])["status"] == "completed":
+                    result.update(trained_sha256=digest, training="Approved dataset completed")
+                elif state.get("trained_sha256") != digest:
+                    run = self.agent.start(policy.task_id)
+                    result.update(run_id=run["id"])
+                else:
+                    result["training"] = "No new approved data"
+        except Exception as error:
+            result["error"] = f"{type(error).__name__}: {error}"
+        if "trained_sha256" not in result and state.get("trained_sha256"):
+            result["trained_sha256"] = state["trained_sha256"]
+        write_json(state_path, result)
 
     def start(self):
         def loop():

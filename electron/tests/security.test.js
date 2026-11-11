@@ -3,6 +3,19 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const s = require("../security");
 
+test("app URLs require the exact origin, never a matching text prefix", () => {
+  const origin = "http://127.0.0.1:1234";
+  for (const url of [origin, origin + "/", origin + "/api/molecules?x=1#result"]) {
+    assert.equal(s.isSameOrigin(url, origin), true, url);
+  }
+  for (const url of [origin + "5/", origin + "@evil.example/", "https://127.0.0.1:1234/",
+    "http://localhost:1234/", "blob:" + origin + "/id", "file:///tmp/report.html", "", null]) {
+    assert.equal(s.isSameOrigin(url, origin), false, String(url));
+  }
+  assert.equal(s.isSameOrigin(origin, null), false);
+  assert.equal(s.isSameOrigin("http://localhost:51730/", "http://localhost:5173"), false);
+});
+
 test("внешние URL: разрешены только https и белый список хостов", () => {
   assert.equal(s.isAllowedExternalUrl("https://pubchem.ncbi.nlm.nih.gov/compound/2244"), true);
   assert.equal(s.isAllowedExternalUrl("https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL25"), true);
@@ -39,6 +52,8 @@ test("имена файлов: нет обхода каталогов, заре�
   assert.equal(s.sanitizeFileName("calc.exe"), "calc.txt");
   assert.equal(s.sanitizeFileName("run.bat"), "run.txt");
   assert.equal(s.sanitizeFileName("CON.pdf"), "chemanalyzer.pdf");
+  assert.equal(s.sanitizeFileName("CON.backup.pdf"), "chemanalyzer.pdf");
+  assert.equal(s.sanitizeFileName("LPT1.results.csv"), "chemanalyzer.csv");
   assert.equal(s.sanitizeFileName('bad<>:"|?*.json'), "bad_______.json");
   assert.equal(s.sanitizeFileName(""), "chemanalyzer.txt");
   assert.equal(s.sanitizeFileName("a".repeat(500) + ".csv").length <= 104, true);

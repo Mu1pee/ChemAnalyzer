@@ -22,7 +22,7 @@ const { seedResearchData } = require("./research-seed");
 const RESEARCH_BUNDLE = require("../package.json").chemanalyzerResearchBundle === true;
 
 const ROOT = path.resolve(__dirname, "..");
-const DEV_URL = process.env.CHEMANALYZER_DEV_URL || ""; // например http://localhost:5173
+const DEV_URL = app.isPackaged ? "" : (process.env.CHEMANALYZER_DEV_URL || "");
 const IS_DEV = !app.isPackaged && Boolean(DEV_URL);
 const DEVTOOLS = IS_DEV || process.env.CHEMANALYZER_DEVTOOLS === "1";
 
@@ -115,8 +115,7 @@ async function startBackend() {
 function isTrusted(event) {
   try {
     const url = event.senderFrame ? event.senderFrame.url : event.sender.getURL();
-    return Boolean(origin) && (url === origin || url.startsWith(`${origin}/`) ||
-      (DEV_URL && url.startsWith(DEV_URL)));
+    return Boolean(origin) && (security.isSameOrigin(url, origin) || security.isSameOrigin(url, DEV_URL));
   } catch {
     return false;
   }
@@ -157,7 +156,7 @@ function createWindow() {
 
   // Никаких переходов на сторонние адреса внутри приложения.
   mainWindow.webContents.on("will-navigate", (event, url) => {
-    const inApp = (origin && url.startsWith(origin)) || (DEV_URL && url.startsWith(DEV_URL));
+    const inApp = security.isSameOrigin(url, origin) || security.isSameOrigin(url, DEV_URL);
     if (!inApp) {
       event.preventDefault();
       openExternalSafe(url);
@@ -181,7 +180,7 @@ function setupSession() {
 
   ses.webRequest.onHeadersReceived((details, callback) => {
     const headers = { ...details.responseHeaders };
-    if (!DEV_URL && details.url.startsWith(origin || "\0")) {
+    if (!DEV_URL && security.isSameOrigin(details.url, origin)) {
       headers["Content-Security-Policy"] = [csp];
     }
     callback({ responseHeaders: headers });
@@ -192,9 +191,7 @@ function setupSession() {
   // страницам нашего origin; навигация на чужие адреса заблокирована выше.
   const always = new Set(["fullscreen", "clipboard-sanitized-write"]);
   const ownOnly = new Set(["clipboard-read"]);
-  const isOwn = (url) =>
-    Boolean(url) && ((origin && (url === origin || url.startsWith(`${origin}/`))) ||
-      Boolean(DEV_URL && url.startsWith(DEV_URL)));
+  const isOwn = (url) => security.isSameOrigin(url, origin) || security.isSameOrigin(url, DEV_URL);
 
   ses.setPermissionRequestHandler((_wc, permission, callback, details) =>
     callback(always.has(permission) || (ownOnly.has(permission) && isOwn(details && details.requestingUrl)))

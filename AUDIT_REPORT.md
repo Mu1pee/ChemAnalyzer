@@ -36,3 +36,20 @@ No P0 issue confirmed by checks performed so far.
 3. Resolve dependency/runtime findings and build/test Windows artifacts.
 4. Audit and extend reproducible ML training only with suitable real experimental data.
 5. Add CI and update user documentation with verified results and explicit limitations.
+
+## Update: 2026-11-11, version 3.2.7
+
+The preceding sections are the historical 3.2.0 baseline. Subsequent versions
+include actual Windows builds and real experimental models; current coverage is
+documented in docs/MODEL_QUALITY_POLICY.md. The overall >60% goal remains open.
+
+This update corrects endpoint/context pointer collisions, malformed quality
+evidence/counts, failure propagation from one damaged model/schedule, interrupted
+bundled-model copying, Electron origin-prefix checks and reserved Windows export
+names. The fixes preserve existing user files and scientific model weights.
+Backend: 276 tests passed; Electron: 20 passed; TypeScript/Vite build passed.
+Nine fixed research models had their original test metrics, support counts,
+scaffold separation and checksums reproduced. Native packaged Windows checks
+passed, including corrupt-record isolation. Live ChEMBL still returned upstream
+HTTP 500 for two sections, correctly reported as a partial result. See
+docs/RESILIENCE_VALIDATION_3.2.7.md for scope and outstanding limitations.

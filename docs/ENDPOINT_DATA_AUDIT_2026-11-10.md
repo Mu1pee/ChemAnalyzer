@@ -65,3 +65,27 @@ plant-growth screen. The publisher returned HTTP 403; the university repository
 showed an access challenge. Full row-level outcomes and redistribution terms
 remain unverified. Neither access protection was bypassed. This is not yet an
 eligible training dataset, and the abstract does not supply missing outcomes.
+
+## Further bounded search, 2026-11-11 (3.2.7)
+
+Yang et al., Nature Communications 7, 11916 (2016),
+https://www.nature.com/articles/ncomms11916 , describes an acetaminophen rescue
+screen of 302 **miRNA mimics**. This concerns nucleic-acid perturbations, not
+302 small molecules suitable for the current molecular-fingerprint QSAR. It
+was excluded without importing labels. Full supplemental reuse terms were
+not established; publisher retrieval redirected to authentication and PMC
+displayed a browser challenge. Neither was bypassed.
+
+Kim and Kim, Biomolecules 14, 1177 (2024),
+https://www.mdpi.com/2218-273X/14/9/1177 , describes a 14,400-compound reporter
+screen and detailed follow-up of SRR1/SRR2. Reporter expression does not supply
+primary-root-length/control values for that full library. Full supplement and
+license review remains incomplete (publisher HTTP 429; PMC browser challenge).
+No root outcomes or negative labels were inferred from those aggregate counts.
+
+Christian et al., Journal of Experimental Botany 59, 2757 (2008),
+https://academic.oup.com/jxb/article/59/10/2757/436620 , is a further root-growth
+screening lead. Publisher retrieval failed; a complete structure-linked outcome
+table and usable data terms have not been verified. It remains a lead, not an
+imported dataset. These bounded checks do not establish that no eligible dataset
+exists elsewhere. Both requested target models remain explicitly not_trained.
