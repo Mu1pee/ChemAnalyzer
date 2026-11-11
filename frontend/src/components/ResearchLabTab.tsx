@@ -76,6 +76,7 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
         <div className="research-actions">
           <button disabled={busy} onClick={() => setConfig(JSON.stringify(QSAR_TASK, null, 2))}>QSAR: обучение активности</button>
           <button disabled={busy} onClick={() => setConfig(JSON.stringify(status.default_task, null, 2))}>FreeSolv: гидратация</button>
+          {status.hlm_task && <button disabled={busy} onClick={() => setConfig(JSON.stringify(status.hlm_task, null, 2))}>NCATS: стабильность HLM</button>}
           {Object.entries(status.cyp_tasks ?? {}).map(([isoform, task]) =>
             <button key={isoform} disabled={busy} onClick={() => setConfig(JSON.stringify(task, null, 2))}>{isoform}: ингибирование</button>)}
           {Object.entries(status.screening_tasks ?? {}).map(([key, task]) =>
@@ -106,6 +107,10 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
           const result = await request(`/tasks/${selected}/tdc-cyp`, {});
           setMessage(`TDC CYP импортирован: ${result.measurements} исходных записей. SHA256 ${result.dataset_sha256}`);
         })}>Импорт TDC CYP</button>
+        <button disabled={busy || !selected || tasks.find(t => t.id === selected)?.endpoint !== status.hlm_task?.endpoint} onClick={() => act(async () => {
+          const result = await request(`/tasks/${selected}/ncats-hlm`, {});
+          setMessage(`NCATS HLM: импортировано ${result.measurements} исходных измерений. SHA256 ${result.dataset_sha256}`);
+        })}>Импорт NCATS HLM</button>
         {(["hiv", "hepg2"] as const).map(key => <button key={key} disabled={busy || !selected || tasks.find(t => t.id === selected)?.endpoint !== status.screening_tasks?.[key]?.endpoint} onClick={() => act(async () => {
           const result = await request(`/tasks/${selected}/tdc-${key}`, {});
           setMessage(`${key === "hiv" ? "NCI HIV" : "ToxCast HepG2"}: импортировано ${result.measurements} измерений. SHA256 ${result.dataset_sha256}`);

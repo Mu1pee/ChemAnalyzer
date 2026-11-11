@@ -49,7 +49,7 @@ import type {
 
 const FALLBACK_VERSION = __APP_VERSION__;
 const TAB_ICONS = { bioactivity: Layers3, props: Atom, adme: FlaskConical, ident: ScanLine, drug: ShieldCheck,
-  activity: Activity, antidote: Microscope, chembl: Database, cyp: FlaskConical, screening: Microscope, "3d": Network, history: History, research: Sparkles, assistant: BookOpen };
+  activity: Activity, antidote: Microscope, chembl: Database, cyp: FlaskConical, screening: Microscope, metabolism: FlaskConical, "3d": Network, history: History, research: Sparkles, assistant: BookOpen };
 
 // Пустой molfile надёжнее, чем setMolecule("").
 const EMPTY_MOLFILE =

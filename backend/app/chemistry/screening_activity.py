@@ -6,14 +6,19 @@ from app.ai_research_agent.model_registry import Registry
 from app.ai_research_agent.molecular_features import molecule
 from app.ai_research_agent.tdc_hiv import task_config as hiv_task
 from app.ai_research_agent.tdc_hepg2 import task_config as hepg2_task
+from app.ai_research_agent.ncats_hlm import task_config as hlm_task
 
-TASKS = {"hiv": hiv_task, "hepg2": hepg2_task}
-TITLES = {"hiv": "ВИЧ: ингибирование репликации", "hepg2": "HepG2: снижение пролиферации, 24 ч"}
+TASKS = {"hiv": hiv_task, "hepg2": hepg2_task, "hlm": hlm_task}
+TITLES = {"hiv": "ВИЧ: ингибирование репликации", "hepg2": "HepG2: снижение пролиферации, 24 ч",
+          "hlm": "Стабильность в микросомах человека: T½ > 30 мин"}
 CONTEXTS = {
     "hiv": "NCI/MoleculeNet: подтверждённо и умеренно активные соединения объединены в положительный класс. "
            "Это скрининговый исход, без единого порога EC50; не клиническая эффективность и не активность против других вирусов.",
     "hepg2": "ToxCast APR_HepG2_CellLoss_24h_dn: клетки HepG2, 24 часа, исходная бинарная оценка снижения пролиферации. "
              "Не доказательство гибели клеток, лечения рака, поражения печени или защиты от парацетамола.",
+    "hlm": "NCATS/PubChem AID 1963597: стабильность в микросомах печени человека, T½ > 30 минут. "
+           "Отдельная экспериментальная модель при фиксированных условиях источника. "
+           "Показана оценка стабильного фенотипа, а не точный период полужизни, клиренс, клинический прогноз или антидотное действие.",
 }
 DISCLAIMER = (
     "Экспериментальные модели отдельных тестов. Качество оценено на внутренней отложенной выборке "

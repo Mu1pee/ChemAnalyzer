@@ -36,6 +36,7 @@ export type Tab =
   | "chembl"
   | "cyp"
   | "screening"
+  | "metabolism"
   | "3d"
   | "history"
   | "research"
@@ -52,6 +53,7 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "chembl", label: "ChEMBL" },
   { id: "cyp", label: "CYP" },
   { id: "screening", label: "ВИЧ / HepG2" },
+  { id: "metabolism", label: "Стабильность HLM" },
   { id: "3d", label: "3D" },
   { id: "history", label: "История" },
   { id: "research", label: "AI Research Lab" },
@@ -72,7 +74,7 @@ interface Props {
   onClearHistory: () => void;
 }
 
-const NEEDS_RESULT: Tab[] = ["props", "adme", "ident", "drug", "activity", "antidote", "chembl", "cyp", "screening", "3d"];
+const NEEDS_RESULT: Tab[] = ["props", "adme", "ident", "drug", "activity", "antidote", "chembl", "cyp", "screening", "metabolism", "3d"];
 
 export default function ResultsPanel({
   tab,
@@ -185,6 +187,8 @@ export default function ResultsPanel({
         return <CypTab smiles={result.canonical_smiles} />;
       case "screening":
         return <ScreeningTab smiles={result.canonical_smiles} />;
+      case "metabolism":
+        return <ScreeningTab smiles={result.canonical_smiles} endpointKey="hlm" />;
       case "3d":
         return (
           <StructureTab

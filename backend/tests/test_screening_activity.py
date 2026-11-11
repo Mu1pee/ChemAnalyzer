@@ -26,17 +26,18 @@ def test_separate_endpoints_disclose_low_recall_and_class_counts(monkeypatch):
     registry(monkeypatch, [metadata()])
     response = TestClient(app).post("/api/molecules/screening", json=dict(smiles="CCO"))
     assert response.status_code == 200
-    hiv, hepg2 = response.json()["predictions"]
+    hiv, hepg2, hlm = response.json()["predictions"]
     assert hiv["key"] == "hiv" and hiv["probability"] == .7 and hiv["metrics"]["recall"] == .32
     assert hiv["test_positive"] == 10 and hiv["test_negative"] == 30
     assert hepg2["key"] == "hepg2" and hepg2["status"] == "not_trained" and hepg2["probability"] is None
+    assert hlm["key"] == "hlm" and hlm["status"] == "not_trained" and hlm["probability"] is None
 
 
 def test_wrong_assay_context_and_failed_quality_have_no_predictions(monkeypatch):
     wrong = metadata("hepg2")
     wrong["task"]["context"] = "HepG2: 72 hours or paracetamol rescue"
     registry(monkeypatch, [wrong, metadata(quality=dict(passed=False))])
-    hiv, hepg2 = screening.predict_screening("CCO")["predictions"]
+    hiv, hepg2 = screening.predict_screening("CCO")["predictions"][:2]
     assert hiv["status"] == "quality_failed" and hepg2["status"] == "not_trained"
     assert hiv["probability"] is None and hepg2["probability"] is None
 
@@ -58,6 +59,18 @@ def test_latest_selected_without_test_score_cherry_picking(monkeypatch):
 def test_invalid_and_mixture_smiles_rejected():
     for smiles in ("invalid", "CCO.Cl"):
         assert TestClient(app).post("/api/molecules/screening", json=dict(smiles=smiles)).status_code == 400
+
+
+def test_human_hlm_stability_does_not_use_rat_or_clinical_half_life_models(monkeypatch):
+    wrong = metadata("hlm", id="rat")
+    wrong["task"]["context"] = "Rat microsomes or clinical elimination half-life"
+    registry(monkeypatch, [wrong])
+    assert screening.predict_screening("CCO")["predictions"][2]["status"] == "not_trained"
+    registry(monkeypatch, [metadata("hlm", id="hlm")])
+    prediction = screening.predict_screening("CCO")["predictions"][2]
+    assert prediction["key"] == "hlm" and prediction["probability"] == .7
+    assert "T½ > 30" in prediction["title"]
+    assert prediction["model_status"] == "experimental"
 
 
 @pytest.mark.parametrize("key", ["hiv", "hepg2"])

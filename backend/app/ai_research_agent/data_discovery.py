@@ -8,6 +8,9 @@ from .config import FREESOLV_TASK
 from .security import checksum, utcnow
 
 CATALOG = [
+    {"id": "ncats_hlm", "name": "NCATS / PubChem AID 1963597 — human microsomal stability",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/bioassay/1963597", "license": "Public-Domain-US-Gov",
+     "endpoint": "human_hlm_stability_30min_ncats", "status": "supported_federal_source_phenotype_crosschecked_text_adapter"},
     {"id": "tdc_hiv", "name": "TDC / NCI MoleculeNet — HIV replication screen",
      "url": "https://tdcommons.ai/single_pred_tasks/hts/", "license": "CC-BY-4.0",
      "endpoint": "hiv_replication_inhibition_nci", "status": "supported_primary_reference_crosschecked_text_adapter"},
@@ -31,7 +34,7 @@ CATALOG = [
 
 def discover(endpoint: str):
     return {"endpoint": endpoint, "sources": CATALOG,
-            "message": "FreeSolv, TDC Veith CYP, NCI/MoleculeNet HIV and one ToxCast HepG2 24-hour assay have reviewed text adapters. Other sources are leads, not verified datasets."}
+            "message": "FreeSolv, TDC Veith CYP, NCI/MoleculeNet HIV, one ToxCast HepG2 assay and federal NCATS HLM AID 1963597 have reviewed text adapters. Other sources are leads, not verified datasets."}
 
 
 def _fetch(url, limit=4_000_000):

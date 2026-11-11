@@ -142,6 +142,17 @@ class ResearchAgent:
         (folder / "source-metadata.json").write_bytes(metadata)
         return result
 
+    def import_ncats_hlm(self, identifier):
+        from .ncats_hlm import fetch_hlm, validate_task
+        validate_task(self.task(identifier))
+        text, provenance, raw, metadata, policy, evidence = fetch_hlm()
+        result = self.import_csv(identifier, text, Provenance(**provenance), evidence)
+        folder = safe_child(self.root / "tasks", identifier) / result["version_id"]
+        (folder / "source.csv").write_bytes(raw)
+        (folder / "source-metadata.json").write_bytes(metadata)
+        (folder / "SOURCE_POLICY.html").write_bytes(policy)
+        return result
+
     def start(self, identifier, action="train"):
         if action not in ("prepare", "train"):
             raise ValueError("Unknown action")

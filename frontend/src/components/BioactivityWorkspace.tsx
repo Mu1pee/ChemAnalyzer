@@ -69,18 +69,19 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
     const text = `${item.name} ${item.method} ${item.scope}`.toLocaleLowerCase("ru");
     return (category === "all" || item.group === category) && text.includes(query.trim().toLocaleLowerCase("ru"))
       && (!onlyReady || ["calculation", "source"].includes(item.status) || (item.status === "qsar" && activity.data?.qsar.status === "ready")
-        || (["cyp", "hiv", "hepg2"].includes(item.id) && matchingModels(item).some(model => model.quality?.passed)));
+        || (["cyp", "hiv", "hepg2", "metabolism"].includes(item.id) && matchingModels(item).some(model => model.quality?.passed)));
   }), [query, category, onlyReady, activity.data, agent.models]);
   const localCount = activity.data?.qsar.models_loaded;
   const liveModels = agent.models.filter(model => model.status === "approved" && model.quality?.passed);
   function matchingModels(item: BioModule) {
     if (item.id === "cyp") return agent.models.filter(model => model.status !== "archived" && /^cyp(?:1a2|2c9|2c19|2d6|3a4)_inhibition_veith$/.test(model.task?.endpoint ?? ""));
+    if (item.id === "metabolism") return agent.models.filter(model => model.status !== "archived" && model.task?.endpoint === "human_hlm_stability_30min_ncats");
     if (item.id === "hiv" || item.id === "hepg2") return agent.models.filter(model => model.status !== "archived" && model.task?.endpoint === (item.id === "hiv" ? "hiv_replication_inhibition_nci" : "hepg2_cellloss_24h_toxcast"));
     return item.preset ? agent.models.filter(model => model.task?.endpoint === item.preset?.endpoint) : [];
   }
 
   function open(item: BioModule) {
-    if (["cyp", "hiv", "hepg2"].includes(item.id) && item.tab) { onTab(item.tab); return; }
+    if (["cyp", "hiv", "hepg2", "metabolism"].includes(item.id) && item.tab) { onTab(item.tab); return; }
     if (item.status === "dataset" || item.status === "key") { setSelected(item); return; }
     if (item.tab) onTab(item.tab);
   }

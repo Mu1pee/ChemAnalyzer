@@ -40,7 +40,7 @@ class Provenance(BaseModel):
     model_config = ConfigDict(extra="forbid")
     source_url: str = Field(min_length=8, max_length=2000)
     doi: str = Field(min_length=3, max_length=200)
-    license: Literal["CC-BY-4.0", "CC0-1.0", "CC-BY-SA-4.0", "PDDL-1.0"]
+    license: Literal["CC-BY-4.0", "CC0-1.0", "CC-BY-SA-4.0", "PDDL-1.0", "Public-Domain-US-Gov"]
     license_url: str = Field(min_length=8, max_length=2000)
     source_version: str = Field(min_length=1, max_length=100)
     retrieved_at: str = Field(min_length=10, max_length=100)

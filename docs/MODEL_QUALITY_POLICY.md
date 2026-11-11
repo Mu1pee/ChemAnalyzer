@@ -41,7 +41,8 @@ not claim that all catalog entries meet that goal.
 | HIV replication, NCI/MoleculeNet | Experimental classifier, 38,027 accepted molecules; internal held-out balanced accuracy 65.50%, ROC-AUC 0.7614. Recall only 32.07%; no external validation. |
 | HepG2 proliferation decrease, 24 h | Experimental single-assay ToxCast classifier, 924 accepted molecules; internal held-out balanced accuracy 71.25%, ROC-AUC 0.7704. No clinical toxicity claim or external validation. |
 | CYP inhibition | Version 3.2.3 adds five separate TDC/Veith models; internal held-out balanced accuracy 72.76–78.62%. Full evidence and class-specific limitations: CYP_VALIDATION_3.2.3.md. No external validation. |
-| Metabolic stability, toxicity | Separate endpoint datasets and validation required. No trained predictions claimed. |
+| Human liver microsomal stability >30 min | Version 3.2.6 adds one NCATS AID 1963597 classifier: internal held-out balanced accuracy 71.25%, ROC-AUC 0.7441, stable recall 65.69%, positive predictive value 80.72%. 171 test compounds; experimental, no external validation. See HLM_VALIDATION_3.2.6.md. |
+| Quantitative in-vitro half-life, other metabolic systems, general toxicity | Separate endpoint datasets and validation required. No validated predictions claimed for these broader endpoints. |
 | Gene expression, publication entity extraction | Planned pipelines without trained artifacts. |
 | Activity spectrum | Tanimoto nearest-drug comparison; structural similarity, not calibrated biological prediction. No accuracy percentage is assigned. |
 | ADME profile, drug-likeness | RDKit descriptors, rules, ESOL/BOILED-Egg estimates. Deterministic rules and empirical estimates are labelled by method; no blanket >60% prediction claim. |

@@ -77,6 +77,23 @@ Richard et al. (2016), doi:10.1021/acs.chemrestox.6b00135; TDC contributors.
 Исходные бинарные метки сохранены. Оригинальный код ChemAnalyzer имеет
 собственные условия; лицензия данных их не заменяет.
 
+## NCATS HLM — модель метаболической стабильности, сборка 3.2.6
+
+Источник: федеральные экспериментальные данные NCATS/NIH, PubChem AID 1963597,
+NCGC ADME-HLM1, версия 1, ревизия 1. Происхождение и политика:
+https://pubchem.ncbi.nlm.nih.gov/bioassay/1963597 и
+https://www.ncbi.nlm.nih.gov/home/about/policies/ . Для этих федеральных записей
+provenance указывает Public-Domain-US-Gov. Это не утверждение, что все сторонние
+материалы PubChem свободны от прав, и не вымышленная лицензия CC0.
+Статья отдельно опубликована под CC BY 4.0: Shah et al. (2024),
+doi:10.3390/pharmaceutics16101257. Новая подготовленная таблица и веса модели
+предоставляются под CC BY 4.0 с сохранением атрибуции NCATS/NIH, PubChem и авторов;
+https://creativecommons.org/licenses/by/4.0/ . Изменения: проверка исходного
+фенотипа и меток, явное отображение Stable/Class=0 как положительного класса
+модели, подготовка структур, scaffold-разбиение и обучение Random Forest.
+Не подразумевается одобрение со стороны правительства США. Условия исходного
+кода ChemAnalyzer не меняются.
+
 ## ChemCanvas
 
 Проект ChemCanvas (https://github.com/ksharindam/chemcanvas, GPL-3.0)
