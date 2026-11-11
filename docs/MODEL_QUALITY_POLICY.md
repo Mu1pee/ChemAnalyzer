@@ -34,6 +34,28 @@ not claim that all catalog entries meet that goal.
 - Internal CV and internal held-out tests remain explicitly distinct from
   independent external or prospective validation; none is claimed here.
 
+## Specialized binary training, version 3.2.8
+
+The acetaminophen-rescue and Arabidopsis primary-root binary trainer now requires
+a schema-2 protocol sidecar with CSV SHA-256, exact endpoint/context, organism,
+profile-specific conditions, class definition and experimental-source/license
+declaration. Missing source outcomes cannot be treated as inactive. The protocol
+is a curator declaration and does not establish independent review by itself.
+
+Fixed candidates fit train only; validation selects the candidate using PR-AUC
+after validation quality gates. The selected object is tested once and retained
+without refitting. Its test must pass balanced accuracy >0.60, ROC-AUC >=0.70,
+MCC >=0.10 and beat the prior baseline in PR-AUC. Fitted support requires 30
+compounds and five scaffolds/class; validation needs five compounds/class and
+test ten/class. Disjoint partition indices and complete support are checked again
+at loading, along with protocol, feature schema and artifact SHA-256.
+
+CV-only legacy specialized artifacts stay on disk but cannot generate predictions
+without retraining under this contract. All acyclic structures share one split
+group; mixtures require explicit curation. This binary path does not produce
+continuous rescue or root-length ratios. Both requested specialized endpoints
+remain not_trained until eligible real data and a passing model are available.
+
 ## Current coverage
 
 | Application system | Evidence / status |

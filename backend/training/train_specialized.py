@@ -5,19 +5,22 @@ Run from backend:
     python -m training.train_specialized --domain antidote
 
 Data sources must be curated and traceable. Each endpoint/context is trained
-as a separate binary task. No model is emitted unless sample-size and CV
-quality gates pass.
+as a separate binary task. No model is emitted unless sample-size and held-out
+quality gates pass on a test excluded from model selection. A matching protocol
+sidecar with source rights and experimental conditions is required.
 """
 from __future__ import annotations
 
 import argparse
 import csv
 import hashlib
+import io
 import json
 import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
+from uuid import uuid4
 
 import joblib
 import numpy as np
@@ -25,15 +28,16 @@ import sklearn
 from rdkit import Chem
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import (
-    balanced_accuracy_score,
-    matthews_corrcoef,
-    roc_auc_score,
-)
-from sklearn.model_selection import StratifiedGroupKFold
+from sklearn.dummy import DummyClassifier
+from sklearn.metrics import matthews_corrcoef
+from threadpoolctl import threadpool_limits
+from rdkit.Chem.Scaffolds import MurckoScaffold
 
 from app import config
-from app.model_quality import classification_reasons
+from app.model_quality import classification_reasons, finite, held_out_quality
+from app.ai_research_agent.evaluation import metrics as evaluate_metrics, scaffold_split
+from app.ai_research_agent.security import write_json
+from app.chemistry.specialized_evidence import FEATURE_CONFIG, SpecializedProtocol, quality
 from app.chemistry import fingerprints as fp
 from app.chemistry import qsar_core as core
 
@@ -59,8 +63,8 @@ def create_model(algorithm: str, seed: int, final: bool = False):
         return GradientBoostingClassifier(n_estimators=100, max_depth=2, random_state=seed)
     if algorithm != "random_forest":
         raise ValueError(f"Unknown algorithm: {algorithm}")
-    return RandomForestClassifier(n_estimators=400 if final else 200,
-                                  class_weight="balanced_subsample", n_jobs=-1,
+    return RandomForestClassifier(n_estimators=200,
+                                  class_weight="balanced_subsample", n_jobs=1,
                                   random_state=seed, min_samples_leaf=2)
 
 
@@ -80,17 +84,30 @@ def read_dataset(path: Path) -> tuple[dict, list[str]]:
     if not path.is_file():
         return report, [f"Файл данных не найден: {path}"]
 
-    with path.open("r", newline="", encoding="utf-8-sig") as handle:
+    with path.open("rb") as handle:
+        raw = handle.read(8_000_001)
+    if len(raw) > 8_000_000:
+        return report, ["Dataset exceeds 8 MB limit"]
+    report["dataset_sha256"] = hashlib.sha256(raw).hexdigest()
+    with io.StringIO(raw.decode("utf-8-sig"), newline="") as handle:
         reader = csv.DictReader(handle)
         headers = set(reader.fieldnames or [])
+        if len(headers) != len(reader.fieldnames or []):
+            return report, ["Duplicate CSV column names are not permitted"]
         missing = REQUIRED_COLUMNS - headers
         if missing:
             return report, ["В CSV отсутствуют столбцы: " + ", ".join(sorted(missing))]
 
         for line_number, row in enumerate(reader, start=2):
-            if not any((value or "").strip() for value in row.values()):
+            if None not in row and not any((value or "").strip() for value in row.values()):
                 continue
             report["rows_read"] += 1
+            if report["rows_read"] > 50000:
+                return report, ["Dataset exceeds 50,000-row limit"]
+            if None in row:
+                report["invalid_rows"] += 1
+                report["errors"].append(f"Строка {line_number}: лишние поля CSV")
+                continue
             try:
                 smiles = (row.get("smiles") or "").strip()
                 endpoint = (row.get("endpoint") or "").strip()
@@ -103,11 +120,13 @@ def read_dataset(path: Path) -> tuple[dict, list[str]]:
                 mol = fp.mol_from_smiles(smiles)
                 if mol is None:
                     raise ValueError("некорректный SMILES")
+                if len(Chem.GetMolFrags(mol)) != 1 or mol.GetNumAtoms() > 200:
+                    raise ValueError("соль, смесь или слишком большая структура: нужна явная курация")
                 mol = fp.standardize(mol)
                 canonical = Chem.MolToSmiles(mol, canonical=True, isomericSmiles=True)
                 if not canonical:
                     raise ValueError("не удалось канонизировать SMILES")
-                scaffold = fp.scaffold_smiles(mol)
+                scaffold = MurckoScaffold.MurckoScaffoldSmiles(mol=mol, includeChirality=False) or "ACYCLIC"
                 tasks[(endpoint, context)][canonical].append({
                     "label": label, "mol": mol, "scaffold": scaffold,
                     "source": source, "source_id": source_id,
@@ -148,7 +167,7 @@ def read_dataset(path: Path) -> tuple[dict, list[str]]:
     return {"report": report, "tasks": prepared}, []
 
 
-def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, seed: int, algorithm: str = "random_forest") -> tuple[tuple[str, dict] | None, str | None, dict]:
+def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, seed: int, algorithm: str = "auto") -> tuple[tuple[str, dict] | None, str | None, dict]:
     rows = task["rows"]
     y = np.asarray([row["label"] for row in rows], dtype=np.int8)
     n_active = int(y.sum())
@@ -174,6 +193,8 @@ def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, se
     }
 
     reasons = []
+    if min_per_class < MODEL_MIN_PER_CLASS or not finite(min_auc) or not MODEL_MIN_AUC_DEFAULT <= min_auc <= 1:
+        reasons.append("Нельзя ослаблять пороги: минимум 30 соединений класса и ROC-AUC >= 0.70")
     if n_active < min_per_class or n_inactive < min_per_class:
         reasons.append(f"нужно не менее {min_per_class} примеров каждого класса; получено {n_active}/{n_inactive}")
     if min(unique_groups_by_class.values()) < MODEL_MIN_SCAFFOLDS_PER_CLASS:
@@ -182,73 +203,84 @@ def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, se
         report["reasons"] = reasons
         return None, "; ".join(reasons), report
 
-    X = np.stack([fp.fingerprint_array(row["mol"]) for row in rows]).astype(np.uint8)
-    n_splits = min(5, unique_groups_by_class[0], unique_groups_by_class[1])
-    oof = np.full(len(y), np.nan, dtype=float)
-    cv_failures = []
-    splitter = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=seed)
-
     try:
-        split_iterator = splitter.split(X, y, groups)
-        for fold, (train_idx, test_idx) in enumerate(split_iterator, start=1):
-            if len(np.unique(y[train_idx])) != 2:
-                cv_failures.append(f"fold {fold}: обучающая часть содержит один класс")
-                continue
-            model = create_model(algorithm, seed + fold)
-            model.fit(X[train_idx], y[train_idx])
-            classes = list(model.classes_)
-            if 1 not in classes:
-                cv_failures.append(f"fold {fold}: модель не обучила положительный класс")
-                continue
-            oof[test_idx] = model.predict_proba(X[test_idx])[:, classes.index(1)]
-    except Exception as error:
-        message = f"не удалось выполнить scaffold cross-validation: {error}"
-        report["reasons"] = [message]
-        return None, message, report
-
-    mask = np.isfinite(oof)
-    if mask.sum() == 0 or len(np.unique(y[mask])) != 2:
-        message = "не удалось получить проверяемые out-of-fold прогнозы"
-        report["reasons"] = [message, *cv_failures]
-        return None, message, report
-
-    y_true = y[mask]
-    y_prob = oof[mask]
-    y_pred = (y_prob >= 0.5).astype(np.int8)
-    metrics = {
-        "roc_auc": round(float(roc_auc_score(y_true, y_prob)), 4),
-        "balanced_accuracy": round(float(balanced_accuracy_score(y_true, y_pred)), 4),
-        "mcc": round(float(matthews_corrcoef(y_true, y_pred)), 4),
-        "n_evaluated": int(mask.sum()),
-        "cv_folds": n_splits,
-    }
-    report["metrics"] = metrics
-    reasons += classification_reasons(metrics, max(min_auc, MODEL_MIN_AUC_DEFAULT), MODEL_MIN_MCC)
-    if not mask.all() or cv_failures:
-        reasons += ["Incomplete out-of-fold evaluation", *cv_failures]
-    if reasons:
-        report["reasons"] = reasons
-        return None, "; ".join(reasons), report
-
-    final_model = create_model(algorithm, seed, final=True)
-    final_model.fit(X, y)
-    packed = core.pack_bits(X)
+        protocol = SpecializedProtocol.model_validate(task.get("protocol"))
+        if any(getattr(protocol, key) != value for key, value in
+               (("domain", domain), ("endpoint", task["endpoint"]), ("context", task["context"]))):
+            raise ValueError("Protocol must match the complete endpoint/context task")
+        algorithms = ALGORITHMS if algorithm == "auto" else (algorithm,)
+        if any(name not in ALGORITHMS for name in algorithms):
+            raise ValueError("Unknown algorithm")
+        X = np.stack([fp.fingerprint_array(row["mol"]) for row in rows]).astype(np.uint8)
+        train_idx, validation_idx, test_idx = scaffold_split(y, groups, seed)
+        split = dict(train=train_idx, validation=validation_idx, test=test_idx)
+        support = {}
+        for name, indices in split.items():
+            support[name] = dict(molecules=len(indices), scaffolds=len(np.unique(groups[indices])),
+                                 positive=int((y[indices] == 1).sum()), negative=int((y[indices] == 0).sum()))
+            minimum = min_per_class if name == "train" else 10 if name == "test" else 5
+            if min(support[name]["positive"], support[name]["negative"]) < minimum:
+                raise ValueError(f"Insufficient {name} class support: need {minimum} compounds/class")
+        if any(len(np.unique(groups[train_idx][y[train_idx] == cls])) < MODEL_MIN_SCAFFOLDS_PER_CLASS for cls in (0, 1)):
+            raise ValueError("Training partition needs at least five scaffold groups/class")
+        def measure(estimator, indices):
+            result = evaluate_metrics(estimator, X[indices], y[indices], "classification")
+            result.update(mcc=float(matthews_corrcoef(y[indices], estimator.predict(X[indices]))), n_evaluated=len(indices))
+            return result
+        candidates = []
+        with threadpool_limits(limits=1):
+            for name in algorithms:
+                candidate = create_model(name, seed)
+                candidate.fit(X[train_idx], y[train_idx])
+                validation = measure(candidate, validation_idx)
+                candidates.append((candidate, dict(algorithm=name, validation=validation)))
+            eligible = [item for item in candidates if not classification_reasons(item[1]["validation"], min_auc, MODEL_MIN_MCC)]
+            if not eligible:
+                raise ValueError("No candidate passed validation quality; held-out test remains unused")
+            final_model, winner = max(eligible, key=lambda item: item[1]["validation"]["pr_auc"])
+            # Never refit after this evaluation: the shipped object is exactly
+            # the train-only fitted model evaluated here, including tree count.
+            metrics = measure(final_model, test_idx)
+            baseline = DummyClassifier(strategy="prior").fit(X[train_idx], y[train_idx])
+            baseline_metrics = measure(baseline, test_idx)
+        evaluation = dict(test=metrics, baseline_test=baseline_metrics, support=support,
+                          validation=winner["validation"], candidates=[item[1] for item in candidates], selected=winner["algorithm"],
+                          split={name: indices.tolist() for name, indices in split.items()},
+                          split_method="scaffold groups by size only; fixed train/validation/test; no post-test refit",
+                          test_used_for_selection=False, beats_baseline=metrics["pr_auc"] > baseline_metrics["pr_auc"])
+        report.update(metrics=metrics, evaluation=evaluation)
+        reasons = held_out_quality("classification", evaluation)["reasons"] + classification_reasons(metrics, min_auc, MODEL_MIN_MCC)
+        if reasons:
+            raise ValueError("; ".join(dict.fromkeys(reasons)))
+    except ValueError as error:
+        report["reasons"] = [str(error)]
+        return None, str(error), report
+    packed = core.pack_bits(X[train_idx])
     source_values = sorted({source for row in rows for source in row["sources"]})
-    model_key = hashlib.sha256(f"{domain}\0{task['endpoint']}\0{task['context']}".encode("utf-8")).hexdigest()[:16]
+    model_key = uuid4().hex
     model_file = f"{domain}_{model_key}.joblib"
     meta = {
         "domain": domain,
         "endpoint": task["endpoint"],
         "context": task["context"],
-        "model_version": "1.0",
-        "algorithm": algorithm,
+        "schema_version": 2,
+        "model_version": "2.0",
+        "algorithm": winner["algorithm"],
         "trained_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "sklearn_version": sklearn.__version__,
-        "n_train": int(len(y)),
-        "n_active": n_active,
-        "n_inactive": n_inactive,
+        "n_train": len(train_idx),
+        "n_total": len(rows),
+        "n_active": support["train"]["positive"],
+        "n_inactive": support["train"]["negative"],
+        "n_test": len(test_idx),
         "metrics": metrics,
+        "evaluation": evaluation,
+        "protocol": protocol.model_dump(),
+        "dataset_sha256": protocol.dataset_sha256,
+        "feature_config": FEATURE_CONFIG,
+        "scientific_status": "experimental; internal held-out test, no external validation; uncalibrated probabilities",
         "decision_threshold": 0.5,
+        "decision_rule": "estimator.predict with fixed class ordering 0/1; no threshold tuning",
         "domain_edge_threshold": core.DOMAIN_EDGE,
         "dataset_source": " | ".join(source_values[:10]),
         "source_count": len(source_values),
@@ -262,7 +294,12 @@ def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, se
         "train_popcount": core.popcounts(packed),
         "meta": meta,
     }
+    admission = quality(meta)
+    if not admission["passed"]:
+        report["reasons"] = admission["reasons"]
+        return None, "; ".join(admission["reasons"]), report
     report["accepted"] = True
+    report["curated_records"] = [{key: row[key] for key in ("smiles", "label", "scaffold", "sources")} for row in rows]
     report["model_file"] = model_file
     return (model_file, bundle), None, report
 
@@ -270,7 +307,7 @@ def fit_endpoint(domain: str, task: dict, min_per_class: int, min_auc: float, se
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--domain", choices=["all", *DOMAINS], default="all")
-    parser.add_argument("--algorithm", choices=ALGORITHMS, default="random_forest")
+    parser.add_argument("--algorithm", choices=["auto", *ALGORITHMS], default="auto")
     parser.add_argument("--data-dir", type=Path, default=DATA_DIR)
     parser.add_argument("--models-dir", type=Path, default=config.models_dir() / "specialized_activity")
     parser.add_argument("--min-per-class", type=int, default=MODEL_MIN_PER_CLASS)
@@ -278,8 +315,8 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
-    if args.min_per_class < 10:
-        parser.error("--min-per-class не может быть меньше 10: для исследований нужна минимальная выборка")
+    if args.min_per_class < MODEL_MIN_PER_CLASS or not finite(args.min_auc) or not MODEL_MIN_AUC_DEFAULT <= args.min_auc <= 1:
+        parser.error("Требуется --min-per-class >= 30 и конечное 0.70 <= --min-auc <= 1")
     args.models_dir.mkdir(parents=True, exist_ok=True)
 
     domains = list(DOMAINS) if args.domain == "all" else [args.domain]
@@ -300,6 +337,11 @@ def main() -> int:
             })
         for task in loaded["tasks"]:
             try:
+                protocol_path = path.with_suffix(".protocol.json")
+                protocol = SpecializedProtocol.model_validate_json(protocol_path.read_text(encoding="utf-8"))
+                if protocol.dataset_sha256 != loaded["report"]["dataset_sha256"]:
+                    raise ValueError("CSV checksum does not match the reviewed protocol sidecar")
+                task["protocol"] = protocol.model_dump()
                 result, reason, task_report = fit_endpoint(
                     domain, task, args.min_per_class, args.min_auc, args.seed, args.algorithm
                 )
@@ -309,17 +351,22 @@ def main() -> int:
             if result:
                 model_file, bundle = result
                 joblib.dump(bundle, args.models_dir / model_file, compress=3)
-                accepted.append({"domain": domain, "model_file": model_file, **bundle["meta"]})
+                accepted.append({"domain": domain, "model_file": model_file, **bundle["meta"],
+                                 "artifact_sha256": hashlib.sha256((args.models_dir / model_file).read_bytes()).hexdigest()})
             else:
                 rejected.append({**task_report, "reason": reason or "модель отклонена"})
 
     # Если обучается только одно направление, не удаляем уже обученные модели
     # другого направления из manifest. Для --domain all заменяем оба набора.
     preserved = []
+    manifest_problem = None
     previous_manifest = args.models_dir / "manifest.json"
     if previous_manifest.is_file():
         try:
-            old_records = json.loads(previous_manifest.read_text(encoding="utf-8")).get("models", [])
+            old_manifest = json.loads(previous_manifest.read_text(encoding="utf-8"))
+            if not isinstance(old_manifest, dict) or not isinstance(old_manifest.get("models", []), list):
+                raise ValueError("Invalid previous manifest structure")
+            old_records = old_manifest.get("models", [])
             accepted_domains = {record.get("domain") for record in accepted}
             for old in old_records if isinstance(old_records, list) else []:
                 if not isinstance(old, dict):
@@ -335,16 +382,17 @@ def main() -> int:
                         and "\\" not in filename and "/" not in filename
                         and (args.models_dir / filename).is_file()):
                     preserved.append(old)
-        except (OSError, ValueError, TypeError):
-            preserved = []
+        except (OSError, ValueError, TypeError) as error:
+            manifest_problem = f"Previous manifest is unreadable and was preserved: {type(error).__name__}"
 
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "application": "ПК Антидот-Прогноз",
         "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "models": [*preserved, *accepted],
     }
-    (args.models_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    if manifest_problem is None:
+        write_json(args.models_dir / "manifest.json", manifest)
     report = {
         "application": "ПК Антидот-Прогноз",
         "data_dir": str(args.data_dir),
@@ -352,6 +400,8 @@ def main() -> int:
         "accepted_count": len(accepted),
         "preserved_count": len(preserved),
         "manifest_model_count": len(manifest["models"]),
+        "manifest_updated": manifest_problem is None,
+        "manifest_error": manifest_problem,
         "rejected_count": len(rejected),
         "summaries": summaries,
         "accepted": accepted,
@@ -362,11 +412,11 @@ def main() -> int:
             "min_balanced_accuracy": MODEL_MIN_BALANCED_ACC,
             "min_mcc": MODEL_MIN_MCC,
         },
-        "note": "Модель сохраняется только после endpoint-specific scaffold CV и прохождения заданных порогов. Это не подтверждение экспериментальной активности.",
+        "note": "Фиксированное разделение каркасов на train/validation/test. Алгоритм выбирается по validation, веса не переобучаются после test. Источник и права требуют независимой проверки; прогноз исследовательский.",
     }
-    (args.models_dir / "training_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_json(args.models_dir / "training_report.json", report)
     print(json.dumps({"accepted": len(accepted), "preserved": len(preserved), "rejected": len(rejected), "manifest_models": len(manifest["models"]), "models_dir": str(args.models_dir)}, ensure_ascii=False, indent=2))
-    return 0 if accepted else 1
+    return 0 if accepted and manifest_problem is None else 1
 
 
 def DOMAINS_FILE(domain: str) -> str:

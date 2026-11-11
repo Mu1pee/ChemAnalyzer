@@ -323,6 +323,12 @@ export interface SpecializedModelPrediction {
   n_train: number;
   n_active: number;
   n_inactive: number;
+  n_test: number;
+  test_positive: number;
+  test_negative: number;
+  validation_method: string;
+  scientific_status: string;
+  quality: Record<string, unknown>;
   metrics: Record<string, number>;
   dataset_source: string;
   message: string | null;

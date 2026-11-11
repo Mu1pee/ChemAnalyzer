@@ -53,3 +53,17 @@ scaffold separation and checksums reproduced. Native packaged Windows checks
 passed, including corrupt-record isolation. Live ChEMBL still returned upstream
 HTTP 500 for two sections, correctly reported as a partial result. See
 docs/RESILIENCE_VALIDATION_3.2.7.md for scope and outstanding limitations.
+
+## Update: 2026-11-11, version 3.2.8
+
+Specialized training previously evaluated 200-tree Random Forest CV objects and
+then fit a 400-tree final object. It now selects fixed train-only candidates by
+validation, tests the selected object and saves it without post-test refitting.
+The two requested biological profiles require a checksum-bound experimental
+protocol/source/license declaration. Legacy CV-only specialized models cannot
+bypass held-out admission; model artifacts are checked before deserialization.
+Mixtures, acyclic-group leakage and damaged-manifest preservation are covered.
+Backend: 295 tests passed; TypeScript/Vite production build passed; packaged
+Windows checks retained existing models and rejected an invalid high-score
+legacy fixture. Actual empty-template training created zero models. See
+docs/SPECIALIZED_PIPELINE_3.2.8.md. The overall model-quality goal remains open.

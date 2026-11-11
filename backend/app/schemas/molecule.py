@@ -294,6 +294,12 @@ class SpecializedModelPrediction(BaseModel):
     n_train: int
     n_active: int
     n_inactive: int
+    n_test: int
+    test_positive: int
+    test_negative: int
+    validation_method: str
+    scientific_status: str
+    quality: dict = Field(default_factory=dict)
     metrics: dict[str, float] = Field(default_factory=dict)
     dataset_source: str
     message: str | None = None

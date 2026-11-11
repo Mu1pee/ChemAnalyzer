@@ -7,6 +7,7 @@ The module deliberately reports `not_trained` instead of inventing a prediction.
 from __future__ import annotations
 
 import json
+import hashlib
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -15,7 +16,8 @@ import numpy as np
 from rdkit import Chem
 
 from app import config
-from app.model_quality import classification_reasons
+from app.model_quality import finite
+from .specialized_evidence import quality
 from app.chemistry import fingerprints as fp
 from app.chemistry import qsar_core as core
 
@@ -69,7 +71,6 @@ def _load_bundles() -> tuple[dict[str, list[dict[str, Any]]], str | None]:
             raise ValueError("Поле models в manifest.json должно быть списком.")
         import joblib
 
-        missing_model_files: list[str] = []
         rejected: dict[str, list[str]] = {key: [] for key in DOMAINS}
         for record in records:
             if not isinstance(record, dict):
@@ -84,31 +85,36 @@ def _load_bundles() -> tuple[dict[str, list[dict[str, Any]]], str | None]:
                 continue
             model_path = MODEL_DIR / filename
             if not model_path.is_file():
-                missing_model_files.append(filename)
+                rejected[domain].append("В manifest.json указаны отсутствующие файлы моделей: " + filename)
                 continue
-            bundle = joblib.load(model_path)
-            if not isinstance(bundle, dict) or not all(
-                key in bundle for key in ("model", "train_packed", "train_popcount", "meta")
-            ):
-                continue
-            meta = bundle["meta"]
-            if not isinstance(meta, dict) or meta.get("domain") != domain:
-                continue
-            reasons = classification_reasons(meta.get("metrics"), min_mcc=0.10)
-            if (meta.get("metrics") or {}).get("n_evaluated") != meta.get("n_train"):
-                reasons.append("Incomplete out-of-fold evaluation")
-            if min(meta.get("n_active", 0), meta.get("n_inactive", 0)) < 30:
-                reasons.append("At least 30 compounds per class required")
-            if reasons:
-                rejected[domain] += reasons
-                continue
-            grouped[domain].append(bundle)
+            try:
+                if model_path.resolve().parent != MODEL_DIR.resolve():
+                    raise ValueError("Model artifact resolves outside model storage")
+                if hashlib.sha256(model_path.read_bytes()).hexdigest() != record.get("artifact_sha256"):
+                    raise ValueError("Model checksum missing or mismatched; retrain legacy specialized artifacts")
+                bundle = joblib.load(model_path)
+                if not isinstance(bundle, dict) or not all(key in bundle for key in ("model", "train_packed", "train_popcount", "meta")):
+                    raise ValueError("Invalid model bundle")
+                meta = bundle["meta"]
+                if not isinstance(meta, dict) or meta.get("domain") != domain:
+                    raise ValueError("Model domain mismatch")
+                admission = quality(meta)
+                if not admission["passed"]:
+                    rejected[domain] += admission["reasons"]
+                    continue
+                if (list(getattr(bundle["model"], "classes_", [])) != [0, 1]
+                        or np.asarray(bundle["train_packed"]).shape != (meta["n_train"], fp.N_BITS // 8)
+                        or np.asarray(bundle["train_popcount"]).shape != (meta["n_train"],)):
+                    raise ValueError("Model classes or applicability reference dimensions are incompatible")
+                bundle["quality"] = admission
+                grouped[domain].append(bundle)
+            except Exception as error:
+                # Damage in one domain never suppresses another domain's model.
+                rejected[domain].append(f"{type(error).__name__}: {error}")
         for domain, reasons in rejected.items():
             if reasons and not grouped[domain]:
                 # Domain-specific failure must not suppress a valid model in another domain.
                 grouped[domain] = [{"rejected": "; ".join(dict.fromkeys(reasons))}]
-        if missing_model_files:
-            return grouped, "В manifest.json указаны отсутствующие файлы моделей: " + ", ".join(missing_model_files[:5])
     except Exception as error:
         return grouped, f"Не удалось загрузить модели Антидот-Прогноз: {error}"
 
@@ -124,6 +130,8 @@ def predict_specialized_activity(smiles: str) -> dict:
     mol = fp.mol_from_smiles(smiles)
     if mol is None:
         raise ValueError("Некорректный SMILES. Не удалось распознать структуру.")
+    if len(Chem.GetMolFrags(mol)) != 1 or mol.GetNumAtoms() > 200:
+        raise ValueError("Соли, смеси и слишком большие структуры требуют отдельной курации.")
 
     mol = fp.standardize(mol)
     canonical_smiles = Chem.MolToSmiles(mol, canonical=True, isomericSmiles=True)
@@ -154,16 +162,17 @@ def predict_specialized_activity(smiles: str) -> dict:
             classes = list(getattr(model, "classes_", []))
             if 1 not in classes or 0 not in classes:
                 continue
-            probabilities = model.predict_proba(features)[0]
-            probability = float(probabilities[classes.index(1)])
             in_domain = similarity >= float(meta.get("domain_edge_threshold", core.DOMAIN_EDGE))
+            probability = float(model.predict_proba(features)[0, classes.index(1)]) if in_domain else None
+            if in_domain and (not finite(probability) or not 0 <= probability <= 1):
+                continue
             model_status = "ready" if in_domain else "out_of_domain"
             predictions.append({
                 "endpoint": str(meta.get("endpoint", "Endpoint не указан")),
                 "context": str(meta.get("context", "Контекст не указан")),
                 "status": model_status,
                 "probability": round(probability, 4) if in_domain else None,
-                "predicted_label": (1 if probability >= float(meta.get("decision_threshold", 0.5)) else 0) if in_domain else None,
+                "predicted_label": int(model.predict(features)[0]) if in_domain else None,
                 "similarity": round(float(similarity), 4),
                 "domain_label": core.domain_label(float(similarity)),
                 "model_version": str(meta.get("model_version", "1.0")),
@@ -171,6 +180,12 @@ def predict_specialized_activity(smiles: str) -> dict:
                 "n_train": int(meta.get("n_train", 0)),
                 "n_active": int(meta.get("n_active", 0)),
                 "n_inactive": int(meta.get("n_inactive", 0)),
+                "n_test": meta["evaluation"]["support"]["test"]["molecules"],
+                "test_positive": meta["evaluation"]["support"]["test"]["positive"],
+                "test_negative": meta["evaluation"]["support"]["test"]["negative"],
+                "validation_method": meta["evaluation"]["split_method"],
+                "quality": bundle["quality"],
+                "scientific_status": meta["scientific_status"],
                 "metrics": meta.get("metrics", {}),
                 "dataset_source": str(meta.get("dataset_source", "Не указан")),
                 "message": None if in_domain else (

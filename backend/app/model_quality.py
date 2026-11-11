@@ -6,7 +6,12 @@ MIN_BALANCED_ACCURACY = 0.60
 
 
 def finite(value):
-    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return False
+    try:
+        return math.isfinite(value)
+    except OverflowError:
+        return False
 
 
 def valid_count(value, minimum=0):

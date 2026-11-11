@@ -1,0 +1,34 @@
+{
+  "schema_version": 2,
+  "profile_id": "arabidopsis_primary_root",
+  "domain": "growth_regulating",
+  "endpoint": "primary_root_length_relative_to_control",
+  "context": "",
+  "species": "Arabidopsis thaliana",
+  "toxicant": null,
+  "conditions": {
+    "ecotype": "",
+    "seedling_age": "",
+    "compound_concentration": "",
+    "exposure_duration": "",
+    "medium": "",
+    "light_cycle": "",
+    "control_definition": "",
+    "replicates": ""
+  },
+  "label_definition": "",
+  "dataset_sha256": "",
+  "provenance": {
+    "source_url": "",
+    "doi": "",
+    "license": "",
+    "license_url": "",
+    "source_version": "",
+    "retrieved_at": "",
+    "endpoint": "primary_root_length_relative_to_control",
+    "units": "0/1",
+    "context": "",
+    "experimental": false,
+    "curator": ""
+  }
+}

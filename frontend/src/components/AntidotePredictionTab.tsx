@@ -58,7 +58,7 @@ function PredictionCard({ prediction }: { prediction: SpecializedModelPrediction
       {isReady ? (
         <div className="special-probability-row">
           <div>
-            <span className="special-caption">Оценка модели для класса «активный»</span>
+            <span className="special-caption">Некалиброванная оценка класса «активный»</span>
             <strong className="special-probability">{pct(prediction.probability!)}</strong>
           </div>
           <span className={`special-status ${prediction.predicted_label === 1 ? "special-status-ready" : "special-status-warning"}`}>
@@ -79,11 +79,12 @@ function PredictionCard({ prediction }: { prediction: SpecializedModelPrediction
       </div>
 
       <div className="special-model-quality">
-        <span>Проверка на отложенных folds:</span>
+        <span>Отдельный тест по каркасам, без выбора модели по тесту:</span>
         <span>ROC-AUC {typeof auc === "number" ? auc.toFixed(2) : "—"}</span>
         <span>Balanced accuracy {typeof bacc === "number" ? bacc.toFixed(2) : "—"}</span>
         <span>MCC {typeof mcc === "number" ? mcc.toFixed(2) : "—"}</span>
       </div>
+      <p className="special-source">Тест: {prediction.n_test} соединений · класс 1: {prediction.test_positive} · класс 0: {prediction.test_negative}. Внешней валидации нет.</p>
       <p className="special-source">Источник данных: {prediction.dataset_source}</p>
     </article>
   );
@@ -163,7 +164,7 @@ export default function AntidotePredictionTab({ smiles }: Props) {
       <div className="special-note special-note-warning">
         <strong>Научное ограничение</strong>
         <p>
-          Результаты доступны только при наличии моделей, обученных на проверенных данных для конкретного endpoint. Значение Random Forest — оценка класса модели, а не откалиброванная вероятность. У приложения нет универсальной модели для всех токсикантов и видов растений. Прогноз не заменяет лабораторный эксперимент и не предназначен для выбора лечения отравлений или применения веществ в окружающей среде.
+          Результаты доступны только при наличии моделей, обученных на проверенных данных для конкретного endpoint. Оценка класса модели не является откалиброванной вероятностью. У приложения нет универсальной модели для всех токсикантов и видов растений. Прогноз не заменяет лабораторный эксперимент и не предназначен для выбора лечения отравлений или применения веществ в окружающей среде.
         </p>
       </div>
 
@@ -183,7 +184,7 @@ export default function AntidotePredictionTab({ smiles }: Props) {
           <div className="special-note">
             <strong>Как активировать прогнозирование</strong>
             <p>
-              Подготовьте CSV с экспериментальными данными из прослеживаемого источника и обучите модели скриптом <code>python -m training.train_specialized</code> из папки <code>backend</code>. Шаблоны CSV и правила подготовки данных находятся в <code>backend/training/specialized_data/README.md</code>. Модели публикуются в локальном каталоге данных приложения после прохождения проверки качества.
+              Для обучения нужны экспериментальный CSV и соответствующий протокол с условиями опыта, определением классов и правами на данные. Инструкция и пустые шаблоны находятся в <code>backend/training/specialized_data/README.md</code>. В приложении доступны только модели, прошедшие проверку на отдельной тестовой выборке. Старые модели требуют повторной проверки по текущему протоколу.
             </p>
           </div>
           <p className="special-disclaimer">{state.data.disclaimer}</p>
