@@ -35,7 +35,7 @@ def provenance(task):
 
 def test_discovery_does_not_claim_leads_are_verified():
     data = discover("unknown")
-    assert len(data["sources"]) == 4
+    assert {s["id"] for s in data["sources"]} == {"freesolv", "tdc_cyp", "pubchem", "chembl", "zenodo"}
     assert "not verified" in data["message"]
 
 

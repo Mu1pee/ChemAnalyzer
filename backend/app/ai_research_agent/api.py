@@ -54,7 +54,9 @@ def call(function, *args):
 
 @router.get("/status")
 def status():
-    return dict(enabled=enabled(), default_task=FREESOLV_TASK, api_cost_limit=0, worker_limit=1)
+    from .tdc_cyp import FILES, task_config
+    return dict(enabled=enabled(), default_task=FREESOLV_TASK,
+                cyp_tasks={key: task_config(key) for key in FILES}, api_cost_limit=0, worker_limit=1)
 
 
 @router.get("/sources")
@@ -85,6 +87,11 @@ def import_data(identifier: str, body: ImportRequest):
 @router.post("/tasks/{identifier}/freesolv")
 def freesolv(identifier: str):
     return call(lambda: agent().import_freesolv(identifier))
+
+
+@router.post("/tasks/{identifier}/tdc-cyp")
+def tdc_cyp(identifier: str):
+    return call(lambda: agent().import_tdc_cyp(identifier))
 
 
 @router.post("/tasks/{identifier}/{action}")

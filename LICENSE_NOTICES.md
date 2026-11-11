@@ -23,6 +23,18 @@
 
 ## Данные
 
+В CYP-поставке 3.2.3 используются отдельные наборы ингибирования CYP1A2,
+CYP2C9, CYP2C19, CYP2D6 и CYP3A4 из Therapeutics Data Commons / Harvard
+Dataverse. Атрибуция: Veith et al., Nature Biotechnology 27, 1050–1055 (2009),
+doi:10.1038/nbt.1581; Therapeutics Data Commons contributors. TDC указывает
+CC BY 4.0 (https://tdcommons.ai/single_pred_tasks/adme/), репозиторий Dataverse
+указывает CC0 1.0 (doi:10.7910/DVN/21LKWG). При распространении этих наборов
+и предоставляемых CYP-весов сохраняйте атрибуцию и уведомление CC BY 4.0:
+https://creativecommons.org/licenses/by/4.0/ . Изменения: перенос исходных
+бинарных меток без нового порога активности, исключение смесей/солей и
+конфликтующих дубликатов, отдельное scaffold-разбиение каждой изоформы,
+обучение и отложенная оценка моделей. Это не меняет лицензию кода ChemAnalyzer.
+
 В QSAR-поставке 3.2.1 встроена экспериментальная COX-2 / IC50 модель, обученная на ChEMBL 37. Исходные данные, курированная выборка и предоставляемая модель распространяются под CC BY-SA 3.0; атрибуция: ChEMBL contributors, EMBL-EBI. Изменения: фильтрация assay confidence 9, стандартизация структур, обработка дубликатов, Morgan fingerprints и обучение Random Forest с калибровкой. Полные условия: https://creativecommons.org/licenses/by-sa/3.0/ . Снимки источников, контрольные суммы и отчёт поставляются отдельным архивом. Это уведомление не изменяет условия оригинального кода ChemAnalyzer.
 
 - **PubChem** — данные NCBI; учитывайте условия использования PubChem и

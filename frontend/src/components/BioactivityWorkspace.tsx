@@ -68,13 +68,18 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
   const filtered = useMemo(() => BIO_MODULES.filter(item => {
     const text = `${item.name} ${item.method} ${item.scope}`.toLocaleLowerCase("ru");
     return (category === "all" || item.group === category) && text.includes(query.trim().toLocaleLowerCase("ru"))
-      && (!onlyReady || ["calculation", "source"].includes(item.status) || (item.status === "qsar" && activity.data?.qsar.status === "ready"));
-  }), [query, category, onlyReady, activity.data]);
+      && (!onlyReady || ["calculation", "source"].includes(item.status) || (item.status === "qsar" && activity.data?.qsar.status === "ready")
+        || (item.id === "cyp" && matchingModels(item).some(model => model.quality?.passed)));
+  }), [query, category, onlyReady, activity.data, agent.models]);
   const localCount = activity.data?.qsar.models_loaded;
   const liveModels = agent.models.filter(model => model.status === "approved" && model.quality?.passed);
-  const matchingModels = (item: BioModule) => item.preset ? agent.models.filter(model => model.task?.endpoint === item.preset?.endpoint) : [];
+  function matchingModels(item: BioModule) {
+    if (item.id === "cyp") return agent.models.filter(model => model.status !== "archived" && /^cyp(?:1a2|2c9|2c19|2d6|3a4)_inhibition_veith$/.test(model.task?.endpoint ?? ""));
+    return item.preset ? agent.models.filter(model => model.task?.endpoint === item.preset?.endpoint) : [];
+  }
 
   function open(item: BioModule) {
+    if (item.id === "cyp" && item.tab) { onTab(item.tab); return; }
     if (item.status === "dataset" || item.status === "key") { setSelected(item); return; }
     if (item.tab) onTab(item.tab);
   }

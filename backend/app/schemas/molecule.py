@@ -314,3 +314,23 @@ class SpecializedActivityResponse(BaseModel):
     antidote: SpecializedDomainResult
     growth_regulating: SpecializedDomainResult
     disclaimer: str
+
+
+class CypPrediction(BaseModel):
+    isoform: str
+    status: str
+    model_id: str | None = None
+    model_status: str | None = None
+    probability: float | None = None
+    max_similarity: float | None = None
+    metrics: dict[str, float] = Field(default_factory=dict)
+    n_train: int = 0
+    n_test: int = 0
+    trained_at: str | None = None
+    message: str | None = None
+
+
+class CypResponse(BaseModel):
+    canonical_smiles: str
+    predictions: list[CypPrediction]
+    disclaimer: str

@@ -38,7 +38,8 @@ not claim that all catalog entries meet that goal.
 | Antidote: acetaminophen rescue | No eligible curated training table has been integrated. Remains not_trained. General liver toxicity is not an antidote label. |
 | Arabidopsis primary-root growth/control | No eligible curated training table has been integrated. Remains not_trained. Auxin receptor binding is not root growth. |
 | Antibacterial, antiviral, cytotoxicity | Endpoint-specific datasets, organisms/strains/cell lines, exposure and label rules still required. No trained predictions claimed. |
-| CYP inhibition, metabolic stability, toxicity | Separate endpoint datasets and validation required. No trained predictions claimed. |
+| CYP inhibition | Version 3.2.3 adds five separate TDC/Veith models; internal held-out balanced accuracy 72.76–78.62%. Full evidence and class-specific limitations: CYP_VALIDATION_3.2.3.md. No external validation. |
+| Metabolic stability, toxicity | Separate endpoint datasets and validation required. No trained predictions claimed. |
 | Gene expression, publication entity extraction | Planned pipelines without trained artifacts. |
 | Activity spectrum | Tanimoto nearest-drug comparison; structural similarity, not calibrated biological prediction. No accuracy percentage is assigned. |
 | ADME profile, drug-likeness | RDKit descriptors, rules, ESOL/BOILED-Egg estimates. Deterministic rules and empirical estimates are labelled by method; no blanket >60% prediction claim. |

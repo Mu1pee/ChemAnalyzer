@@ -344,3 +344,23 @@ export interface SpecializedActivityResponse {
   growth_regulating: SpecializedDomainResult;
   disclaimer: string;
 }
+
+export interface CypPrediction {
+  isoform: string;
+  status: "ready" | "out_of_domain" | "not_trained" | "quality_failed" | "error";
+  model_id: string | null;
+  model_status: string | null;
+  probability: number | null;
+  max_similarity: number | null;
+  metrics: Record<string, number>;
+  n_train: number;
+  n_test: number;
+  trained_at: string | null;
+  message: string | null;
+}
+
+export interface CypResponse {
+  canonical_smiles: string;
+  predictions: CypPrediction[];
+  disclaimer: string;
+}

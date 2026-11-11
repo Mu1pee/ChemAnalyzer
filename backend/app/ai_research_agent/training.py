@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 from threadpoolctl import threadpool_limits
 
 from .evaluation import metrics, scaffold_split
-from app.model_quality import held_out_quality
+from app.model_quality import held_out_quality, classification_reasons
 
 
 def train(X, y, groups, task, checkpoint=lambda stage: None):
@@ -51,7 +51,13 @@ def train(X, y, groups, task, checkpoint=lambda stage: None):
             results.append(dict(algorithm=name, parameters=search.best_params_, cv_score=float(search.best_score_), validation=valid))
             fitted.append(search.best_estimator_)
         scores = [r["validation"][selection] for r in results]
-        winner = int(np.argmin(scores) if task.kind == "regression" else np.argmax(scores))
+        if task.kind == "classification":
+            eligible = [i for i, result in enumerate(results) if not classification_reasons(result["validation"])]
+            if not eligible:
+                raise ValueError("No candidate passed the validation quality thresholds; held-out test remains unused")
+            winner = max(eligible, key=lambda i: scores[i])
+        else:
+            winner = int(np.argmin(scores))
         checkpoint("evaluating:held_out_test")
         # The test set is evaluated only after all candidate/parameter selection.
         model = fitted[winner]

@@ -111,6 +111,16 @@ class ResearchAgent:
         (folder / "LICENSE.txt").write_bytes(license_data)
         return result
 
+    def import_tdc_cyp(self, identifier):
+        from .tdc_cyp import fetch_cyp, isoform_for_task
+        isoform = isoform_for_task(self.task(identifier))
+        text, provenance, raw, metadata, evidence = fetch_cyp(isoform)
+        result = self.import_csv(identifier, text, Provenance(**provenance), evidence)
+        folder = safe_child(self.root / "tasks", identifier) / result["version_id"]
+        (folder / "source.tab").write_bytes(raw)
+        (folder / "source-metadata.json").write_bytes(metadata)
+        return result
+
     def start(self, identifier, action="train"):
         if action not in ("prepare", "train"):
             raise ValueError("Unknown action")

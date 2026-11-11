@@ -1,4 +1,4 @@
-"""Read-only discovery; only reviewed FreeSolv text is downloaded automatically."""
+"""Read-only discovery with reviewed FreeSolv and TDC CYP text adapters."""
 import csv
 import io
 
@@ -8,6 +8,9 @@ from .config import FREESOLV_TASK
 from .security import checksum, utcnow
 
 CATALOG = [
+    {"id": "tdc_cyp", "name": "TDC / Harvard Dataverse — Veith CYP inhibition",
+     "url": "https://tdcommons.ai/single_pred_tasks/adme/", "license": "CC-BY-4.0",
+     "status": "supported_isoform_specific_text_adapter"},
     {"id": "freesolv", "name": "FreeSolv", "endpoint": "hydration_free_energy",
      "url": "https://github.com/MobleyLab/FreeSolv", "license": "CC-BY-4.0",
      "status": "supported_text_adapter"},
@@ -22,7 +25,7 @@ CATALOG = [
 
 def discover(endpoint: str):
     return {"endpoint": endpoint, "sources": CATALOG,
-            "message": "Only FreeSolv has an automatic import adapter. Other sources are leads, not verified datasets."}
+            "message": "FreeSolv and TDC Veith CYP have reviewed text import adapters. Other sources are leads, not verified datasets."}
 
 
 def _fetch(url, limit=4_000_000):

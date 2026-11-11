@@ -76,6 +76,8 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
         <div className="research-actions">
           <button disabled={busy} onClick={() => setConfig(JSON.stringify(QSAR_TASK, null, 2))}>QSAR: обучение активности</button>
           <button disabled={busy} onClick={() => setConfig(JSON.stringify(status.default_task, null, 2))}>FreeSolv: гидратация</button>
+          {Object.entries(status.cyp_tasks ?? {}).map(([isoform, task]) =>
+            <button key={isoform} disabled={busy} onClick={() => setConfig(JSON.stringify(task, null, 2))}>{isoform}: ингибирование</button>)}
         </div>
         <p>Для QSAR заполните endpoint и context: мишень, организм, assay, тип измерения и заранее обоснованное правило меток 0/1. Импортируйте экспериментальный CSV с provenance. Для непрерывных измерений задайте kind: regression и соответствующие units.</p>
         <p>Для классификации требуется минимум 30 уникальных молекул каждого класса и достаточное число scaffold-групп. Обученная в лаборатории модель проходит отдельную проверку и утверждение; её создание не снимает сообщение об отсутствии рабочих QSAR-моделей.</p>
@@ -98,6 +100,10 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
           const result = await request(`/tasks/${selected}/freesolv`, {});
           setMessage(`FreeSolv импортирован: ${result.measurements} измерений. SHA256 ${result.dataset_sha256}`);
         })}>Импорт FreeSolv</button>
+        <button disabled={busy || !selected || !tasks.find(t => t.id === selected)?.endpoint?.match(/^cyp.*_inhibition_veith$/)} onClick={() => act(async () => {
+          const result = await request(`/tasks/${selected}/tdc-cyp`, {});
+          setMessage(`TDC CYP импортирован: ${result.measurements} исходных записей. SHA256 ${result.dataset_sha256}`);
+        })}>Импорт TDC CYP</button>
         <button disabled={busy || running || !selected} onClick={() => act(async () => {
           await request(`/tasks/${selected}/prepare`, {}); setMessage("Подготовка запущена в отдельном процессе");
         })}>Подготовить данные</button>

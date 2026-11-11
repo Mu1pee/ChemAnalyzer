@@ -12,6 +12,7 @@ import ActivityTab from "./ActivityTab";
 import AdmeTab from "./AdmeTab";
 import AssistantPanel from "./AssistantPanel";
 import ChemblTab from "./ChemblTab";
+import CypTab from "./CypTab";
 import DruglikenessTab from "./DruglikenessTab";
 import HistoryTab from "./HistoryTab";
 import { IconCopy } from "./Icons";
@@ -32,6 +33,7 @@ export type Tab =
   | "activity"
   | "antidote"
   | "chembl"
+  | "cyp"
   | "3d"
   | "history"
   | "research"
@@ -46,6 +48,7 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "activity", label: "Активность" },
   { id: "antidote", label: "Антидот-Прогноз" },
   { id: "chembl", label: "ChEMBL" },
+  { id: "cyp", label: "CYP" },
   { id: "3d", label: "3D" },
   { id: "history", label: "История" },
   { id: "research", label: "AI Research Lab" },
@@ -66,7 +69,7 @@ interface Props {
   onClearHistory: () => void;
 }
 
-const NEEDS_RESULT: Tab[] = ["props", "adme", "ident", "drug", "activity", "antidote", "chembl", "3d"];
+const NEEDS_RESULT: Tab[] = ["props", "adme", "ident", "drug", "activity", "antidote", "chembl", "cyp", "3d"];
 
 export default function ResultsPanel({
   tab,
@@ -175,6 +178,8 @@ export default function ResultsPanel({
         return <AntidotePredictionTab smiles={result.canonical_smiles} />;
       case "chembl":
         return <ChemblTab state={chembl} />;
+      case "cyp":
+        return <CypTab smiles={result.canonical_smiles} />;
       case "3d":
         return (
           <StructureTab
