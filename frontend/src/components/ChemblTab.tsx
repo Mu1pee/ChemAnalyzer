@@ -67,6 +67,15 @@ export default function ChemblTab({ state }: Props) {
       {data.message && (
         <div className="tab-note">{data.message}</div>
       )}
+      {data.activity_coverage && <div className="tab-note">
+        Измерения: загружено {data.activity_coverage.retrieved_rows}
+        {data.activity_coverage.total_rows !== null && ` из ${data.activity_coverage.total_rows}`}
+        {data.activity_coverage.complete ? " · Все страницы измерений получены." : " · Неполная выдача измерений."}
+        {" "}В таблице используются строки с pChEMBL; показано до 15 мишеней.
+      </div>}
+      {data.found && !data.activity_coverage && <div className="tab-note">
+        Полнота списка измерений в этой сохранённой выдаче не проверена.
+      </div>}
 
       {data.found && (
         <>
@@ -126,7 +135,7 @@ export default function ChemblTab({ state }: Props) {
               <thead>
                 <tr>
                   <th>Мишень</th>
-                  <th>pChEMBL</th>
+                  <th>Макс. pChEMBL</th>
                   <th>≈ Конц.</th>
                   <th>N</th>
                 </tr>
@@ -177,9 +186,11 @@ export default function ChemblTab({ state }: Props) {
       )}
 
       <div className="tab-note">
-        Источник: ChEMBL (EMBL-EBI). pChEMBL = −log10 активности в молях:
-        чем больше, тем сильнее связывание. Это экспериментальные данные из
-        литературы, а не предсказание.
+        Источник: ChEMBL (EMBL-EBI). pChEMBL = −log10 концентрации в молях/л;
+        большее значение соответствует меньшей измеренной концентрации.
+        В таблице приведён максимум по загруженным строкам для каждой мишени.
+        IC50, Ki, Kd, EC50 и Potency измеряются разными методами и при разных условиях;
+        их нельзя считать единой оценкой связывания. Это данные опубликованных экспериментов.
       </div>
     </div>
   );

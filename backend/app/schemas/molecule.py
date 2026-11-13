@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class MoleculeRequest(BaseModel):
@@ -164,6 +164,24 @@ class ChemblSimilar(BaseModel):
     mechanisms: list[ChemblMechanism] = []
 
 
+class ChemblActivityCoverage(BaseModel):
+    retrieved_rows: int = Field(ge=0, strict=True)
+    total_rows: int | None = Field(default=None, ge=0, strict=True)
+    pages: int = Field(ge=0, strict=True)
+    complete: bool = Field(strict=True)
+    limit_rows: int = Field(ge=1, strict=True)
+
+    @model_validator(mode="after")
+    def consistent_counts(self):
+        if (self.retrieved_rows > self.limit_rows
+                or (self.total_rows is not None and self.retrieved_rows > self.total_rows)
+                or (self.retrieved_rows > 0 and self.pages == 0)
+                or (self.complete and (self.total_rows is None
+                                      or self.retrieved_rows != self.total_rows or self.pages == 0))):
+            raise ValueError("Inconsistent ChEMBL activity coverage")
+        return self
+
+
 class ChemblResponse(BaseModel):
     available: bool
     found: bool
@@ -182,6 +200,7 @@ class ChemblResponse(BaseModel):
     partial: bool = False
     retrieved_at: str | None = None
     warnings: list[str] = Field(default_factory=list)
+    activity_coverage: ChemblActivityCoverage | None = None
 
 
 class ConformerRequest(BaseModel):

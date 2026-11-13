@@ -134,6 +134,14 @@ export interface ChemblSimilar {
   mechanisms: ChemblMechanism[];
 }
 
+export interface ChemblActivityCoverage {
+  retrieved_rows: number;
+  total_rows: number | null;
+  pages: number;
+  complete: boolean;
+  limit_rows: number;
+}
+
 export interface ChemblResponse {
   available: boolean;
   found: boolean;
@@ -152,6 +160,7 @@ export interface ChemblResponse {
   partial: boolean;
   retrieved_at: string | null;
   warnings: string[];
+  activity_coverage: ChemblActivityCoverage | null;
 }
 
 export interface AsyncState<T> {

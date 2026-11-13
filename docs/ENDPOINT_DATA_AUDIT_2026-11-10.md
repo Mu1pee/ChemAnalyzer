@@ -89,3 +89,22 @@ screening lead. Publisher retrieval failed; a complete structure-linked outcome
 table and usable data terms have not been verified. It remains a lead, not an
 imported dataset. These bounded checks do not establish that no eligible dataset
 exists elsewhere. Both requested target models remain explicitly not_trained.
+
+## Additional primary source audit, 2026-11-11
+
+Emmenecker et al., iScience 28, 112375 (2025), DOI
+https://doi.org/10.1016/j.isci.2025.112375 , reports a 1,519-compound Prestwick
+screen in Arabidopsis WT and mus81. The primary-screen readout is segmented
+root/leaf area in pixels, not primary-root-length/control. Full data/code are
+available from the authors on request according to the source's data-availability
+section. The primary full-text XML explicitly identifies CC BY-NC 4.0:
+https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12032938/fullTextXML
+(HTTP 200, 130,917 bytes, checked 2026-11-11).
+
+No compound outcomes were inferred from reported hit percentages, and no
+unmeasured compounds were labeled inactive. No data were imported and no author
+was contacted. This source would require a separate root-area endpoint,
+structure-linked complete measurements, experimental-condition review and
+acceptable reuse terms; it does not fill the requested primary-root-length
+dataset. Publisher/PMC browser access challenges were not bypassed; the public
+Europe PMC API supplied the source XML.

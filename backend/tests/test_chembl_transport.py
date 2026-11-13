@@ -140,3 +140,141 @@ def test_http_200_error_envelope_is_not_an_empty_success():
             assert await client.fetch("molecule.json") is None
             assert client.failures == ["molecule: invalid_response"]
     asyncio.run(scenario())
+
+
+def paged_activities(handler, monkeypatch, max_pages=4):
+    monkeypatch.setattr(chembl, "ACTIVITY_LIMIT", 2)
+    monkeypatch.setattr(chembl, "MAX_ACTIVITY_PAGES", max_pages)
+    async def scenario():
+        async with transport.ChemblClient(transport=httpx.MockTransport(handler)) as client:
+            payload, coverage = await chembl._fetch_activities(client, "CHEMBL25")
+            return payload, coverage, client.failures
+    return asyncio.run(scenario())
+
+
+def activity_page(offset, total, ids):
+    return {"activities": [{"activity_id": i} for i in ids],
+            "page_meta": {"offset": offset, "total_count": total}}
+
+
+def test_activity_fetches_remaining_page_without_following_remote_urls(monkeypatch):
+    seen = []
+    def handler(request):
+        offset = int(request.url.params["offset"])
+        seen.append(offset)
+        assert request.url.host == "www.ebi.ac.uk" and request.url.params["order_by"] == "activity_id"
+        payload = activity_page(offset, 3, [1, 2] if offset == 0 else [3])
+        payload["page_meta"]["next"] = "https://untrusted.invalid/ignored"
+        return httpx.Response(200, json=payload)
+    payload, coverage, errors = paged_activities(handler, monkeypatch)
+    assert seen == [0, 2] and len(payload["activities"]) == 3
+    assert coverage == dict(retrieved_rows=3, total_rows=3, pages=2, complete=True, limit_rows=8)
+    assert not errors
+
+
+def test_large_source_is_capped_and_explicitly_incomplete(monkeypatch):
+    def handler(request):
+        offset = int(request.url.params["offset"])
+        return httpx.Response(200, json=activity_page(offset, 7, [offset+1, offset+2]))
+    payload, coverage, errors = paged_activities(handler, monkeypatch, max_pages=2)
+    assert len(payload["activities"]) == 4 and coverage["total_rows"] == 7
+    assert not coverage["complete"] and errors == ["activity: row_limit (4 of 7)"]
+
+
+def test_empty_activity_collection_is_complete_not_an_outage(monkeypatch):
+    payload, coverage, errors = paged_activities(
+        lambda request: httpx.Response(200, json=activity_page(0, 0, [])), monkeypatch)
+    assert payload == {"activities": []} and coverage["complete"] and not errors
+
+
+def test_truncation_is_visible_in_profile_and_survives_schema_and_cache(monkeypatch):
+    from app.schemas.molecule import ChemblResponse
+    monkeypatch.setattr(chembl, "ACTIVITY_LIMIT", 2)
+    monkeypatch.setattr(chembl, "MAX_ACTIVITY_PAGES", 2)
+    def handler(request):
+        resource = request.url.path.rsplit("/", 1)[-1]
+        if resource == "molecule.json":
+            data = {"molecules": [{"molecule_chembl_id": "CHEMBL25"}]}
+        elif resource == "activity.json":
+            offset = int(request.url.params["offset"])
+            data = activity_page(offset, 7, [offset+1, offset+2])
+        elif resource == "mechanism.json":
+            data = {"mechanisms": []}
+        elif resource == "drug_indication.json":
+            data = {"drug_indications": []}
+        else:
+            data = {"molecules": []}
+        return httpx.Response(200, json=data)
+    profile = ChemblResponse.model_validate(run_fetch(handler, monkeypatch)).model_dump()
+    assert profile["available"] and profile["partial"] and not profile["activity_coverage"]["complete"]
+    cached, _ = transport.read_cache(transport.cache_key("CCO", "TESTKEY"))
+    assert cached["activity_coverage"] == profile["activity_coverage"] and cached["partial"]
+
+
+@pytest.mark.parametrize("bad_page", [activity_page(1, 3, [3]), activity_page(2, 4, [3]),
+                                      activity_page(2, 3, [1]), activity_page(2, 3, []),
+                                      {"activities": [{"activity_id": 3}]},
+                                      activity_page(2, True, [3])])
+def test_inconsistent_second_page_does_not_corrupt_saved_first_page(monkeypatch, bad_page):
+    def handler(request):
+        payload = activity_page(0, 3, [1, 2]) if request.url.params["offset"] == "0" else bad_page
+        return httpx.Response(200, json=payload)
+    payload, coverage, errors = paged_activities(handler, monkeypatch)
+    assert [r["activity_id"] for r in payload["activities"]] == [1, 2]
+    assert coverage["retrieved_rows"] == 2 and not coverage["complete"] and errors
+
+
+def test_failed_later_activity_page_keeps_partial_data(monkeypatch):
+    def handler(request):
+        if request.url.params["offset"] != "0":
+            return httpx.Response(500)
+        return httpx.Response(200, json=activity_page(0, 3, [1, 2]))
+    payload, coverage, errors = paged_activities(handler, monkeypatch)
+    assert len(payload["activities"]) == 2 and not coverage["complete"]
+    assert errors == ["activity: http_500"]
+
+
+def test_malformed_collection_rows_do_not_reach_profile_parsers():
+    async def scenario():
+        async with transport.ChemblClient(transport=httpx.MockTransport(
+                lambda request: httpx.Response(200, json={"mechanisms": [None, "bad"]}))) as client:
+            assert await client.fetch("mechanism.json") is None
+            assert client.failures == ["mechanism: invalid_response"]
+    asyncio.run(scenario())
+
+
+def test_legacy_cache_cannot_claim_complete_activity_coverage():
+    from app.schemas.molecule import ChemblResponse
+    key = transport.cache_key("CCO", "TESTKEY")
+    profile = ChemblResponse(available=True, found=True, chembl_id="CHEMBL545").model_dump()
+    transport.write_cache(key, profile)
+    cached, _ = transport.read_cache(key)
+    assert cached["partial"] and cached["activity_coverage"] is None
+    assert "activity: legacy_cache_coverage_unknown" in cached["warnings"]
+
+
+@pytest.mark.parametrize("changes", [dict(complete=True), dict(retrieved_rows=True),
+                                     dict(pages=0), dict(limit_rows=1), dict(total_rows=1)])
+def test_inconsistent_cached_coverage_is_rejected(changes):
+    from app.schemas.molecule import ChemblResponse
+    key = transport.cache_key("CCO", "TESTKEY")
+    profile = ChemblResponse(available=True, found=True).model_dump()
+    profile["activity_coverage"] = dict(dict(retrieved_rows=2, total_rows=3, pages=1,
+                                             complete=False, limit_rows=8), **changes)
+    transport.write_cache(key, profile)
+    assert transport.read_cache(key) is None
+
+
+def test_cached_incomplete_coverage_cannot_clear_partial_flag():
+    from app.schemas.molecule import ChemblResponse
+    key = transport.cache_key("CCO", "TESTKEY")
+    profile = ChemblResponse(available=True, found=True, partial=False,
+        activity_coverage=dict(retrieved_rows=2, total_rows=3, pages=1, complete=False, limit_rows=8)).model_dump()
+    transport.write_cache(key, profile)
+    cached, _ = transport.read_cache(key)
+    assert cached["partial"]
+
+
+@pytest.mark.parametrize("value", [True, 10**1000, "nan", "inf"])
+def test_non_numeric_or_nonfinite_source_values_are_never_pchembl(value):
+    assert chembl._to_float(value) is None

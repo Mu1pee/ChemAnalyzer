@@ -1,4 +1,4 @@
-# Model admission policy, 2026-11-11 (ChemAnalyzer 3.2.9)
+# Model admission policy, 2026-11-11 (ChemAnalyzer 3.2.10)
 
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
@@ -108,6 +108,17 @@ Successful responses are timestamped and cached locally (24 hours fresh, partial
 responses 5 minutes). Up to 128 entries are retained; a saved copy up to 30 days
 old can be shown during an outage, explicitly marked stale with its original date.
 An unavailable service is never interpreted as lack of bioactivity.
+
+Version 3.2.10 also corrects silent activity pagination truncation. A fresh
+3.2.9 transport check returned useful data without warnings in 6.3 seconds,
+but an independent source count showed 655 aspirin activity rows versus the
+old 500-row cap. This was a successful availability check, not proof of full
+activity coverage. Ordered activity pages are now loaded within the shared
+55-second budget, at most four pages/2,000 rows. The API and UI retain explicit
+retrieved/total counts and completeness. Source-count changes, duplicate IDs,
+invalid pagination and later-page failures retain only verified earlier pages
+and mark the response partial. Legacy cache entries have unknown coverage and
+cannot claim completeness. See CHEMBL_PAGINATION_3.2.10.md.
 
 Live source check after correction: aspirin CHEMBL25, 15 targets, 8 analogs, no
 failed sections; 30.12 seconds live, 0.30 seconds from cache on this computer.

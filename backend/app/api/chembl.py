@@ -22,15 +22,18 @@ HEADERS = {
 SIMILARITY_CUTOFF = 70
 SIMILAR_LIMIT = 8
 ACTIVITY_LIMIT = 500
+MAX_ACTIVITY_PAGES = 4
 TOP_TARGETS = 15
 ACTIVITY_TYPES = "IC50,Ki,Kd,EC50,Potency"
 
 
 def _to_float(value) -> float | None:
+    if isinstance(value, bool):
+        return None
     try:
         number = float(value)
         return number if math.isfinite(number) else None
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None
 
 
@@ -201,6 +204,53 @@ async def _fetch_target_names(
     return parse_target_names(payload)
 
 
+async def _fetch_activities(client: ChemblClient, molecule_id: str):
+    """Fetch bounded, ordered source pages and retain explicit completeness evidence.
+
+    Reconstruct offsets locally; never follow an upstream next-page URL. A
+    changed total, inconsistent page or duplicate row cannot be called complete.
+    All requests share the client's existing wall-clock deadline.
+    """
+    rows, seen, total, pages = [], set(), None, 0
+    complete = False
+    for _ in range(MAX_ACTIVITY_PAGES):
+        payload = await _get_json(client, "activity.json", {
+            "molecule_chembl_id": molecule_id, "standard_type__in": ACTIVITY_TYPES,
+            "limit": ACTIVITY_LIMIT, "offset": len(rows), "order_by": "activity_id",
+        })
+        if payload is None:
+            break
+        page = payload["activities"]
+        meta = payload.get("page_meta")
+        valid_int = lambda value: isinstance(value, int) and not isinstance(value, bool) and value >= 0
+        if (not isinstance(meta, dict) or not valid_int(meta.get("total_count"))
+                or not valid_int(meta.get("offset")) or meta["offset"] != len(rows)
+                or len(page) > ACTIVITY_LIMIT or len(rows) + len(page) > meta["total_count"]
+                or (not page and len(rows) < meta["total_count"])):
+            client.failures.append("activity: invalid_pagination")
+            break
+        if total is not None and total != meta["total_count"]:
+            client.failures.append("activity: source_changed_during_pagination")
+            break
+        total = meta["total_count"]
+        identifiers = [row.get("activity_id") for row in page]
+        if (any(not valid_int(value) for value in identifiers)
+                or len(set(identifiers)) != len(identifiers) or seen.intersection(identifiers)):
+            client.failures.append("activity: duplicate_or_invalid_record_id")
+            break
+        rows.extend(page)
+        seen.update(identifiers)
+        pages += 1
+        if len(rows) == total:
+            complete = True
+            break
+    if not complete and pages == MAX_ACTIVITY_PAGES:
+        client.failures.append(f"activity: row_limit ({len(rows)} of {total})")
+    coverage = dict(retrieved_rows=len(rows), total_rows=total, pages=pages,
+                    complete=complete, limit_rows=ACTIVITY_LIMIT * MAX_ACTIVITY_PAGES)
+    return {"activities": rows}, coverage
+
+
 async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
     key = cache_key(smiles, inchikey)
     cached = read_cache(key)
@@ -226,6 +276,7 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
         "partial": False,
         "retrieved_at": None,
         "warnings": [],
+        "activity_coverage": None,
     }
 
     async with ChemblClient(timeout=TIMEOUT, headers=HEADERS) as client:
@@ -263,15 +314,7 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
                     "drug_indication.json",
                     {"molecule_chembl_id": own_id, "limit": 100},
                 ),
-                _get_json(
-                    client,
-                    "activity.json",
-                    {
-                        "molecule_chembl_id": own_id,
-                        "standard_type__in": ACTIVITY_TYPES,
-                        "limit": ACTIVITY_LIMIT,
-                    },
-                ),
+                _fetch_activities(client, own_id),
             ]
 
         results = await asyncio.gather(*tasks)
@@ -281,7 +324,8 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
         if molecule:
             own_mechanisms = results[1]
             profile["indications"] = parse_indications(results[2])
-            profile["targets"] = aggregate_targets(results[3])
+            activity_payload, profile["activity_coverage"] = results[3]
+            profile["targets"] = aggregate_targets(activity_payload)
             profile.update(
                 {
                     "found": True,
@@ -325,7 +369,7 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
             "Не удалось получить ответ ChEMBL: " + "; ".join(profile["warnings"]) + ". Повторите запрос позже."
         )
     elif profile["partial"]:
-        profile["message"] = "ChEMBL ответил частично. Некоторые разделы не загрузились: " + "; ".join(profile["warnings"])
+        profile["message"] = "ChEMBL ответил частично. Часть данных не загрузилась или ограничена объёмом: " + "; ".join(profile["warnings"])
     elif not profile["found"] and not similar:
         profile["message"] = (
             "Соединение и близкие аналоги в ChEMBL не найдены."

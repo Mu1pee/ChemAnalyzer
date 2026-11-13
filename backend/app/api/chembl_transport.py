@@ -47,7 +47,9 @@ class ChemblClient(httpx.AsyncClient):
                     collection = {"molecule": "molecules", "similarity": "molecules",
                                   "mechanism": "mechanisms", "drug_indication": "drug_indications",
                                   "activity": "activities", "target": "targets"}.get(endpoint)
-                    if isinstance(data, dict) and (collection is None or isinstance(data.get(collection), list)):
+                    if (isinstance(data, dict) and (collection is None or
+                            (isinstance(data.get(collection), list)
+                             and all(isinstance(row, dict) for row in data[collection])))):
                         return data
                     code = "invalid_response"
                 else:
@@ -106,6 +108,16 @@ def read_cache(key):
         payload = ChemblResponse.model_validate(value["profile"]).model_dump()
         if not payload["available"] or not 0 <= age <= MAX_AGE_SECONDS:
             return None
+        # Historic cache entries predate pagination evidence. Keep the copy,
+        # but never promote its capped activity table to a complete response.
+        if payload["found"] and payload["activity_coverage"] is None:
+            payload["partial"] = True
+            issue = "activity: legacy_cache_coverage_unknown"
+            if issue not in payload["warnings"]:
+                payload["warnings"].append(issue)
+            payload["message"] = "Сохранённая выдача ChEMBL: полнота списка измерений не проверена. Обновите запрос."
+        elif payload["activity_coverage"] is not None and not payload["activity_coverage"]["complete"]:
+            payload["partial"] = True
         _remember(memory_key, value)
         return deepcopy(payload), age
     except (KeyError, TypeError, ValueError):
