@@ -57,8 +57,10 @@ def status():
     from .tdc_hiv import task_config as hiv_task
     from .tdc_hepg2 import task_config as hepg2_task
     from .ncats_hlm import task_config as hlm_task
+    from .ncats_solubility import task_config as solubility_task
     return dict(enabled=enabled(), default_task=FREESOLV_TASK,
                 hlm_task=hlm_task(),
+                solubility_task=solubility_task(),
                 screening_tasks={"hiv": hiv_task(), "hepg2": hepg2_task()},
                 cyp_tasks={key: task_config(key) for key in FILES}, api_cost_limit=0, worker_limit=1)
 
@@ -111,6 +113,11 @@ def tdc_hepg2(identifier: str):
 @router.post("/tasks/{identifier}/ncats-hlm")
 def ncats_hlm(identifier: str):
     return call(lambda: agent().import_ncats_hlm(identifier))
+
+
+@router.post("/tasks/{identifier}/ncats-solubility")
+def ncats_solubility(identifier: str):
+    return call(lambda: agent().import_ncats_solubility(identifier))
 
 
 @router.post("/tasks/{identifier}/{action}")

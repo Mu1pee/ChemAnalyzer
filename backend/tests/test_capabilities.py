@@ -80,6 +80,20 @@ def test_partial_cyp_counts_only_exact_admitted_isoforms_and_freesolv_contract(i
     assert result["antidote"]["status"] == result["growth"]["status"] == "not_trained"
 
 
+def test_solubility_context_and_integrity_gate_are_shared_with_prediction(install, monkeypatch):
+    task = screening.TASKS["solubility"]()
+    install([model(task, id="kinetic-solubility")])
+    monkeypatch.delenv("CHEMANALYZER_RESEARCH_ENABLED", raising=False)
+    assert modules()["solubility"]["states"][0]["model_id"] == "kinetic-solubility"
+    prediction = screening.predict_screening("CCO")["predictions"][-1]
+    assert prediction["key"] == "solubility" and prediction["probability"] == .7
+    assert "≤10" in prediction["title"] and "низкая растворимость" in prediction["context"]
+    task["context"] = "Thermodynamic solubility, another pH or threshold"
+    install([model(task, id="wrong-solubility")])
+    assert not modules()["solubility"]["available"]
+    assert screening.predict_screening("CCO")["predictions"][-1]["probability"] is None
+
+
 def test_selection_matches_inference_and_never_uses_highest_test_score(install):
     old = model(id="old", trained_at="2026-11-12")
     old["evaluation"]["test"]["balanced_accuracy"] = .99

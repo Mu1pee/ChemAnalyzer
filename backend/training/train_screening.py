@@ -1,4 +1,4 @@
-"""Reproduce the fixed HIV, HepG2 and human HLM experiments in a fresh registry.
+"""Reproduce fixed HIV, HepG2, human HLM and kinetic-solubility experiments in a fresh registry.
 
 From backend: python -m training.train_screening --assay all --output-dir <fresh-directory>
 The held-out test is never used to select an algorithm, hyperparameter or threshold.
@@ -27,7 +27,8 @@ def main():
     try:
         for key in (TASKS if args.assay == "all" else [args.assay]):
             task = agent.create(TaskConfig(**TASKS[key]()))
-            imported = getattr(agent, "import_ncats_hlm" if key == "hlm" else "import_tdc_" + key)(task["id"])
+            importer = {"hlm": "import_ncats_hlm", "solubility": "import_ncats_solubility"}.get(key, "import_tdc_" + key)
+            imported = getattr(agent, importer)(task["id"])
             run = agent.start(task["id"])
             print(json.dumps(dict(assay=key, task_id=task["id"], run_id=run["id"], source_rows=imported["measurements"])), flush=True)
             previous = None

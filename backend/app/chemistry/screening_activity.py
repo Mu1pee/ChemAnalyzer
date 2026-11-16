@@ -7,11 +7,17 @@ from app.ai_research_agent.molecular_features import molecule
 from app.ai_research_agent.tdc_hiv import task_config as hiv_task
 from app.ai_research_agent.tdc_hepg2 import task_config as hepg2_task
 from app.ai_research_agent.ncats_hlm import task_config as hlm_task
+from app.ai_research_agent.ncats_solubility import task_config as solubility_task
 
-TASKS = {"hiv": hiv_task, "hepg2": hepg2_task, "hlm": hlm_task}
+TASKS = {"hiv": hiv_task, "hepg2": hepg2_task, "hlm": hlm_task, "solubility": solubility_task}
 TITLES = {"hiv": "ВИЧ: ингибирование репликации", "hepg2": "HepG2: снижение пролиферации, 24 ч",
-          "hlm": "Стабильность в микросомах человека: T½ > 30 мин"}
+          "hlm": "Стабильность в микросомах человека: T½ > 30 мин",
+          "solubility": "Низкая кинетическая растворимость: ≤10 мкг/мл, pH 7,4"}
 CONTEXTS = {
+    "solubility": "NCATS/PubChem AID 1645848: кинетическая растворимость при pH 7,4, "
+                  "150 мкМ, 6 часов при комнатной температуре; фильтрация и УФ-измерение. "
+                  "Положительный класс — низкая растворимость ≤10 мкг/мл. "
+                  "Это не количественный logS, термодинамическая растворимость, биодоступность или лечебная эффективность.",
     "hiv": "NCI/MoleculeNet: подтверждённо и умеренно активные соединения объединены в положительный класс. "
            "Это скрининговый исход, без единого порога EC50; не клиническая эффективность и не активность против других вирусов.",
     "hepg2": "ToxCast APR_HepG2_CellLoss_24h_dn: клетки HepG2, 24 часа, исходная бинарная оценка снижения пролиферации. "

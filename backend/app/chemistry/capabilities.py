@@ -6,6 +6,7 @@ from app.ai_research_agent.tdc_cyp import FILES, task_config as cyp_task
 from app.ai_research_agent.tdc_hiv import task_config as hiv_task
 from app.ai_research_agent.tdc_hepg2 import task_config as hepg2_task
 from app.ai_research_agent.ncats_hlm import task_config as hlm_task
+from app.ai_research_agent.ncats_solubility import task_config as solubility_task
 
 
 def supported_tasks():
@@ -13,6 +14,7 @@ def supported_tasks():
         "cyp": [(key, cyp_task(key)) for key in FILES],
         "hiv": [("hiv", hiv_task())], "hepg2": [("hepg2", hepg2_task())],
         "metabolism": [("hlm", hlm_task())],
+        "solubility": [("solubility", solubility_task())],
         # Preserve the historical source task, including its qsar domain.
         "hydration": [("freesolv", TaskConfig(**FREESOLV_TASK).model_dump())],
     }

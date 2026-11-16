@@ -8,6 +8,9 @@ from .config import FREESOLV_TASK
 from .security import checksum, utcnow
 
 CATALOG = [
+    {"id": "ncats_solubility", "name": "NCATS / PubChem AID 1645848 — kinetic solubility, pH 7.4",
+     "url": "https://pubchem.ncbi.nlm.nih.gov/bioassay/1645848", "license": "Public-Domain-US-Gov",
+     "endpoint": "kinetic_low_solubility_10ugml_ncats_ph74", "status": "supported_federal_source_censored_intervals_checked"},
     {"id": "ncats_hlm", "name": "NCATS / PubChem AID 1963597 — human microsomal stability",
      "url": "https://pubchem.ncbi.nlm.nih.gov/bioassay/1963597", "license": "Public-Domain-US-Gov",
      "endpoint": "human_hlm_stability_30min_ncats", "status": "supported_federal_source_phenotype_crosschecked_text_adapter"},
@@ -34,7 +37,7 @@ CATALOG = [
 
 def discover(endpoint: str):
     return {"endpoint": endpoint, "sources": CATALOG,
-            "message": "FreeSolv, TDC Veith CYP, NCI/MoleculeNet HIV, one ToxCast HepG2 assay and federal NCATS HLM AID 1963597 have reviewed text adapters. Other sources are leads, not verified datasets."}
+            "message": "FreeSolv, TDC Veith CYP, NCI/MoleculeNet HIV, one ToxCast HepG2 assay, federal NCATS HLM AID 1963597 and kinetic solubility AID 1645848 have reviewed text adapters. Other sources are leads, not verified datasets."}
 
 
 def _fetch(url, limit=4_000_000):

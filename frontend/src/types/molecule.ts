@@ -417,7 +417,7 @@ export interface CypResponse {
 }
 
 export interface ScreeningPrediction extends Omit<CypPrediction, "isoform"> {
-  key: "hiv" | "hepg2" | "hlm";
+  key: "hiv" | "hepg2" | "hlm" | "solubility";
   title: string;
   context: string;
   test_positive: number;

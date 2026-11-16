@@ -153,6 +153,17 @@ class ResearchAgent:
         (folder / "SOURCE_POLICY.html").write_bytes(policy)
         return result
 
+    def import_ncats_solubility(self, identifier):
+        from .ncats_solubility import fetch_solubility, validate_task
+        validate_task(self.task(identifier))
+        text, provenance, raw, metadata, policy, evidence = fetch_solubility()
+        result = self.import_csv(identifier, text, Provenance(**provenance), evidence)
+        folder = safe_child(self.root / "tasks", identifier) / result["version_id"]
+        (folder / "source.csv").write_bytes(raw)
+        (folder / "source-metadata.json").write_bytes(metadata)
+        (folder / "SOURCE_POLICY.html").write_bytes(policy)
+        return result
+
     def start(self, identifier, action="train"):
         if action not in ("prepare", "train"):
             raise ValueError("Unknown action")

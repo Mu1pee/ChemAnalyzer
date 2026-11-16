@@ -26,11 +26,12 @@ def test_separate_endpoints_disclose_low_recall_and_class_counts(monkeypatch):
     registry(monkeypatch, [metadata()])
     response = TestClient(app).post("/api/molecules/screening", json=dict(smiles="CCO"))
     assert response.status_code == 200
-    hiv, hepg2, hlm = response.json()["predictions"]
+    hiv, hepg2, hlm, solubility = response.json()["predictions"]
     assert hiv["key"] == "hiv" and hiv["probability"] == .7 and hiv["metrics"]["recall"] == .32
     assert hiv["test_positive"] == 10 and hiv["test_negative"] == 30
     assert hepg2["key"] == "hepg2" and hepg2["status"] == "not_trained" and hepg2["probability"] is None
     assert hlm["key"] == "hlm" and hlm["status"] == "not_trained" and hlm["probability"] is None
+    assert solubility["key"] == "solubility" and solubility["status"] == "not_trained" and solubility["probability"] is None
 
 
 def test_wrong_assay_context_and_failed_quality_have_no_predictions(monkeypatch):

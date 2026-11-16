@@ -12,7 +12,7 @@ type AgentModel = { id: string; task: { endpoint: string; name: string }; status
 type AgentSummary = { enabled: boolean; models: AgentModel[]; error: string };
 const groupIcons = { pharmacology: Activity, admet: FlaskConical, science: BookOpen, sources: Database };
 const statusNames = { calculation: "Доступен расчёт", qsar: "Локальные модели", dataset: "Нужны данные", key: "API-ассистент", source: "Внешний источник" };
-const modelModules = new Set(["targets", "cyp", "hiv", "hepg2", "metabolism", "hydration", "antidote", "growth"]);
+const modelModules = new Set(["targets", "cyp", "hiv", "hepg2", "metabolism", "solubility", "hydration", "antidote", "growth"]);
 const capabilityLabels: Record<string, string> = { experimental: "Экспериментальная", validated: "Проверена в реестре", approved: "Утверждена",
   partial: "Допущена часть моделей", not_trained: "Модель не обучена", quality_failed: "Качество не пройдено",
   incompatible: "Нет совместимого контекста", archived: "Только архивные модели", error: "Ошибка проверки модели", disabled: "Нужно включить AI Research Lab" };
@@ -105,7 +105,7 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
   }
 
   function open(item: BioModule) {
-    if (["cyp", "hiv", "hepg2", "metabolism"].includes(item.id) && item.tab) { onTab(item.tab); return; }
+    if (["cyp", "hiv", "hepg2", "metabolism", "solubility"].includes(item.id) && item.tab) { onTab(item.tab); return; }
     if (item.status === "dataset" || item.status === "key") { setSelected(item); return; }
     if (item.tab) onTab(item.tab);
   }

@@ -1,4 +1,4 @@
-# Model admission policy (ChemAnalyzer 3.2.11, updated 2026-11-16)
+# Model admission policy (ChemAnalyzer 3.2.12, updated 2026-11-16)
 
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
@@ -86,6 +86,7 @@ validation or human approval. See CATALOG_CONTRACT_3.2.11.md.
 | HepG2 proliferation decrease, 24 h | Experimental single-assay ToxCast classifier, 924 accepted molecules; internal held-out balanced accuracy 71.25%, ROC-AUC 0.7704. No clinical toxicity claim or external validation. |
 | CYP inhibition | Version 3.2.3 adds five separate TDC/Veith models; internal held-out balanced accuracy 72.76–78.62%. Full evidence and class-specific limitations: CYP_VALIDATION_3.2.3.md. No external validation. |
 | Human liver microsomal stability >30 min | Version 3.2.6 adds one NCATS AID 1963597 classifier: internal held-out balanced accuracy 71.25%, ROC-AUC 0.7441, stable recall 65.69%, positive predictive value 80.72%. 171 test compounds; experimental, no external validation. See HLM_VALIDATION_3.2.6.md. |
+| Low kinetic aqueous solubility, pH 7.4, <=10 ug/mL | Version 3.2.12 adds one NCATS AID 1645848 classifier: 2,435 accepted molecules; internal held-out balanced accuracy 78.20%, ROC-AUC 0.8492, low-solubility recall 80.57%, precision 77.43%. 487 test molecules/486 scaffold groups; group-bootstrap 95% BA interval 74.48–81.87%. Experimental; not numerical logS, permeability or thermodynamic solubility. See SOLUBILITY_VALIDATION_3.2.12.md. |
 | Quantitative in-vitro half-life, other metabolic systems, general toxicity | Separate endpoint datasets and validation required. No validated predictions claimed for these broader endpoints. |
 | Gene expression, publication entity extraction | Planned pipelines without trained artifacts. |
 | Activity spectrum | Tanimoto nearest-drug comparison; structural similarity, not calibrated biological prediction. No accuracy percentage is assigned. |
