@@ -1,5 +1,4 @@
 """Local opt-in API. No arbitrary URL download, code execution or model upload."""
-import os
 import httpx
 from functools import lru_cache
 
@@ -7,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Request, Depends
 from urllib.parse import urlparse
 from pydantic import BaseModel, Field
 
-from .config import FREESOLV_TASK, Provenance, TaskConfig
+from .config import FREESOLV_TASK, Provenance, TaskConfig, research_enabled
 from .data_discovery import discover
 from .model_registry import Registry, Review, Approval
 from .orchestrator import ResearchAgent
@@ -36,7 +35,7 @@ def scheduler():
 
 
 def enabled():
-    return os.environ.get("CHEMANALYZER_RESEARCH_ENABLED") == "1"
+    return research_enabled()
 
 
 def call(function, *args):

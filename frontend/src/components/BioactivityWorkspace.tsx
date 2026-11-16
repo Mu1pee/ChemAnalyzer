@@ -4,7 +4,7 @@ import { BIO_GROUPS, BIO_MODULES, type BioGroup, type BioModule, type ResearchPr
 import { API_ORIGIN } from "../api/base";
 import { saveText } from "../lib/exporters";
 import type { Tab } from "./ResultsPanel";
-import type { ActivityResponse, AsyncState } from "../types/molecule";
+import type { ActivityResponse, AsyncState, CapabilitiesResponse, ModelCapability } from "../types/molecule";
 import iconUrl from "../../../assets/icon.png";
 
 type AgentModel = { id: string; task: { endpoint: string; name: string }; status: string;
@@ -12,6 +12,10 @@ type AgentModel = { id: string; task: { endpoint: string; name: string }; status
 type AgentSummary = { enabled: boolean; models: AgentModel[]; error: string };
 const groupIcons = { pharmacology: Activity, admet: FlaskConical, science: BookOpen, sources: Database };
 const statusNames = { calculation: "Доступен расчёт", qsar: "Локальные модели", dataset: "Нужны данные", key: "API-ассистент", source: "Внешний источник" };
+const modelModules = new Set(["targets", "cyp", "hiv", "hepg2", "metabolism", "hydration", "antidote", "growth"]);
+const capabilityLabels: Record<string, string> = { experimental: "Экспериментальная", validated: "Проверена в реестре", approved: "Утверждена",
+  partial: "Допущена часть моделей", not_trained: "Модель не обучена", quality_failed: "Качество не пройдено",
+  incompatible: "Нет совместимого контекста", archived: "Только архивные модели", error: "Ошибка проверки модели", disabled: "Нужно включить AI Research Lab" };
 
 export default function BioactivityWorkspace({ onTab, onResearch, activity, hasMolecule }: {
   onTab: (tab: Tab) => void; onResearch: (preset?: ResearchPreset) => void;
@@ -21,6 +25,8 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
   const [query, setQuery] = useState("");
   const [onlyReady, setOnlyReady] = useState(false);
   const [agent, setAgent] = useState<AgentSummary>({ enabled: false, models: [], error: "" });
+  const [capabilities, setCapabilities] = useState<CapabilitiesResponse | null>(null);
+  const [capabilityError, setCapabilityError] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<BioModule | null>(null);
@@ -48,7 +54,7 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true);
-    (async () => {
+    const research = (async () => {
       const response = await fetch(`${API_ORIGIN}/api/research/status`, { signal: controller.signal });
       if (!response.ok) throw new Error("Не удалось получить статус исследовательского агента");
       const status: { enabled: boolean } = await response.json();
@@ -61,23 +67,41 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
       if (!controller.signal.aborted) setAgent({ enabled: status.enabled, models, error: "" });
     })().catch(error => {
       if (!controller.signal.aborted) setAgent({ enabled: false, models: [], error: String(error.message) });
-    }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    });
+    const catalog = (async () => {
+      const response = await fetch(`${API_ORIGIN}/api/molecules/capabilities`, { signal: controller.signal });
+      if (!response.ok) throw new Error("Не удалось подтвердить доступность моделей");
+      const data: CapabilitiesResponse = await response.json();
+      if (!controller.signal.aborted) { setCapabilities(data); setCapabilityError(""); }
+    })().catch(error => {
+      if (!controller.signal.aborted) { setCapabilities(null); setCapabilityError(String(error.message)); }
+    });
+    Promise.allSettled([research, catalog]).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [refreshKey]);
 
+  const capabilityMap = useMemo(() => new Map(capabilities?.modules.map(module => [module.id, module]) ?? []), [capabilities]);
   const filtered = useMemo(() => BIO_MODULES.filter(item => {
     const text = `${item.name} ${item.method} ${item.scope}`.toLocaleLowerCase("ru");
     return (category === "all" || item.group === category) && text.includes(query.trim().toLocaleLowerCase("ru"))
-      && (!onlyReady || ["calculation", "source"].includes(item.status) || (item.status === "qsar" && activity.data?.qsar.status === "ready")
-        || (["cyp", "hiv", "hepg2", "metabolism"].includes(item.id) && matchingModels(item).some(model => model.quality?.passed)));
-  }), [query, category, onlyReady, activity.data, agent.models]);
-  const localCount = activity.data?.qsar.models_loaded;
+      && (!onlyReady || ["calculation", "source"].includes(item.status)
+        || (!loading && capabilityMap.get(item.id)?.available === true));
+  }), [query, category, onlyReady, capabilityMap, loading]);
+  const localCount = capabilities?.modules.find(module => module.id === "targets")?.models_available;
   const liveModels = agent.models.filter(model => model.status === "approved" && model.quality?.passed);
-  function matchingModels(item: BioModule) {
-    if (item.id === "cyp") return agent.models.filter(model => model.status !== "archived" && /^cyp(?:1a2|2c9|2c19|2d6|3a4)_inhibition_veith$/.test(model.task?.endpoint ?? ""));
-    if (item.id === "metabolism") return agent.models.filter(model => model.status !== "archived" && model.task?.endpoint === "human_hlm_stability_30min_ncats");
-    if (item.id === "hiv" || item.id === "hepg2") return agent.models.filter(model => model.status !== "archived" && model.task?.endpoint === (item.id === "hiv" ? "hiv_replication_inhibition_nci" : "hepg2_cellloss_24h_toxcast"));
-    return item.preset ? agent.models.filter(model => model.task?.endpoint === item.preset?.endpoint) : [];
+  function capabilityLabel(item: BioModule) {
+    if (!modelModules.has(item.id)) return statusNames[item.status];
+    if (loading) return "Проверка моделей";
+    const capability = capabilityMap.get(item.id);
+    if (!capability) return "Статус не подтверждён";
+    const label = capabilityLabels[capability.status] ?? "Статус не подтверждён";
+    return capability.available ? `${label} · ${capability.models_available}/${capability.models_expected}` : label;
+  }
+  function capabilityDescription(capability?: ModelCapability) {
+    if (!capability) return "Доступность модели не подтверждена. Обновите проверку статусов.";
+    return capability.available
+      ? "Для совместимого экспериментального контекста есть допущенная модель. Прогноз требует проверки области применимости конкретной структуры. Внешняя валидация не заявлена."
+      : capability.states.map(state => state.message).filter(Boolean).join(" ") || capabilityLabels[capability.status];
   }
 
   function open(item: BioModule) {
@@ -89,7 +113,8 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
   async function exportRegistry() {
     try {
       const outcome = await saveText("ChemAnalyzer-bioactivity.json", JSON.stringify({ exported_at: new Date().toISOString(), modules: BIO_MODULES,
-        agent_enabled: agent.enabled, research_models: agent.models, local_qsar: activity.data?.qsar ?? null }, null, 2));
+        agent_enabled: agent.enabled, research_models: agent.models, capabilities, capability_error: capabilityError,
+        local_qsar: activity.data?.qsar ?? null }, null, 2));
       setNotice(outcome.ok ? "Реестр сохранён" : outcome.canceled ? "Экспорт отменён" : "Не удалось сохранить реестр");
     } catch { setNotice("Не удалось сохранить реестр"); }
   }
@@ -101,12 +126,15 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
     </header>
     <div className="bio-summary" aria-label="Состояние моделей">
       <div><strong>{BIO_MODULES.length}</strong><span>модуль исследования</span></div>
-      <div><strong>{localCount ?? "—"}</strong><span>QSAR в текущем анализе</span></div>
-      <div><strong>{loading ? "…" : agent.models.length}</strong><span>моделей в реестре агента</span></div>
-      <div><strong>{loading ? "…" : liveModels.length}</strong><span>утверждено в реестре</span></div>
+      <div><strong>{loading ? "…" : localCount ?? "—"}</strong><span>допущено моделей мишеней</span></div>
+      <div><strong>{loading ? "…" : capabilities?.registry_models ?? agent.models.length}</strong><span>моделей в реестре агента</span></div>
+      <div><strong>{loading ? "…" : capabilities?.registry_approved ?? liveModels.length}</strong><span>утверждено в реестре</span></div>
       <span className={`bio-agent-state ${agent.enabled ? "online" : ""}`}><i />{loading ? "Проверка агента" : agent.error ? "Нет связи с агентом" : agent.enabled ? "Агент подключён" : "Агент выключен"}</span>
     </div>
     {agent.error && <div className="bio-message" role="alert">{agent.error}</div>}
+    {capabilityError && <div className="bio-message" role="alert">{capabilityError}</div>}
+    {capabilities?.registry_error && <div className="bio-message" role="alert">{capabilities.registry_error}</div>}
+    {!!capabilities?.registry_invalid && <div className="bio-message">Повреждённых записей реестра: {capabilities.registry_invalid}. Они исключены из прогнозирования.</div>}
     <div className="bio-message">
       Допуск прогнозных моделей: сбалансированная точность &gt; 60% на отложенных структурах;
       для регрессии — R² &gt; 0,60 и ошибка ниже базовой модели.
@@ -129,7 +157,7 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
       return entries.length > 0 && <section className={`bio-band bio-band-${group.id}`} key={group.id} aria-labelledby={`bio-${group.id}`}>
         <div className="bio-band-heading"><Icon size={18} /><h2 id={`bio-${group.id}`}>{group.name}</h2><span>{entries.length.toString().padStart(2, "0")}</span></div>
         <div className="bio-grid">{entries.map(item => <button key={item.id} type="button" className="bio-module" onClick={() => open(item)} aria-label={`Открыть: ${item.name}`}>
-          <div className="bio-module-top"><Icon size={20} /><span className={`bio-badge bio-badge-${item.status}`}>{matchingModels(item).length ? `В реестре: ${matchingModels(item).length}` : item.status === "qsar" && localCount === 0 ? "Нет локальных моделей" : statusNames[item.status]}</span></div>
+          <div className="bio-module-top"><Icon size={20} /><span className={`bio-badge bio-badge-${item.status}`}>{capabilityLabel(item)}</span></div>
           <h3>{item.name}</h3><p>{item.method}</p><div className="bio-module-bottom"><span>{item.scope}</span><ArrowRight size={16} /></div>
         </button>)}</div>
       </section>;
@@ -137,14 +165,21 @@ export default function BioactivityWorkspace({ onTab, onResearch, activity, hasM
     {filtered.length === 0 && <div className="bio-empty"><Search size={24} /><h2>Модули не найдены</h2><button type="button" onClick={() => { setQuery(""); setCategory("all"); setOnlyReady(false); }}>Сбросить фильтры</button></div>}
     {notice && <div className="bio-message" role="status">{notice}</div>}
     <footer className="bio-footnote">Исследовательские оценки. Наличие модуля не означает наличие обученной модели. Экспериментальная проверка обязательна.</footer>
+    {capabilities && <div className="bio-footnote">Статусы моделей проверены: {new Date(capabilities.checked_at).toLocaleString()}</div>}
     {selected && <div className="bio-modal-backdrop" onClick={e => { if (e.target === e.currentTarget) setSelected(null); }}>
       <dialog ref={dialogRef} open tabIndex={-1} aria-modal="true" className="bio-dialog" aria-labelledby="bio-detail-title" onCancel={() => setSelected(null)}>
         <div className="bio-dialog-heading"><h2 id="bio-detail-title">{selected.name}</h2><button type="button" onClick={() => setSelected(null)} aria-label="Закрыть" title="Закрыть"><X size={19} /></button></div>
-        <dl><dt>Метод / endpoint</dt><dd>{selected.method}</dd><dt>Контекст</dt><dd>{selected.scope}</dd><dt>Статус</dt><dd>{selected.status === "key" ? "Ответы ассистента требуют настроенного ключа API; они не являются прогнозом обученной QSAR-модели." : matchingModels(selected).length ? "В реестре есть модели этого endpoint. Статус, контекст и метрики каждой модели указаны в AI Research Lab; наличие артефакта не означает независимую валидацию." : "Обученная модель не подключена. Прогноз для этого направления не рассчитывается."}</dd></dl>
+        <dl><dt>Метод / endpoint</dt><dd>{selected.method}</dd><dt>Контекст</dt><dd>{selected.scope}</dd><dt>Статус</dt><dd>{selected.status === "key" ? "Ответы ассистента требуют настроенного ключа API; они не являются прогнозом обученной QSAR-модели." : modelModules.has(selected.id) ? capabilityDescription(capabilityMap.get(selected.id)) : "Обученная модель не подключена. Прогноз для этого направления не рассчитывается."}</dd></dl>
+        {capabilityMap.get(selected.id)?.states.map(state => <div className="bio-message" key={state.key}>
+          <strong>{state.key}: {capabilityLabels[state.status] ?? state.status}</strong>
+          {state.context && <p>{state.context}</p>}
+          {state.kind && <p>{state.kind === "regression" ? "Регрессия" : "Классификация"}{state.units && ` · ${state.units}`}</p>}
+          {state.message && <p>{state.message}</p>}
+        </div>)}
         <div className="bio-dialog-actions">
           {selected.tab && <button type="button" onClick={() => onTab(selected.tab!)}>Открыть раздел <ArrowRight size={15} /></button>}
           {selected.preset && <button className="bio-primary" type="button" onClick={() => onResearch(selected.preset)}>Подготовить задачу <Workflow size={15} /></button>}
-          {matchingModels(selected).length > 0 && <button type="button" onClick={() => onResearch()}>Открыть реестр <Database size={15} /></button>}
+          {!!capabilityMap.get(selected.id)?.models_available && <button type="button" onClick={() => onResearch()}>Открыть реестр <Database size={15} /></button>}
           {!selected.tab && !selected.preset && <span>Модуль запланирован; модель и pipeline отсутствуют.</span>}
         </div>
       </dialog>

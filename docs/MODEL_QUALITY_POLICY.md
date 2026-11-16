@@ -1,4 +1,4 @@
-# Model admission policy, 2026-11-11 (ChemAnalyzer 3.2.10)
+# Model admission policy (ChemAnalyzer 3.2.11, updated 2026-11-16)
 
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
@@ -57,6 +57,15 @@ continuous rescue or root-length ratios. Both requested specialized endpoints
 remain not_trained until eligible real data and a passing model are available.
 
 ## Current coverage
+
+Catalog availability in 3.2.11 is provided by the backend, using the same exact
+endpoint/context/kind/domain/units match and approval/recency selection as
+CYP/screening inference. Quality is recomputed from current metadata and the
+selected artifact checksum is checked. A matching endpoint alone, an archived
+record or a failing model cannot enable a catalog card. Availability describes
+this admission and integrity check; model loading and the molecule-specific
+applicability domain are checked again during prediction. It is not external
+validation or human approval. See CATALOG_CONTRACT_3.2.11.md.
 
 | Application system | Evidence / status |
 | --- | --- |

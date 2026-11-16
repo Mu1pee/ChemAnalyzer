@@ -1,6 +1,38 @@
 from pydantic import BaseModel, Field, model_validator
 
 
+class CapabilityState(BaseModel):
+    key: str
+    status: str
+    available: bool
+    model_id: str | None = None
+    model_status: str | None = None
+    endpoint: str | None = None
+    context: str | None = None
+    kind: str | None = None
+    domain: str | None = None
+    units: str | None = None
+    message: str | None = None
+
+
+class ModelCapability(BaseModel):
+    id: str
+    status: str
+    available: bool
+    models_available: int
+    models_expected: int
+    states: list[CapabilityState]
+
+
+class CapabilitiesResponse(BaseModel):
+    modules: list[ModelCapability]
+    registry_models: int
+    registry_invalid: int
+    registry_approved: int
+    registry_error: str | None = None
+    checked_at: str
+
+
 class MoleculeRequest(BaseModel):
     smiles: str = Field(
         ...,

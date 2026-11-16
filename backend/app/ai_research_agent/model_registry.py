@@ -11,6 +11,28 @@ from .molecular_features import molecule, vector
 from .security import checksum, read_json, safe_child, utcnow, write_json
 
 logger = logging.getLogger(__name__)
+TASK_FIELDS = ("endpoint", "context", "kind", "domain", "units")
+PREDICTABLE_STATES = ("experimental", "validated", "approved")
+
+
+def task_matches(meta, expected):
+    task = meta.get("task") if isinstance(meta, dict) else None
+    return (isinstance(task, dict) and isinstance(expected, dict)
+            and all(isinstance(expected.get(field), str) and bool(expected[field])
+                    and task.get(field) == expected[field] for field in TASK_FIELDS))
+
+
+def select_task_model(models, expected):
+    """Same scientific contract and selection for catalog and inference.
+
+    Only human approval and recency affect selection; test scores never do.
+    Registry.list() recomputes quality before these records are considered.
+    """
+    candidates = [meta for meta in models if meta.get("status") in PREDICTABLE_STATES
+                  and task_matches(meta, expected)]
+    qualified = [meta for meta in candidates if meta.get("quality", {}).get("passed") is True]
+    selected = max(qualified, key=lambda m: (m["status"] == "approved", m.get("trained_at", ""), m["id"])) if qualified else None
+    return candidates, selected
 
 
 class Review(BaseModel):
@@ -76,12 +98,17 @@ class Registry:
         if not meta["quality"]["passed"]:
             raise ValueError("Model failed quality policy: " + "; ".join(meta["quality"]["reasons"]))
 
-    def load(self, identifier):
+    def verify_artifact(self, identifier):
         folder = safe_child(self.root, identifier)
         meta = self.metadata(identifier)
         path = folder / "model.joblib"
         if checksum(path.read_bytes()) != meta["artifact_sha256"]:
             raise ValueError("Model checksum mismatch")
+        return meta
+
+    def load(self, identifier):
+        self.verify_artifact(identifier)
+        path = safe_child(self.root, identifier) / "model.joblib"
         # Only agent-generated local artifacts; arbitrary uploaded pickle is never accepted.
         return joblib.load(path)
 

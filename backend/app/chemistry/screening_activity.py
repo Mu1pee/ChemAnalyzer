@@ -2,7 +2,7 @@
 from rdkit import Chem
 
 from app.ai_research_agent.config import storage_root
-from app.ai_research_agent.model_registry import Registry
+from app.ai_research_agent.model_registry import Registry, select_task_model
 from app.ai_research_agent.molecular_features import molecule
 from app.ai_research_agent.tdc_hiv import task_config as hiv_task
 from app.ai_research_agent.tdc_hepg2 import task_config as hepg2_task
@@ -45,16 +45,11 @@ def predict_screening(smiles):
     predictions = []
     for key, config in TASKS.items():
         expected = config()
-        candidates = [meta for meta in models if meta.get("status") != "archived"
-                      and all(meta.get("task", {}).get(field) == expected[field]
-                              for field in ("endpoint", "context", "kind", "domain", "units"))]
-        qualified = [meta for meta in candidates if meta.get("quality", {}).get("passed")]
-        if not qualified:
+        candidates, meta = select_task_model(models, expected)
+        if meta is None:
             predictions.append(_empty(key, "quality_failed" if candidates else "not_trained",
                                       "Модель не прошла текущий контроль качества; прогноз скрыт." if candidates else None))
             continue
-        # Human approval, then recency; never choose by held-out test score.
-        meta = max(qualified, key=lambda m: (m["status"] == "approved", m.get("trained_at", ""), m["id"]))
         try:
             result = registry.predict(meta["id"], canonical)
             domain, support = result["applicability"], meta["evaluation"]["support"]

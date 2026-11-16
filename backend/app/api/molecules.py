@@ -16,6 +16,7 @@ from app.chemistry.cyp_activity import predict_cyp
 from app.chemistry.screening_activity import predict_screening
 from app.schemas.molecule import (
     ActivityResponse,
+    CapabilitiesResponse,
     AdmeResponse,
     ChemblResponse,
     CypResponse,
@@ -30,6 +31,12 @@ from app.schemas.molecule import (
 )
 
 router = APIRouter()
+
+
+@router.get("/capabilities", response_model=CapabilitiesResponse)
+def capabilities():
+    from app.chemistry.capabilities import model_capabilities
+    return model_capabilities()
 
 
 @router.post("/analyze", response_model=MoleculeResponse)

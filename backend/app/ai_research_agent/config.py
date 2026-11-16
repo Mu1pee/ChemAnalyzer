@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -8,6 +9,10 @@ from app import config as app_config
 
 def storage_root() -> Path:
     return (app_config.data_dir() or app_config.BACKEND_DIR) / "research_agent"
+
+
+def research_enabled():
+    return os.environ.get("CHEMANALYZER_RESEARCH_ENABLED") == "1"
 
 
 class TaskConfig(BaseModel):

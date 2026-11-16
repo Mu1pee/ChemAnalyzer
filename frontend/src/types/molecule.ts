@@ -171,6 +171,38 @@ export interface AsyncState<T> {
 
 // ---------- QSAR и ассистент ----------
 
+export interface CapabilityState {
+  key: string;
+  status: string;
+  available: boolean;
+  model_id: string | null;
+  model_status: string | null;
+  endpoint: string | null;
+  context: string | null;
+  kind: string | null;
+  domain: string | null;
+  units: string | null;
+  message: string | null;
+}
+
+export interface ModelCapability {
+  id: string;
+  status: string;
+  available: boolean;
+  models_available: number;
+  models_expected: number;
+  states: CapabilityState[];
+}
+
+export interface CapabilitiesResponse {
+  modules: ModelCapability[];
+  registry_models: number;
+  registry_invalid: number;
+  registry_approved: number;
+  registry_error: string | null;
+  checked_at: string;
+}
+
 export interface QsarPrediction {
   model_id: string | null;
   model_version: string | null;
