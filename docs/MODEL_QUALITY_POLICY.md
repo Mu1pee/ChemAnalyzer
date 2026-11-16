@@ -64,6 +64,14 @@ validation five/class and test ten/class implies a necessary lower bound of 90
 distinct curated compounds, with fixed-split scaffold/class support still
 required. See SPECIALIZED_SOURCE_AUDIT_2026-11-16.md and its hashed inventory.
 
+A subsequent review expanded the PubChem union to 2,983 IDs, with 2,981
+available summaries and two explicit 404s. It also downloaded and verified all
+17 workbooks in Mendeley Data 10.17632/jzd9mnsx8t.1. Their four named APAP
+interventions are selected follow-ups, not a full training set; CIL56/ConA
+results were not relabeled as APAP rescue. Both specialized templates remain
+empty and both models remain not_trained. See
+[ENDPOINT_DATA_REVIEW_2026-11-16.md](ENDPOINT_DATA_REVIEW_2026-11-16.md).
+
 ## Current coverage
 
 Catalog availability in 3.2.11 is provided by the backend, using the same exact
