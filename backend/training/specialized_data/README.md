@@ -82,8 +82,18 @@ The split is fixed by seed (42 by default), using entire scaffold groups and
 group sizes only. The train partition needs at least 30 compounds and five
 scaffolds of each class. Validation needs at least five compounds/class, and
 test needs at least ten compounds/class, 20 molecules and three scaffold groups.
-Thus the old 60-row floor alone is insufficient for a real train/validation/test
-experiment. Never try different seeds after inspecting a failed test.
+This implies a necessary total lower bound of 90 distinct curated compounds:
+60 for fitting, 10 for validation and 20 for test. Ninety is not sufficient by
+itself: the fixed scaffold split must actually retain all class and scaffold
+minima in each partition. The old 60-row floor is only a preliminary rejection
+check. Never try different seeds after inspecting a failed test.
+
+The bounded official-source inventory on 2026-11-16 found no eligible training
+table for either requested endpoint. See
+[`docs/SPECIALIZED_SOURCE_AUDIT_2026-11-16.md`](../../../docs/SPECIALIZED_SOURCE_AUDIT_2026-11-16.md)
+for exact coverage, source-series counts, rights checks and retained review-only
+records. Search-hit counts, repeated doses and PubChem/ChEMBL mirrors are not
+additional independently measured molecules.
 
 With `--algorithm auto` (default), fixed Random Forest, logistic regression and
 gradient boosting candidates are fitted to **train only**, in one CPU thread.

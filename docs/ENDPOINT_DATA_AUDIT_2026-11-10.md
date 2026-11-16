@@ -5,6 +5,14 @@ exist anywhere. No labels or measurements from the sources below have yet been
 integrated into training. One root-growth supplement has now been downloaded
 and its actual rows inspected.
 
+The subsequent API audit on 2026-11-16 is documented in
+[SPECIALIZED_SOURCE_AUDIT_2026-11-16.md](SPECIALIZED_SOURCE_AUDIT_2026-11-16.md),
+including complete search/page coverage, per-assay counts and frozen-response
+hashes. Both requested models still lack an eligible training table. The old
+60-compound floor mentioned below is a preliminary check; the current separate
+train/validation/test class minima imply at least 90 distinct compounds before
+scaffold support and all other admission requirements can be satisfied.
+
 ## Arabidopsis primary-root growth relative to control
 
 Primary source: Chuprov–Netochin et al., BMC Plant Biology 16, 192 (2016),

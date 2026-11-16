@@ -56,6 +56,14 @@ group; mixtures require explicit curation. This binary path does not produce
 continuous rescue or root-length ratios. Both requested specialized endpoints
 remain not_trained until eligible real data and a passing model are available.
 
+The 2026-11-16 official-source audit retrieved complete results for its bounded
+PubChem/ChEMBL queries and retained a review-only measurement packet. It found
+no eligible table for these two endpoints; different assays or mirrored database
+records were not pooled to inflate support. Fitting 30 compounds/class plus
+validation five/class and test ten/class implies a necessary lower bound of 90
+distinct curated compounds, with fixed-split scaffold/class support still
+required. See SPECIALIZED_SOURCE_AUDIT_2026-11-16.md and its hashed inventory.
+
 ## Current coverage
 
 Catalog availability in 3.2.11 is provided by the backend, using the same exact
