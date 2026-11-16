@@ -11,7 +11,8 @@ from app.model_quality import held_out_quality
 
 
 def evidence():
-    return dict(test=dict(balanced_accuracy=.75, roc_auc=.8), beats_baseline=True,
+    return dict(test=dict(balanced_accuracy=.75, roc_auc=.8, pr_auc=.7),
+                baseline_test=dict(pr_auc=.5), beats_baseline=True,
                 test_used_for_selection=False,
                 support=dict(test=dict(molecules=40, scaffolds=5, negative=20, positive=20)))
 
@@ -64,8 +65,7 @@ def test_inconsistent_support_counts_fail_quality():
 
 
 @pytest.mark.parametrize("kind,field", [(kind, field) for kind in ("classification", "regression")
-                                      for field in (None, "test", "support", "baseline_test")
-                                      if kind == "regression" or field != "baseline_test"])
+                                      for field in (None, "test", "support", "baseline_test")])
 @pytest.mark.parametrize("bad", ["invalid", [1], 42])
 def test_malformed_evaluation_is_rejected_without_crashing(kind, field, bad):
     report = evidence()

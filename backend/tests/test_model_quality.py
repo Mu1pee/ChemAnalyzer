@@ -25,9 +25,61 @@ def test_qsar_cannot_pass_using_auc_alone_or_incomplete_oof():
 
 
 def evaluation():
-    return dict(test=dict(balanced_accuracy=.72, roc_auc=.8), beats_baseline=True,
+    return dict(test=dict(balanced_accuracy=.72, roc_auc=.8, pr_auc=.7),
+                baseline_test=dict(pr_auc=.5), beats_baseline=True,
                 test_used_for_selection=False,
                 support=dict(test=dict(molecules=40, scaffolds=5, negative=20, positive=20)))
+
+
+@pytest.mark.parametrize("baseline", [None, {}, [], "invalid", 0.5, True,
+                                     dict(pr_auc=.7), dict(pr_auc=.8)])
+def test_classification_baseline_flag_cannot_replace_measured_improvement(baseline):
+    report = evaluation()
+    if baseline is None:
+        report.pop("baseline_test")
+    else:
+        report["baseline_test"] = baseline
+    result = held_out_quality("classification", report)
+    assert not result["passed"]
+    assert any("PR-AUC" in reason for reason in result["reasons"])
+
+
+@pytest.mark.parametrize("which", ["test", "baseline_test"])
+@pytest.mark.parametrize("bad", [None, True, "0.5", -.1, 1.1, float("nan"), float("inf")])
+def test_classification_pr_auc_requires_finite_bounded_numeric_evidence(which, bad):
+    report = evaluation()
+    report[which]["pr_auc"] = bad
+    assert not held_out_quality("classification", report)["passed"]
+
+
+def test_classification_pr_auc_improvement_keeps_all_other_admission_requirements():
+    report = evaluation()
+    assert held_out_quality("classification", report)["passed"]
+    report["beats_baseline"] = False
+    assert not held_out_quality("classification", report)["passed"]
+    report["beats_baseline"] = True
+    report["test"]["balanced_accuracy"] = .60
+    assert not held_out_quality("classification", report)["passed"]
+
+
+def test_unproven_baseline_prevents_registry_review_activation_and_prediction(tmp_path, monkeypatch):
+    registry = Registry(tmp_path)
+    report = evaluation()
+    report["baseline_test"]["pr_auc"] = .9
+    metadata = dict(id="baseline-fixture", status="experimental", task=dict(kind="classification"),
+                    evaluation=report)
+    path = tmp_path / "models" / metadata["id"] / "metadata.json"
+    write_json(path, metadata)
+    monkeypatch.setattr(registry, "load", lambda *args: pytest.fail("Reject unsupported evidence before loading the artifact"))
+    review = Review(reviewer="Software fixture", evidence="Baseline-admission regression fixture; no biological measurements.")
+    with pytest.raises(ValueError, match="PR-AUC"):
+        registry.review(metadata["id"], review)
+    with pytest.raises(ValueError, match="PR-AUC"):
+        registry.predict(metadata["id"], "CCO")
+    metadata["status"] = "validated"
+    write_json(path, metadata)
+    with pytest.raises(ValueError, match="PR-AUC"):
+        registry.approve(metadata["id"], Approval(**review.model_dump(), confirm_activation=True))
 
 
 def test_regression_r2_is_separate_from_accuracy_and_needs_scaffold_support():

@@ -1,4 +1,4 @@
-# Model admission policy (ChemAnalyzer 3.2.12, updated 2026-11-16)
+# Model admission policy (ChemAnalyzer 3.2.13, updated 2026-11-16)
 
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
@@ -33,6 +33,14 @@ not claim that all catalog entries meet that goal.
   available. Existing records are not deleted or silently repaired.
 - Internal CV and internal held-out tests remain explicitly distinct from
   independent external or prospective validation; none is claimed here.
+
+Policy version 2026-11-16 also requires classifier test PR-AUC and baseline
+PR-AUC to be finite numeric values in [0, 1], with strict improvement. PR-AUC
+in the Research Agent is average precision, as computed by its evaluator.
+The stored `beats_baseline` flag alone cannot establish this comparison.
+Missing, malformed, equal or worse baseline evidence prevents review,
+activation and prediction. Existing valid numerical evidence needs no refit;
+the nine reviewed classifiers and FreeSolv regressor retain their artifacts.
 
 ## Specialized binary training, version 3.2.8
 

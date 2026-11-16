@@ -1,7 +1,7 @@
 """Versioned admission criteria; a probability is never a quality metric."""
 import math
 
-POLICY_VERSION = "2026-11-11"
+POLICY_VERSION = "2026-11-16"
 MIN_BALANCED_ACCURACY = 0.60
 
 
@@ -39,6 +39,8 @@ def held_out_quality(kind, evaluation):
     evaluation = evaluation if isinstance(evaluation, dict) else {}
     scores = evaluation.get("test")
     scores = scores if isinstance(scores, dict) else {}
+    baseline = evaluation.get("baseline_test")
+    baseline = baseline if isinstance(baseline, dict) else {}
     support = evaluation.get("support")
     support = support.get("test") if isinstance(support, dict) else None
     support = support if isinstance(support, dict) else {}
@@ -54,6 +56,13 @@ def held_out_quality(kind, evaluation):
     if kind == "classification":
         metric = "balanced_accuracy"
         reasons += classification_reasons(scores)
+        # The stored flag cannot replace the numerical comparison used by the
+        # trainer. PR-AUC is average precision here, computed on the same test
+        # partition for the selected classifier and its train-fitted baseline.
+        pr_auc, baseline_pr_auc = scores.get("pr_auc"), baseline.get("pr_auc")
+        if (not finite(pr_auc) or not finite(baseline_pr_auc)
+                or not 0 <= baseline_pr_auc < pr_auc <= 1):
+            reasons.append("Held-out PR-AUC must be finite, within [0, 1] and strictly better than the baseline")
         negative, positive = support.get("negative"), support.get("positive")
         if not valid_count(negative, 10) or not valid_count(positive, 10):
             reasons.append("Held-out test needs at least 10 compounds of each class")
@@ -64,8 +73,6 @@ def held_out_quality(kind, evaluation):
         value = scores.get(metric)
         if not finite(value) or not 0.60 < value <= 1:
             reasons.append("Held-out R2 must be finite and strictly greater than 0.60; R2 is not percent accuracy")
-        baseline = evaluation.get("baseline_test")
-        baseline = baseline if isinstance(baseline, dict) else {}
         mae, baseline_mae = scores.get("mae"), baseline.get("mae")
         if not finite(mae) or not finite(baseline_mae) or not 0 <= mae < baseline_mae:
             reasons.append("Held-out MAE must be finite and better than the baseline")
