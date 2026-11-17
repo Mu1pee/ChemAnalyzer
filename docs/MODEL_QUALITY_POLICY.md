@@ -1,4 +1,4 @@
-# Model admission policy (ChemAnalyzer 3.2.13, updated 2026-11-16)
+# Model admission policy (ChemAnalyzer 3.2.14, updated 2026-11-17)
 
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
@@ -172,6 +172,11 @@ targets and 8 similar compounds in 55.2 seconds; cache retrieval took 0.328
 seconds. The response was explicitly partial: EBI returned drug-indication and
 mechanism HTTP 500 errors, and target-name lookup exceeded the shared deadline.
 This demonstrates recovery of useful data, not universal upstream availability.
+
+Version 3.2.14 retains one complete, dated ChEMBL profile across partial
+refreshes. During an outage the app can display this profile with its original
+date, activity coverage and a stale-copy notice. Details and source observations
+are recorded in [the cache recovery report](CHEMBL_SNAPSHOT_RECOVERY_3.2.14.md).
 
 Primary references:
 - https://scikit-learn.org/stable/modules/generated/sklearn.metrics.balanced_accuracy_score.html

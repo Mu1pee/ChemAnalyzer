@@ -359,11 +359,14 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
     profile["partial"] = bool(profile["warnings"])
 
     if not profile["available"]:
+        # A newer partial refresh must not erase the last complete response.
+        # Display one dated snapshot, never a mixture of observations.
+        cached = read_cache(key, prefer_complete=True)
         if cached:
             result = cached[0]
             result.update(cached=True, stale=True,
                           message="ChEMBL сейчас не отвечает. Показана сохранённая копия; проверьте дату получения.",
-                          warnings=profile["warnings"])
+                          warnings=list(dict.fromkeys(result["warnings"] + profile["warnings"])))
             return result
         profile["message"] = (
             "Не удалось получить ответ ChEMBL: " + "; ".join(profile["warnings"]) + ". Повторите запрос позже."

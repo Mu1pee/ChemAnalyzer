@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 import logging
+import math
 import os
 from pathlib import Path
 import time
@@ -19,6 +20,7 @@ logger = logging.getLogger(__name__)
 FRESH_SECONDS = 24 * 3600
 MAX_AGE_SECONDS = 30 * FRESH_SECONDS
 MAX_ENTRIES = 128
+MAX_CACHE_BYTES = 4_000_000  # Latest result and at most one complete snapshot.
 _memory = OrderedDict()
 
 
@@ -89,25 +91,39 @@ def _directory():
     return root / "cache" / "chembl-v1" if root else None
 
 
-def read_cache(key):
+def _cache_entry(key):
     directory = _directory()
     memory_key = (str(directory), key)
     value = _memory.get(memory_key)
     if value is None and directory:
         try:
             path = directory / f"{key}.json"
-            if path.stat().st_size <= 2_000_000:
+            if path.stat().st_size <= MAX_CACHE_BYTES:
                 value = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             pass
+    return value if isinstance(value, dict) else None
+
+
+def _validated_snapshot(value):
     if not isinstance(value, dict):
         return None
     try:
         from app.schemas.molecule import ChemblResponse
-        age = time.time() - value["stored_at"]
-        payload = ChemblResponse.model_validate(value["profile"]).model_dump()
-        if not payload["available"] or not 0 <= age <= MAX_AGE_SECONDS:
+        stored_at = value["stored_at"]
+        if isinstance(stored_at, bool) or not isinstance(stored_at, (int, float)):
             return None
+        age = time.time() - stored_at
+        payload = ChemblResponse.model_validate(value["profile"]).model_dump()
+        if not payload["available"] or not math.isfinite(age) or not 0 <= age <= MAX_AGE_SECONDS:
+            return None
+        if payload["retrieved_at"]:
+            try:
+                retrieved = datetime.fromisoformat(payload["retrieved_at"])
+                if retrieved.tzinfo is None or retrieved > datetime.fromtimestamp(stored_at, timezone.utc):
+                    payload["retrieved_at"] = None
+            except (ValueError, OverflowError):
+                payload["retrieved_at"] = None
         # Historic cache entries predate pagination evidence. Keep the copy,
         # but never promote its capped activity table to a complete response.
         if payload["found"] and payload["activity_coverage"] is None:
@@ -118,10 +134,39 @@ def read_cache(key):
             payload["message"] = "Сохранённая выдача ChEMBL: полнота списка измерений не проверена. Обновите запрос."
         elif payload["activity_coverage"] is not None and not payload["activity_coverage"]["complete"]:
             payload["partial"] = True
-        _remember(memory_key, value)
-        return deepcopy(payload), age
-    except (KeyError, TypeError, ValueError):
+        json.dumps(payload, allow_nan=False)
+        return value, payload, age
+    except (KeyError, TypeError, ValueError, OverflowError):
         return None
+
+
+def _complete(payload):
+    coverage = payload["activity_coverage"]
+    return (payload["found"] and bool(payload["retrieved_at"]) and not payload["partial"] and not payload["warnings"]
+            and coverage is not None and coverage["complete"])
+
+
+def _snapshots(value):
+    if not isinstance(value, dict):
+        return []
+    # Never traverse nested history supplied by an old or damaged cache file.
+    latest = _validated_snapshot(value)
+    history = _validated_snapshot(value.get("complete_snapshot"))
+    snapshots = [latest] if latest else []
+    if history and _complete(history[1]):
+        snapshots.append(history)
+    return snapshots
+
+
+def read_cache(key, *, prefer_complete=False):
+    value = _cache_entry(key)
+    snapshots = _snapshots(value)
+    if not snapshots:
+        return None
+    complete = [item for item in snapshots if _complete(item[1])] if prefer_complete else []
+    selected = min(complete, key=lambda item: item[2]) if complete else snapshots[0]
+    _remember((str(_directory()), key), value)
+    return deepcopy(selected[1]), selected[2]
 
 
 def _remember(key, value):
@@ -133,13 +178,27 @@ def _remember(key, value):
 
 def write_cache(key, profile):
     directory = _directory()
+    previous = _cache_entry(key)
     value = dict(stored_at=time.time(), profile=deepcopy(profile))
+    incoming = _validated_snapshot(value)
+    if incoming is None or not _complete(incoming[1]):
+        full = [item for item in _snapshots(previous) if _complete(item[1])]
+        if full:
+            original, payload, _ = min(full, key=lambda item: item[2])
+            value["complete_snapshot"] = dict(stored_at=original["stored_at"], profile=deepcopy(payload))
+    try:
+        encoded = json.dumps(value, ensure_ascii=False, allow_nan=False)
+        if len(encoded.encode("utf-8")) > MAX_CACHE_BYTES:
+            raise ValueError("Cache entry exceeds size limit")
+    except (TypeError, ValueError, OverflowError):
+        logger.warning("Could not encode bounded ChEMBL cache entry")
+        return
     _remember((str(directory), key), value)
     if directory:
         temporary = directory / f"{key}.{uuid4().hex}.tmp"
         try:
             directory.mkdir(parents=True, exist_ok=True)
-            temporary.write_text(json.dumps(value, ensure_ascii=False, allow_nan=False), encoding="utf-8")
+            temporary.write_text(encoded, encoding="utf-8")
             os.replace(temporary, directory / f"{key}.json")
             for path in sorted(directory.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)[MAX_ENTRIES:]:
                 path.unlink(missing_ok=True)

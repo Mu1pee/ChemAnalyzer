@@ -48,9 +48,9 @@ export default function ChemblTab({ state }: Props) {
 
   return (
     <div>
-      {data.retrieved_at && <div className="tab-note">
+      {(data.cached || data.stale || data.retrieved_at) && <div className="tab-note">
         {data.stale ? "Сохранённая копия при сбое сервиса" : data.cached ? "Локальный кэш ChEMBL" : "Ответ ChEMBL"}
-        {" · Получено: "}{new Date(data.retrieved_at).toLocaleString()}
+        {data.retrieved_at ? ` · Получено: ${new Date(data.retrieved_at).toLocaleString()}` : " · Дата получения неизвестна"}
         {data.partial && " · Неполные данные"}
       </div>}
       {!data.found &&
