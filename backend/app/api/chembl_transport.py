@@ -140,7 +140,7 @@ def _validated_snapshot(value):
         return None
 
 
-def _complete(payload):
+def is_complete_snapshot(payload):
     coverage = payload["activity_coverage"]
     return (payload["found"] and bool(payload["retrieved_at"]) and not payload["partial"] and not payload["warnings"]
             and coverage is not None and coverage["complete"])
@@ -153,7 +153,7 @@ def _snapshots(value):
     latest = _validated_snapshot(value)
     history = _validated_snapshot(value.get("complete_snapshot"))
     snapshots = [latest] if latest else []
-    if history and _complete(history[1]):
+    if history and is_complete_snapshot(history[1]):
         snapshots.append(history)
     return snapshots
 
@@ -163,7 +163,7 @@ def read_cache(key, *, prefer_complete=False):
     snapshots = _snapshots(value)
     if not snapshots:
         return None
-    complete = [item for item in snapshots if _complete(item[1])] if prefer_complete else []
+    complete = [item for item in snapshots if is_complete_snapshot(item[1])] if prefer_complete else []
     selected = min(complete, key=lambda item: item[2]) if complete else snapshots[0]
     _remember((str(_directory()), key), value)
     return deepcopy(selected[1]), selected[2]
@@ -181,8 +181,8 @@ def write_cache(key, profile):
     previous = _cache_entry(key)
     value = dict(stored_at=time.time(), profile=deepcopy(profile))
     incoming = _validated_snapshot(value)
-    if incoming is None or not _complete(incoming[1]):
-        full = [item for item in _snapshots(previous) if _complete(item[1])]
+    if incoming is None or not is_complete_snapshot(incoming[1]):
+        full = [item for item in _snapshots(previous) if is_complete_snapshot(item[1])]
         if full:
             original, payload, _ = min(full, key=lambda item: item[2])
             value["complete_snapshot"] = dict(stored_at=original["stored_at"], profile=deepcopy(payload))

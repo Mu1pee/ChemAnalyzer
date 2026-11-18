@@ -64,6 +64,51 @@ def test_exact_hit_survives_failed_similarity_and_is_cached(monkeypatch):
     assert cached["cached"] and cached["chembl_id"] == result["chembl_id"]
 
 
+def test_similarity_failure_does_not_delay_exact_activity_pages(monkeypatch):
+    monkeypatch.setattr(chembl, "ACTIVITY_LIMIT", 2)
+    finished_exact_activity_before_similarity = []
+
+    async def scenario():
+        exact_activity_finished = asyncio.Event()
+
+        async def handler(request):
+            path = request.url.path
+            if "/similarity/" in path:
+                try:
+                    await asyncio.wait_for(exact_activity_finished.wait(), timeout=0.15)
+                    finished_exact_activity_before_similarity.append(True)
+                except TimeoutError:
+                    finished_exact_activity_before_similarity.append(False)
+                return httpx.Response(500)
+            if path.endswith("/molecule.json"):
+                data = {"molecules": [{"molecule_chembl_id": "CHEMBL25"}]}
+            elif path.endswith("/activity.json"):
+                assert request.url.params["molecule_chembl_id"] == "CHEMBL25"
+                if request.url.params["offset"] == "0":
+                    data = activity_page(0, 3, [1, 2])
+                else:
+                    data = activity_page(2, 3, [3])
+                    exact_activity_finished.set()
+            elif path.endswith("/mechanism.json"):
+                data = {"mechanisms": []}
+            elif path.endswith("/drug_indication.json"):
+                data = {"drug_indications": []}
+            else:
+                pytest.fail(f"Unexpected request: {path}")
+            return httpx.Response(200, json=data)
+
+        client = transport.ChemblClient
+        monkeypatch.setattr(chembl, "ChemblClient", lambda **kw: client(transport=httpx.MockTransport(handler), **kw))
+        return await chembl.fetch_chembl_profile("CC(=O)Oc1ccccc1C(=O)O", "BSYNRYMUTXBXSQ-UHFFFAOYSA-N")
+
+    result = asyncio.run(scenario())
+    assert finished_exact_activity_before_similarity == [True, True]
+    assert result["found"] and result["partial"] and not result["stale"]
+    assert result["activity_coverage"]["complete"]
+    assert result["activity_coverage"]["retrieved_rows"] == 3
+    assert result["warnings"] == ["similarity: http_500"]
+
+
 def test_offline_uses_stale_disk_cache_with_original_timestamp(monkeypatch):
     from app.schemas.molecule import ChemblResponse
     key = transport.cache_key("CCO", "TESTKEY")

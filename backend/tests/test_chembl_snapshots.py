@@ -64,6 +64,53 @@ def test_fresh_partial_result_keeps_its_own_date_and_five_minute_cache(isolated,
     assert result["retrieved_at"] == partial["retrieved_at"]
 
 
+@pytest.mark.parametrize("live_id,activity_status,expect_saved", [
+    ("CHEMBL545", 500, True),
+    ("CHEMBL545", 200, False),
+    ("CHEMBL25", 500, False),
+])
+def test_first_activity_page_failure_recovers_only_matching_complete_profile(
+    isolated, monkeypatch, live_id, activity_status, expect_saved
+):
+    key, full, _ = history(isolated)
+    isolated[0] += 301
+    factory = transport.ChemblClient
+
+    def handler(request):
+        path = request.url.path
+        if path.endswith("/molecule.json"):
+            data = {"molecules": [{"molecule_chembl_id": live_id}]}
+        elif path.endswith("/activity.json"):
+            return httpx.Response(activity_status, json={
+                "activities": [], "page_meta": {"offset": 0, "total_count": 0},
+            })
+        elif path.endswith("/mechanism.json"):
+            data = {"mechanisms": []}
+        elif path.endswith("/drug_indication.json"):
+            data = {"drug_indications": []}
+        else:
+            data = {"molecules": []}
+        return httpx.Response(200, json=data)
+
+    monkeypatch.setattr(chembl, "ChemblClient", lambda **kw: factory(
+        transport=httpx.MockTransport(handler), **kw))
+    monkeypatch.setattr(chembl, "timestamp", lambda: datetime.fromtimestamp(isolated[0], timezone.utc).isoformat())
+    result = asyncio.run(chembl.fetch_chembl_profile("CCO", "FIXTURE-ONLY"))
+    assert result["stale"] is expect_saved
+    assert result["chembl_id"] == live_id
+    if expect_saved:
+        assert result["retrieved_at"] == full["retrieved_at"]
+        assert result["activity_coverage"] == full["activity_coverage"]
+        assert "activity: http_500" in result["warnings"]
+        latest, _ = transport.read_cache(key)
+        assert latest["partial"] and latest["activity_coverage"]["retrieved_rows"] == 0
+        monkeypatch.setattr(chembl, "ChemblClient", lambda **kw: pytest.fail("Cached failure must not retry yet"))
+        assert asyncio.run(chembl.fetch_chembl_profile("CCO", "FIXTURE-ONLY")) == result
+    else:
+        assert result["activity_coverage"]["retrieved_rows"] == 0
+        assert result["activity_coverage"]["complete"] is (activity_status == 200)
+
+
 def test_repeated_partial_writes_preserve_one_full_snapshot_without_extending_age(isolated):
     key, full, partial = history(isolated)
     isolated[0] += 400

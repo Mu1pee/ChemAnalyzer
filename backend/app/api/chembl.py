@@ -9,7 +9,9 @@ import math
 from urllib.parse import quote
 
 import httpx
-from .chembl_transport import ChemblClient, cache_key, read_cache, write_cache, timestamp, FRESH_SECONDS
+from .chembl_transport import (
+    ChemblClient, FRESH_SECONDS, cache_key, is_complete_snapshot, read_cache, timestamp, write_cache,
+)
 
 CHEMBL_BASE = "https://www.ebi.ac.uk/chembl/api/data"
 CHEMBL_COMPOUND_URL = "https://www.ebi.ac.uk/chembl/compound_report_card"
@@ -204,6 +206,14 @@ async def _fetch_target_names(
     return parse_target_names(payload)
 
 
+async def _fetch_named_mechanisms(client: ChemblClient, ids: list[str]) -> list[dict]:
+    mechanisms = await _fetch_mechanisms(client, ids)
+    names = await _fetch_target_names(client, [item["target_id"] for item in mechanisms])
+    for item in mechanisms:
+        item["target_name"] = names.get(item["target_id"])
+    return mechanisms
+
+
 async def _fetch_activities(client: ChemblClient, molecule_id: str):
     """Fetch bounded, ordered source pages and retain explicit completeness evidence.
 
@@ -251,13 +261,94 @@ async def _fetch_activities(client: ChemblClient, molecule_id: str):
     return {"activities": rows}, coverage
 
 
+async def _fetch_exact_match(client: ChemblClient, inchikey: str | None) -> tuple[bool, dict | None]:
+    if not inchikey:
+        return False, None
+    payload = await _get_json(client, "molecule.json", {
+        "molecule_structures__standard_inchi_key": inchikey,
+        "limit": 1,
+    })
+    return payload is not None, parse_molecule(payload)
+
+
+async def _fetch_exact_details(
+    client: ChemblClient, exact_match: asyncio.Task[tuple[bool, dict | None]]
+) -> dict:
+    _, molecule = await exact_match
+    if not molecule:
+        return {}
+    molecule_id = molecule["chembl_id"]
+    mechanisms, indications, activities = await asyncio.gather(
+        _fetch_named_mechanisms(client, [molecule_id]),
+        _get_json(client, "drug_indication.json", {"molecule_chembl_id": molecule_id, "limit": 100}),
+        _fetch_activities(client, molecule_id),
+    )
+    activity_payload, coverage = activities
+    return {
+        "found": True,
+        **molecule,
+        "source_url": f"{CHEMBL_COMPOUND_URL}/{molecule_id}",
+        "mechanisms": mechanisms,
+        "indications": parse_indications(indications),
+        "targets": aggregate_targets(activity_payload),
+        "activity_coverage": coverage,
+    }
+
+
+async def _fetch_analog_details(
+    client: ChemblClient, smiles: str, exact_match: asyncio.Task[tuple[bool, dict | None]]
+) -> list[dict] | None:
+    path = f"similarity/{quote(smiles, safe='')}/{SIMILARITY_CUTOFF}.json"
+    payload = await _get_json(client, path, {"limit": SIMILAR_LIMIT + 2})
+    if payload is None:
+        return None
+    _, molecule = await exact_match
+    similar = parse_similar(payload, molecule["chembl_id"] if molecule else None)
+    mechanisms = await _fetch_named_mechanisms(client, [row["chembl_id"] for row in similar])
+    by_molecule: dict[str, list[dict]] = {}
+    for mechanism in mechanisms:
+        by_molecule.setdefault(mechanism["molecule_id"], []).append(mechanism)
+    for row in similar:
+        row["mechanisms"] = by_molecule.get(row["chembl_id"], [])[:3]
+    return similar
+
+
+def _saved_profile(snapshot: dict, warnings: list[str], message: str) -> dict:
+    return {
+        **snapshot,
+        "cached": True,
+        "stale": True,
+        "message": message,
+        "warnings": list(dict.fromkeys(snapshot["warnings"] + warnings)),
+    }
+
+
+def _recover_missing_activity(key: str, profile: dict) -> dict | None:
+    coverage = profile["activity_coverage"]
+    if (not profile["found"] or coverage is None or coverage["complete"]
+            or coverage["retrieved_rows"] != 0
+            or not any(issue.startswith("activity:") for issue in profile["warnings"])):
+        return None
+    saved = read_cache(key, prefer_complete=True)
+    if saved is None:
+        return None
+    snapshot, _ = saved
+    if (not is_complete_snapshot(snapshot) or snapshot["chembl_id"] != profile["chembl_id"]
+            or snapshot["activity_coverage"]["retrieved_rows"] == 0):
+        return None
+    return _saved_profile(
+        snapshot, profile["warnings"],
+        "Не удалось загрузить измерения ChEMBL. Показан полный сохранённый профиль. Проверьте дату получения.",
+    )
+
+
 async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
     key = cache_key(smiles, inchikey)
     cached = read_cache(key)
     if cached and cached[1] < (300 if cached[0]["partial"] else FRESH_SECONDS):
         result = cached[0]
         result["cached"] = True
-        return result
+        return _recover_missing_activity(key, result) or result
     profile: dict = {
         "available": False,
         "found": False,
@@ -280,82 +371,19 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
     }
 
     async with ChemblClient(timeout=TIMEOUT, headers=HEADERS) as client:
-        # 1. Точное совпадение по InChIKey.
-        molecule = None
-        async def exact():
-            if not inchikey:
-                return None
-            return await _get_json(
-                client,
-                "molecule.json",
-                {
-                    "molecule_structures__standard_inchi_key": inchikey,
-                    "limit": 1,
-                },
-            )
-        payload, similar_payload = await asyncio.gather(
-            exact(),
-            _get_json(client, f"similarity/{quote(smiles, safe='')}/{SIMILARITY_CUTOFF}.json",
-                      {"limit": SIMILAR_LIMIT + 2}),
-        )
-        profile["available"] = payload is not None
-        molecule = parse_molecule(payload)
-        own_id = molecule["chembl_id"] if molecule else None
-        if similar_payload is not None:
-            profile["available"] = True
-        similar = parse_similar(similar_payload, own_id)
-
-        tasks = [_fetch_mechanisms(client, [s["chembl_id"] for s in similar])]
-        if molecule:
-            tasks += [
-                _fetch_mechanisms(client, [own_id]),
-                _get_json(
-                    client,
-                    "drug_indication.json",
-                    {"molecule_chembl_id": own_id, "limit": 100},
-                ),
-                _fetch_activities(client, own_id),
-            ]
-
-        results = await asyncio.gather(*tasks)
-        similar_mechanisms = results[0]
-
-        own_mechanisms: list[dict] = []
-        if molecule:
-            own_mechanisms = results[1]
-            profile["indications"] = parse_indications(results[2])
-            activity_payload, profile["activity_coverage"] = results[3]
-            profile["targets"] = aggregate_targets(activity_payload)
-            profile.update(
-                {
-                    "found": True,
-                    "chembl_id": own_id,
-                    "name": molecule["name"],
-                    "max_phase": molecule["max_phase"],
-                    "source_url": f"{CHEMBL_COMPOUND_URL}/{own_id}",
-                }
-            )
-
-        # 3. Названия мишеней для механизмов.
-        names = await _fetch_target_names(
-            client,
-            [m["target_id"] for m in own_mechanisms + similar_mechanisms],
-        )
+        # Start activity pages as soon as the exact ID is known, even when
+        # the similarity endpoint is slow or retrying within the same budget.
+        async with asyncio.TaskGroup() as requests:
+            exact_match = requests.create_task(_fetch_exact_match(client, inchikey))
+            exact_details = requests.create_task(_fetch_exact_details(client, exact_match))
+            analog_details = requests.create_task(_fetch_analog_details(client, smiles, exact_match))
+        exact_available, _ = exact_match.result()
+        similar = analog_details.result()
+        profile.update(exact_details.result())
+        profile["available"] = exact_available or similar is not None
+        profile["similar"] = similar or []
         profile["warnings"] = list(client.failures)
 
-    for mechanism in own_mechanisms + similar_mechanisms:
-        mechanism["target_name"] = names.get(mechanism["target_id"])
-
-    profile["mechanisms"] = own_mechanisms
-
-    by_molecule: dict[str, list[dict]] = {}
-    for mechanism in similar_mechanisms:
-        by_molecule.setdefault(mechanism["molecule_id"], []).append(
-            mechanism
-        )
-    for item in similar:
-        item["mechanisms"] = by_molecule.get(item["chembl_id"], [])[:3]
-    profile["similar"] = similar
     profile["partial"] = bool(profile["warnings"])
 
     if not profile["available"]:
@@ -363,11 +391,10 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
         # Display one dated snapshot, never a mixture of observations.
         cached = read_cache(key, prefer_complete=True)
         if cached:
-            result = cached[0]
-            result.update(cached=True, stale=True,
-                          message="ChEMBL сейчас не отвечает. Показана сохранённая копия; проверьте дату получения.",
-                          warnings=list(dict.fromkeys(result["warnings"] + profile["warnings"])))
-            return result
+            return _saved_profile(
+                cached[0], profile["warnings"],
+                "ChEMBL сейчас не отвечает. Показана сохранённая копия; проверьте дату получения.",
+            )
         profile["message"] = (
             "Не удалось получить ответ ChEMBL: " + "; ".join(profile["warnings"]) + ". Повторите запрос позже."
         )
@@ -385,4 +412,4 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
     if profile["available"]:
         profile["retrieved_at"] = timestamp()
         write_cache(key, profile)
-    return profile
+    return _recover_missing_activity(key, profile) or profile
