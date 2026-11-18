@@ -1,0 +1,465 @@
+{
+  "hpmoleq": {
+    "checked_at": "2026-11-18T05:50:41.341283+00:00",
+    "repository": "https://github.com/Wqy523/HP-MoleQ",
+    "ref": "d50c777361f177510adf220b0ba74f85479e60aa",
+    "article_doi": "10.1007/s12539-026-00838-3",
+    "supplement_sha256": "ce355c695e230cdfad81a4f406d96692cdd8a0e488a3753a6d6cfb80c4e16e44",
+    "supplement_table_s1": {
+      "Hepatoprotection": 749,
+      "Hepatotoxicity": 803
+    },
+    "source_files": {
+      "train.csv": {
+        "git_blob_sha": "bb5502ab6f1ee773d8bd88d831a49e2de1d0240f",
+        "sha256": "32335ac08db442f460ffde1bd684ea0753c5245ecdb14be450028d1bb1ead616"
+      },
+      "valid.csv": {
+        "git_blob_sha": "003a7c37af8c4ba847e4f63fa53c03c7164d91e3",
+        "sha256": "1573ae7a0abaeaaf640fc8f2b973e9a4b25c7612c24a4e8f0765d5f5df1a3840"
+      },
+      "test.csv": {
+        "git_blob_sha": "f4a4b4acaed89003fc88a31613b957314e5e120d",
+        "sha256": "9f2a1afd0cc47d5247a98e3b1b6d687c3770bc20876cfeb2a0d74c6ad06139bf"
+      },
+      "meta.json": {
+        "git_blob_sha": "98302037994389431a74458ba2d99d4b888900ab",
+        "sha256": "d9a623a9e1fefdbf5bd0e34878dd5f7c996db766f51a3ba528931bc778e04768"
+      },
+      "README.md": {
+        "git_blob_sha": "88008af92a70f83cbe4346b55aaf1b195a03f537",
+        "sha256": "c508e013411d48f5efb1cca0f10208ec0cf9d7030aba3643acb036be6556ea58"
+      }
+    },
+    "partitions": {
+      "train": {
+        "rows": 1241,
+        "columns": [
+          "",
+          "smiles",
+          "labels",
+          "masks"
+        ],
+        "class_counts": {
+          "0": 642,
+          "1": 599
+        },
+        "distinct_standardized_structures": 1220,
+        "distinct_scaffolds": 757,
+        "invalid_or_multifragment_row_indexes": [
+          996
+        ]
+      },
+      "valid": {
+        "rows": 156,
+        "columns": [
+          "",
+          "smiles",
+          "labels",
+          "masks"
+        ],
+        "class_counts": {
+          "1": 75,
+          "0": 81
+        },
+        "distinct_standardized_structures": 156,
+        "distinct_scaffolds": 124,
+        "invalid_or_multifragment_row_indexes": []
+      },
+      "test": {
+        "rows": 155,
+        "columns": [
+          "",
+          "smiles",
+          "labels",
+          "masks"
+        ],
+        "class_counts": {
+          "0": 80,
+          "1": 75
+        },
+        "distinct_standardized_structures": 153,
+        "distinct_scaffolds": 127,
+        "invalid_or_multifragment_row_indexes": [
+          77
+        ]
+      }
+    },
+    "overlap": [
+      {
+        "partitions": [
+          "train",
+          "valid"
+        ],
+        "shared_standardized_structures": 4,
+        "shared_scaffolds": 51
+      },
+      {
+        "partitions": [
+          "train",
+          "test"
+        ],
+        "shared_standardized_structures": 5,
+        "shared_scaffolds": 53
+      },
+      {
+        "partitions": [
+          "valid",
+          "test"
+        ],
+        "shared_standardized_structures": 1,
+        "shared_scaffolds": 17
+      }
+    ],
+    "public_repository_license_field": null,
+    "missing_row_fields": [
+      "source_reference",
+      "experimental_endpoint",
+      "toxicant",
+      "organism_or_cell_line",
+      "compound_dose",
+      "toxicant_dose",
+      "exposure_time",
+      "control",
+      "assay",
+      "units"
+    ],
+    "eligibility": "Endpoint-specific APAP rescue status and reuse terms remain unverified. Requires row-level provenance and rights clarification.",
+    "model_trained": false
+  },
+  "iminosugar": {
+    "checked_at": "2026-11-18T05:48:55.137997+00:00",
+    "doi": "10.1038/s41598-018-34749-1",
+    "pmcid": "PMC6219604",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "sources": [
+      {
+        "file": "article.xml",
+        "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6219604/fullTextXML"
+      },
+      {
+        "file": "supplements.zip",
+        "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6219604/supplementaryFiles"
+      }
+    ],
+    "sha256": {
+      "article.xml": "cac776d63bec64abe6b77f8e9fbec5ea2fbeda270263b8c466b0143973d19512",
+      "supplements.zip": "6bf31e11c3f49d41172584db6ed6d61b9f1b72f58c31bce8460c712b1ab0e3ba",
+      "41598_2018_34749_MOESM2_ESM.xls": "71f2085305c2bc1dd4e62d61a422fab9bae6941d66bf591c871f18274c33dd1d",
+      "41598_2018_34749_MOESM1_ESM.pdf": "d0b85f6f0a00e245e75071f9de277318917e18c612df324fdd3d315243ff2bdd"
+    },
+    "sheet": "Library",
+    "table_rows": 196,
+    "table_columns": 10,
+    "library_ids": 390,
+    "distinct_library_ids": 390,
+    "type_counts": {
+      "1,2 di deoxy": 46,
+      "DNJ": 182,
+      "Tetrahydropyridine": 6,
+      "Piperidinol": 25,
+      "": 47,
+      "NJ": 58,
+      "cyclo hexane core": 1,
+      "Glucose": 3,
+      "N/A": 1,
+      "Tetrahydropyridineol": 11,
+      "Cas": 5,
+      "Oxabicycloheptane": 5
+    },
+    "configuration_counts": {
+      "D-Glc/Man": 3,
+      "L-Ido": 80,
+      "L-Glc/Man": 3,
+      "D-Gal/Tal": 2,
+      "L-Gal/Tal": 3,
+      "D-Gal": 3,
+      "D-Gul/Ido": 2,
+      "D-All/Alt": 3,
+      "L-Gul/Ido": 3,
+      "L-Alt": 5,
+      "L-Allo/Alt": 3,
+      "D-Glc": 118,
+      "2R 3S": 12,
+      "2R,3R": 1,
+      "2S 3S": 9,
+      "2S 3R": 11,
+      "2R 3R": 9,
+      "l-Ido": 12,
+      "D-Glu": 12,
+      "N/A": 7,
+      "": 41,
+      "2R 3R 4R": 3,
+      "2R 3R 4S": 3,
+      "2R3S4R": 3,
+      "2R 3S 4S": 3,
+      "2S 3R 4R": 6,
+      "2S 3R 4S": 3,
+      "2S 3S 4S": 3,
+      "Alt": 5,
+      "All": 5,
+      "Gal": 3,
+      "Tal": 2,
+      "L-All": 6,
+      "L-Gal": 1,
+      "L-Tal": 1,
+      "D-Ido": 1
+    },
+    "paired_machine_readable_activity_rows": 0,
+    "source_article_arabidopsis_hit_rule": "At least 50% inhibition of primary-root growth, 10 uM, seven days",
+    "source_article_hit_count": 5,
+    "figure_s1_observation": "Sorted root-length bars with DMSO controls. Compound-to-bar IDs are not legible or embedded in the accessible page.",
+    "scientific_decision": "Needs the compound-ID to numerical-outcome mapping and verified chemical structures. Five reported hits are below existing classifier support requirements.",
+    "training_performed": false
+  },
+  "root_followup": {
+    "checked_at": "2026-11-18T05:51:44.681152+00:00",
+    "rodriguez": {
+      "doi": "10.1016/j.plantsci.2016.01.001",
+      "original_bundle_files": 1,
+      "source_pdf_sha256": "8ca0e1af974e2d054285f438de5867af698400e88193346e0322618eb34186c4",
+      "source_pdf_md5_verified": true,
+      "paired_root_outcome_table_in_original_bundle": false
+    },
+    "emmenecker": {
+      "pmcid": "PMC12032938",
+      "title": "A high-throughput differential chemical genetic screen uncovers genotype-specific compounds altering plant growth",
+      "supplement_members": [
+        {
+          "name": "gr4.gif",
+          "bytes": 84710,
+          "sha256": "13b40342c1ff1c9c0407bfb5610624ec9f2eed77c81206817773a65f006a9a3e"
+        },
+        {
+          "name": "gr6.jpg",
+          "bytes": 566628,
+          "sha256": "c485c9aeacb1e6f099250e59505709e2d2fe5ec2d4a5ae488b3e7f90d95475e4"
+        },
+        {
+          "name": "gr1.jpg",
+          "bytes": 223173,
+          "sha256": "30ef8246eaa06c61fc870bc056eacd722b4bb0c8b4952687a63d3d6591c248e4"
+        },
+        {
+          "name": "gr2.gif",
+          "bytes": 80091,
+          "sha256": "deae05c5ad541bf89e06a4c600c143d390b45c5bc441c22fa6caa7005c727f2b"
+        },
+        {
+          "name": "gr1.gif",
+          "bytes": 75995,
+          "sha256": "05f061f123de177224da941e9a6ae1cc1138e5022b0eed42bc731f8cd3d69ab4"
+        },
+        {
+          "name": "gr3.jpg",
+          "bytes": 633785,
+          "sha256": "4accd13f6d8281c5c16fd8e9ceba3be377d3268c89785320e54bec47e55115c1"
+        },
+        {
+          "name": "gr7.jpg",
+          "bytes": 359940,
+          "sha256": "46cb7ccd9d8fa3b956d5b4031ea16b7a0448229d6ed7c84d35a73e2f7fb0baf7"
+        },
+        {
+          "name": "gr2.jpg",
+          "bytes": 271458,
+          "sha256": "a972dd5de7a993e1c4184793e63ec982cc8f960997f3797af2a12863c03f482e"
+        },
+        {
+          "name": "gr5.jpg",
+          "bytes": 445692,
+          "sha256": "5e8a2f0d228dca912f933ad0aef849cd2f147331cb91879b0e4f68ed244dfdbb"
+        },
+        {
+          "name": "fx1.gif",
+          "bytes": 77874,
+          "sha256": "8d5a70bc5ce2e7e5dbca7e477359e36eb69c520d0f861aa72ffff1e0d3f71d50"
+        },
+        {
+          "name": "gr5.gif",
+          "bytes": 77019,
+          "sha256": "2d4f09d2b91600dcab3e798abdfa4a03f8def11f91644909736f2c4d19e80e2f"
+        },
+        {
+          "name": "gr7.gif",
+          "bytes": 75779,
+          "sha256": "7076b3fd271f82920a7f1fee509f28667bfd9176e06d57bf65c00b0463cb0e60"
+        },
+        {
+          "name": "gr3.gif",
+          "bytes": 82924,
+          "sha256": "cdbeb89b024b3805b9b9245ee74df9e2d1fc0e535f25f2565ce7b38eccbc772a"
+        },
+        {
+          "name": "mmc1.pdf",
+          "bytes": 1272144,
+          "sha256": "032753558a60dd5267c9605e039f63ecad68fbadc58ef1d35c80a2b17c369500"
+        },
+        {
+          "name": "gr4.jpg",
+          "bytes": 700875,
+          "sha256": "063f2db8b35380779151765fa316d8da33b7ae4c5e624cf6f7be02431afc280d"
+        },
+        {
+          "name": "gr6.gif",
+          "bytes": 77766,
+          "sha256": "d74176e7421d47f7434aa3a522f1a4375efb019a6d685f3bf7bf5dfab65906e5"
+        },
+        {
+          "name": "fx1.jpg",
+          "bytes": 302348,
+          "sha256": "baa7201d544355d707c939dfe359981afad990fa2ad90c94f6310871b9975249"
+        }
+      ],
+      "root_screen_readout": "Root tissue pixel area; WT/mus81 comparison",
+      "primary_root_length_bulk_dataset": false,
+      "source_data_availability": "Available from lead contact on request"
+    },
+    "training_performed": false
+  },
+  "models_trained": 0,
+  "cox2_species_conflict": {
+    "checked_at": "2026-11-18T05:56:04.462670+00:00",
+    "source_version": "ChEMBL_37",
+    "url": "https://www.ebi.ac.uk/chembl/api/data/activity.json?document_chembl_id=CHEMBL1138184&limit=1000",
+    "document_id": "CHEMBL1138184",
+    "doi": "10.1021/jm0510474",
+    "activities": 190,
+    "cox2_rows": 29,
+    "cox2_organism": "Ovis aries",
+    "bindingdb_assay": "2585_1",
+    "reason": "Species conflict with BindingDB human P35354 metadata. Excluded from candidate human external panel.",
+    "sha256": "d5b4baeebbe229272c84ef9c0ac25b936b89811ff1011363fe28b6bd4becf204",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "model_evaluated": false
+  },
+  "cox2_after_excluding_known_mismatches": {
+    "structure_support": {
+      "all_eligible_metadata": {
+        "positive": 44,
+        "negative": 55,
+        "conflict": 1
+      },
+      "after_known_mismatches": {
+        "positive": 32,
+        "negative": 43,
+        "conflict": 1
+      },
+      "explicit_protocols": {
+        "positive": 13,
+        "negative": 31,
+        "conflict": 0
+      }
+    },
+    "explicit_assays": [
+      "13165_1",
+      "1436_3",
+      "6146_3",
+      "6829_2",
+      "7086_1",
+      "7870_1"
+    ],
+    "excluded_mismatch_or_unspecified_counterassay": [
+      "10852_2",
+      "1297_1",
+      "2585_1",
+      "5755_1",
+      "7118_1",
+      "7273_1",
+      "7810_1"
+    ],
+    "assay_row_counts": {
+      "2584_2": {
+        "target_rows": 1,
+        "novel_scaffold_rows": 1
+      },
+      "2585_1": {
+        "target_rows": 29,
+        "novel_scaffold_rows": 20
+      },
+      "2608_1": {
+        "target_rows": 8,
+        "novel_scaffold_rows": 2
+      },
+      "2652_1": {
+        "target_rows": 30,
+        "novel_scaffold_rows": 11
+      },
+      "null": {
+        "target_rows": 1
+      },
+      "5616_1": {
+        "target_rows": 6
+      },
+      "5755_1": {
+        "target_rows": 5,
+        "novel_scaffold_rows": 4
+      },
+      "6146_3": {
+        "target_rows": 9,
+        "novel_scaffold_rows": 1
+      },
+      "6181_2": {
+        "target_rows": 14,
+        "novel_scaffold_rows": 4
+      },
+      "6815_1": {
+        "target_rows": 7,
+        "novel_scaffold_rows": 1
+      },
+      "6829_2": {
+        "target_rows": 19,
+        "novel_scaffold_rows": 18
+      },
+      "6834_2": {
+        "target_rows": 8
+      },
+      "7562_1": {
+        "target_rows": 6,
+        "novel_scaffold_rows": 5
+      },
+      "7839_1": {
+        "target_rows": 19,
+        "novel_scaffold_rows": 4
+      },
+      "7858_1": {
+        "target_rows": 12
+      },
+      "7870_1": {
+        "target_rows": 9
+      },
+      "1297_1": {
+        "target_rows": 213
+      },
+      "1436_3": {
+        "target_rows": 22
+      },
+      "7273_1": {
+        "target_rows": 50
+      },
+      "7810_1": {
+        "target_rows": 10
+      },
+      "8208_2": {
+        "target_rows": 28
+      },
+      "10852_2": {
+        "target_rows": 2
+      },
+      "10916_1": {
+        "target_rows": 6,
+        "novel_scaffold_rows": 2
+      },
+      "11551_1": {
+        "target_rows": 8,
+        "novel_scaffold_rows": 4
+      },
+      "13165_1": {
+        "target_rows": 32,
+        "novel_scaffold_rows": 27
+      }
+    },
+    "min_test_per_class": 30,
+    "model_evaluated": false
+  }
+}
