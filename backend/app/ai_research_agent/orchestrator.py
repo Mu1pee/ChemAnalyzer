@@ -8,6 +8,7 @@ from uuid import uuid4
 from .config import Provenance, TaskConfig, storage_root
 from .data_validation import validate_source
 from .experiment_tracking import update
+from .root_protocol import validate_root_dataset
 from .security import bounded_text, checksum, read_json, safe_child, utcnow, write_json
 
 
@@ -33,6 +34,7 @@ def execute_run(run_path: str):
         update(run, "preparing", status="running")
         raw = (run / "dataset.csv").read_bytes()
         rows, issues = read_measurements(raw.decode("utf-8-sig"), task.max_rows)
+        validate_root_dataset(task, raw, rows)
         X, y, groups, preparation = prepare(rows, issues)
         write_json(run / "preparation.json", preparation)
         if read_json(run / "request.json")["action"] == "prepare":
@@ -87,6 +89,7 @@ class ResearchAgent:
             validate_source(task, provenance)
             raw = bounded_text(csv_text)
             rows, issues = read_measurements(csv_text, task.max_rows)
+            validate_root_dataset(task, raw, rows)
             if not rows:
                 raise ValueError("No usable experimental measurements")
             # Immutable dataset versions avoid mixed snapshots during concurrent import/run.

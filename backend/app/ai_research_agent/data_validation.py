@@ -4,9 +4,14 @@ import math
 from urllib.parse import urlparse
 
 from .config import Provenance, TaskConfig
+from .root_protocol import require_root_protocol
 
 
 def validate_source(task: TaskConfig, provenance: Provenance):
+    # Specialized binary sidecars use this source comparison too; their own
+    # independent protocol contract deliberately has no generic task domain.
+    if hasattr(task, "domain"):
+        require_root_protocol(task)
     if not provenance.experimental:
         raise ValueError("Only experimental labels are permitted")
     for name in ("endpoint", "units", "context"):

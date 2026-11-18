@@ -1,0 +1,23 @@
+{
+  "name": "Arabidopsis: measured primary root / matched control",
+  "domain": "growth",
+  "endpoint": "primary_root_length_relative_to_control",
+  "kind": "regression",
+  "units": "ratio",
+  "context": "Arabidopsis thaliana: REPLACE with the exact verified experimental context",
+  "root_protocol": {
+    "schema_version": 1,
+    "species": "Arabidopsis thaliana",
+    "ecotype": "",
+    "seedling_age_at_treatment_days": null,
+    "compound_concentration_uM": null,
+    "exposure_duration_h": null,
+    "medium": "",
+    "light_cycle": "",
+    "matched_control": "",
+    "replicate_design": "",
+    "measurement_method": "",
+    "normalization": "treated_primary_root_length / matched_control_primary_root_length",
+    "dataset_sha256": ""
+  }
+}

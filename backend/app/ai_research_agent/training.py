@@ -9,11 +9,13 @@ from threadpoolctl import threadpool_limits
 
 from .evaluation import metrics, scaffold_split
 from app.model_quality import held_out_quality, classification_reasons
+from .root_protocol import require_root_protocol
 
 
 def train(X, y, groups, task, checkpoint=lambda stage: None):
     if task.domain == "antidote_catalog":
         raise ValueError("Antidote tasks are catalog/report only; training is not authorized")
+    require_root_protocol(task)
     if not np.isfinite(X).all() or not np.isfinite(y).all():
         raise ValueError("Non-finite training values")
     if task.kind == "classification" and (set(y) != {0, 1} or min(np.bincount(y.astype(int))) < 30):

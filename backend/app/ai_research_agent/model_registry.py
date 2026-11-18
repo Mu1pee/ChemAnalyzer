@@ -8,6 +8,7 @@ from app.model_quality import held_out_quality
 
 from .applicability_domain import assess
 from .molecular_features import molecule, vector
+from .root_protocol import root_metadata_reasons
 from .security import checksum, read_json, safe_child, utcnow, write_json
 
 logger = logging.getLogger(__name__)
@@ -92,6 +93,8 @@ class Registry:
         # cannot be served as JSON and must never disable the whole registry.
         json.dumps(meta, allow_nan=False)
         meta["quality"] = held_out_quality(meta["task"]["kind"], meta.get("evaluation"))
+        meta["quality"]["reasons"] += root_metadata_reasons(meta)
+        meta["quality"]["passed"] = not meta["quality"]["reasons"]
         return meta
 
     def require_quality(self, meta):

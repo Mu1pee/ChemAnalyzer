@@ -1,4 +1,4 @@
-# Model admission policy (ChemAnalyzer 3.2.15, updated 2026-11-18)
+# Model admission policy (ChemAnalyzer 3.2.16, updated 2026-11-18)
 
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
@@ -122,6 +122,16 @@ validation or human approval. See CATALOG_CONTRACT_3.2.11.md.
 | 3D molecule/protein viewer | Conformer generation and structure visualization; evaluate geometry/provenance, not classification accuracy. |
 | Literature assistant | Requires configured API access; generated text needs source checking and is not QSAR validation. |
 | PubChem, ChEMBL, registry, history | Data retrieval/storage: availability, exact identity, provenance and failure handling are relevant; model accuracy does not apply. |
+
+The general Research Lab primary-root regression path now also requires a
+structured `root_protocol` before importing/preparing/fitting data. It fixes
+the species, ecotype, age, dose, exposure, medium, light, control, replicates,
+measurement method, ratio normalization and exact CSV checksum. The registry
+rechecks this declaration and source/dataset binding even for previously
+approved root records. This closes admission based only on free-text context
+and numerical scores; no root data or trained artifact are added. See
+[ROOT_REGRESSION_PROTOCOL.md](ROOT_REGRESSION_PROTOCOL.md). Binary specialized
+sidecars remain a separate contract with their existing gates.
 
 ## Additional screening endpoints in 3.2.4
 

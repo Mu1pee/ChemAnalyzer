@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app import config as app_config
+from .root_protocol import ROOT_ENDPOINT, RootProtocol, is_root_task
 
 
 def storage_root() -> Path:
@@ -29,15 +30,18 @@ class TaskConfig(BaseModel):
     max_seconds: int = Field(default=600, ge=10, le=3600)
     max_ram_mb: int = Field(default=2048, ge=256, le=8192)
     max_disk_mb: int = Field(default=512, ge=32, le=2048)
+    # A draft may omit this; importing/training root data requires it.
+    root_protocol: RootProtocol | None = None
     # No paid API or LLM calls are implemented. CPU is always one worker/thread.
 
     @model_validator(mode="after")
     def domain_context(self):
-        if self.domain == "growth" and (
-            self.endpoint != "primary_root_length_relative_to_control"
+        if is_root_task(self) and (
+            self.domain != "growth" or self.endpoint != ROOT_ENDPOINT
+            or self.kind != "regression" or self.units != "ratio"
             or "Arabidopsis thaliana" not in self.context
         ):
-            raise ValueError("Growth tasks require Arabidopsis thaliana primary-root endpoint")
+            raise ValueError("Growth tasks require Arabidopsis thaliana primary-root regression in ratio units")
         return self
 
 
