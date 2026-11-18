@@ -1,0 +1,63 @@
+{
+  "reviewed_at": "2026-11-18",
+  "article": {
+    "doi": "10.3390/molecules29061309",
+    "license": "CC BY 4.0",
+    "authors": [
+      "Najla A. Alshaye",
+      "Mohamed K. Elgohary",
+      "Mahmoud S. Elkotamy",
+      "Hatem A. Abdel-Aziz"
+    ],
+    "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10974743/fullTextXML",
+    "sha256": "7bd67a2a7e7c1cb594195b6458814b75cbdccd3357bd375b7c9274ff574db66d",
+    "supplementary_package": {
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10974743/supplementaryFiles",
+      "status": 200,
+      "bytes": 5968432,
+      "sha256": "971b5277956c5789b45e14b9c3266ddb7460891f7803b344d8f2670ccd1a867a"
+    },
+    "visually_reviewed_figures": {
+      "molecules-29-01309-sch001.jpg": "b98ee3fb02687fb4dfaecbeb5a1b83d9d1299027ce2d443fb084053107c92ac3",
+      "molecules-29-01309-sch002.jpg": "3586aa59b6d4e15f7a51ab9e79fafe49b2923220ceeab8770fa94360b2170e03"
+    },
+    "molecular_identity_review": "source-review.json"
+  },
+  "bindingdb": {
+    "license": "CC BY 3.0",
+    "candidate_pool_csv_sha256": "d3fe62912d674bac4987c9612349b06cc01d8605f35464d003a579959d5745c7",
+    "authors_by_source": {
+      "10.1073/pnas.97.2.925": "Kalgutkar, AS; Crews, BC; Rowlinson, SW; Marnett, AB; Kozak, KR; Remmel, RP; Marnett, LJ",
+      "10.1111/cbdd.12280": "Ahmad, W; Kumolosasi, E; Jantan, I; Bukhari, SN; Jasamai, M",
+      "10.1111/cbdd.12457": "Bukhari, SN; Zhang, X; Jantan, I; Zhu, HL; Amjad, MW; Masand, VH",
+      "US20250255992": "SILBER, BM; KAYSER, F; REILEY, MA"
+    },
+    "versioned_export_provenance": "../cox2-external-candidates-2026-11-18/provenance.json",
+    "retained_assay_descriptions": {
+      "13165_1": {
+        "name": "COX-1/-2 enzyme assay",
+        "text": "The ability of compounds to inhibit ovine COX-1 and human COX-2 is determined using a commercially available enzyme immunoassay (EIA) kit (catalog no. 701090 (COX-1); 701080 (COX-2) Cayman Chemical Co., Ann Arbor, MI, USA) according to the manufacturer&#39;s protocol. COX catalyzes the first step in the biosynthesis of AA to PGH2. PGF2\u03b1, produced from PGH2 by reduction with stannous chloride, was measured by EIA (ACE\u2122 competitive EIA, Cayman Chemical, Ann Arbor, MI, USA). Briefly, to a series of supplied reaction buffer solutions [960 \u03bcl 0.1 M Tris-HCl (pH 8.0) containing 5 mM EDTA and 2 mM phenol] with either COX-1 or COX-2 (10 \u03bcl) enzyme in the presence of heme (10 \u03bcl), 10 \u03bcl of various concentrations of test drug solutions are added. These solutions are incubated for 15 min at 37\u00b0 C. and subsequently 10 \u03bcl AA solution (100 \u03bcM) is added. The COX reaction is stopped by the addition of 30 \u03bcl stannous chloride after 2 min, mixed immediately, supernatants are 2000-fold diluted. The produced PGF2\u03b1 is measured by EIA. This assay is based on the competition between PGs and a PG-acetylcholinesterase conjugate (PG tracer) for a limited amount of PG antiserum. The amount of PG tracer that is able to bind to the PG antiserum is inversely proportional to the concentration of PGs in the wells since the concentration of the PG tracer is held at a constant while the concentration of PGs varies. The specific antiserum-PG complex binds to a mouse anti-rabbit IgG that had been previously attached to the well. The plate is washed to remove any unbound reagents and 200 \u03bcl Ellman&#39;s reagent (5,5\u2032-dithiobis-(2-nitrobenzoic acid), which contains the substrate to acetylcholine esterase, is added to the well. The product of this enzymatic reaction generates a distinct yellow color that absorbs at 406 nm. The intensity of this color, determined by spectrophotometry, is proportional to the amount of PG tracer bound to the well, which is inversely proportional to the amount of PGs present in the well during the incubation. Percent inhibition is calculated by the comparison of the compounds treated to the various control incubations. Dose-response curves are generated using XLFit (IDBS, Surrey, UK) or Prism (GraphPad Software, La Jolla, CA, US) to calculate IC50 values for each compound tested."
+      },
+      "2652_1": {
+        "name": "Time-Dependent Inhibition Assay",
+        "text": "For the time-dependent inhibition studies, COX enzyme was incubated with test compounds for 20 min and then analyzed for remaining COX activity by treatment with [1-14C]arachidonic acid 30 sec at 37&#176;C. All IC50 values are average determinations from two independent experiments."
+      },
+      "6146_3": {
+        "name": "Cyclooxygenase activity assay",
+        "text": "Reaction mixture containing 100 mM Tris-HCl buffer (pH 8) and COX-1 (ovine) or COX-2 (human recombinant) was preincubated for 10 min in a water bath at 37 &#176;C. The reaction was initiated by the addition of 10 &#181;L arachidonic acid (final concentration 100 &#181;M). After 2 min, the reaction was terminated by adding 1 M HCl. Test compounds were dissolved in DMSO and diluted to the desired concentration with potassium phosphate buffer of pH 7.4."
+      },
+      "6829_2": {
+        "name": "Cyclooxygenase Assay",
+        "text": "100 mM Tris HCl buffer, pH 8.0 containing 1 \u00b5M heme and COX-1 (ovine) or COX-2(human recombinant), which was preincubated for 10 min in a water bath at 37 \u00b0C was used for reaction mixture preparation. Addition of 10 \u00b5L arachidonic acid to the reaction mixture (final concentration 100 \u00b5M) was used to initiate reaction. After 2 min reaction was stopped by addition of 1 M HCl. PGE2 in the reaction mixture was determined using ELISA method. 100 mM potassium phosphate buffer (pH 7.4) was used to dilute the DMSO stock solutions of the test compounds to the desired concentration. This reaction mixture was transferred to a 96-well platethat was precoated with a mouse anti-rabbit IgG. Tracer prostaglandin acetylcholine esterase and primary antibody (mouse anti PGE2) were also added to the plates followed by overnight incubation at room temperature. After overnightincubation, reaction mixtures were pipetted out and the wells were washed with 10 mM potassium phosphate buffer containing 0.05% Twe"
+      }
+    }
+  },
+  "implementation_sha256": {
+    "backend/app/chemistry/qsar_core.py": "32f6043b508e7e11176e5279a26ab600a0277ba1203b0a250b37e42a8a7853b2",
+    "backend/app/chemistry/fingerprints.py": "be3b86d01005ab4030fe968e415fece8b4c579a96f4e26057eca1b88ea63d114",
+    "backend/training/revalidate_qsar.py": "4dc506b23939f003f8057204ce6885c45501c0eb831e3c4f58d7bada4e14df86"
+  },
+  "repository_commit_before_experiment": "6653d29503bd90b7eefd711a5af6244e755f8aef",
+  "now_evaluated_benchmark": true,
+  "source_class_confounding": "Some publications contain only active or only inactive examples; do not interpret pooled metrics as population accuracy."
+}

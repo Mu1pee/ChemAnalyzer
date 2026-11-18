@@ -1,0 +1,187 @@
+{
+  "experiment": "COX-2 external pilot 2026-11-18",
+  "app_activation": false,
+  "plan_sha256": "b448bdfae34ec73fe8e5f99a593b1bc29f6ade9f451c577d1fd81aa42fc61940",
+  "plan_amendment_sha256": "1fda9df98eef3e70abaad24e78605d73b6c8457ecf5fe04a195bb8a9985d753d",
+  "code_sha256": "c3267b2e328a948637f597fb070ed63c3d9730f42b0a1c5e374c013eb57695b6",
+  "dependency_versions": {
+    "sklearn": "1.9.1",
+    "rdkit": "2026.09.1",
+    "numpy": "2.5.4"
+  },
+  "support": {
+    "training": 2740,
+    "external": 62,
+    "active": 30,
+    "inactive": 32,
+    "external_groups": 35,
+    "measurements": 64
+  },
+  "data_sha256": {
+    "training": "b8282f6d0824fbdc685f256c8646903e1c6de8356762ef21e0472a0ba8057413",
+    "external": "3f95dc084b3bf69aad61286a8a2ee5c03a579f16f70a62e63a9769fa2156f617",
+    "measurements": "6de715a2fc6cd7eff261028a158c1dce2ea8ff2b4a96bc45909e2132f6862a53",
+    "source_review": "c0540f2c32ca794946e3a1667bed3d50b21635a5fdab1106442e024ce9357fbd"
+  },
+  "prior_internal_failure_preserved": true,
+  "external_used_for_model_selection": false,
+  "scientific_limitations": [
+    "Small retrospective curated external benchmark; not prospective or population-representative",
+    "Assay protocols differ in preincubation and detection even though human COX-2 and arachidonic acid endpoint are matched",
+    "Data provenance and chemical identity reviewed; experimental results have not been independently reproduced",
+    "Source/class confounding and structural-domain limits must be reported; no claim about APAP rescue or root growth"
+  ],
+  "research_gates_passed": false,
+  "y_randomization": {
+    "roc_auc": 0.4913329476205206,
+    "folds": 3,
+    "training_only": true,
+    "n_evaluated": 2740
+  },
+  "test": {
+    "roc_auc": 0.5916666666666667,
+    "pr_auc": 0.6070619250979247,
+    "f1": 0.5970149253731343,
+    "precision": 0.5405405405405406,
+    "recall": 0.6666666666666666,
+    "balanced_accuracy": 0.5677083333333333,
+    "mcc": 0.1379548169928529,
+    "n_evaluated": 62
+  },
+  "baseline_test": {
+    "roc_auc": 0.5,
+    "pr_auc": 0.4838709677419355,
+    "f1": 0.6521739130434783,
+    "precision": 0.4838709677419355,
+    "recall": 1.0,
+    "balanced_accuracy": 0.5,
+    "mcc": 0.0,
+    "n_evaluated": 62
+  },
+  "confusion_matrix": {
+    "label_order": [
+      0,
+      1
+    ],
+    "matrix": [
+      [
+        15,
+        17
+      ],
+      [
+        10,
+        20
+      ]
+    ]
+  },
+  "uncertainty": {
+    "method": "percentile bootstrap of whole nonchiral Murcko groups",
+    "seed": 42,
+    "requested_replicates": 5000,
+    "valid_replicates": 5000,
+    "confidence": 0.95,
+    "balanced_accuracy_interval": [
+      0.4025197963800905,
+      0.7230709574190176
+    ]
+  },
+  "domain": {
+    "in_domain_ge_0_5": 16,
+    "edge_0_3_to_0_5": 45,
+    "outside_lt_0_3": 1
+  },
+  "per_source": [
+    {
+      "source": "10.1073/pnas.97.2.925",
+      "n": 11,
+      "active": 10,
+      "inactive": 1,
+      "correct": 6,
+      "confusion_matrix": [
+        [
+          0,
+          1
+        ],
+        [
+          4,
+          6
+        ]
+      ]
+    },
+    {
+      "source": "10.1111/cbdd.12280",
+      "n": 1,
+      "active": 0,
+      "inactive": 1,
+      "correct": 1,
+      "confusion_matrix": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "source": "10.1111/cbdd.12457",
+      "n": 18,
+      "active": 0,
+      "inactive": 18,
+      "correct": 14,
+      "confusion_matrix": [
+        [
+          14,
+          4
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "source": "10.3390/molecules29061309",
+      "n": 7,
+      "active": 7,
+      "inactive": 0,
+      "correct": 1,
+      "confusion_matrix": [
+        [
+          0,
+          0
+        ],
+        [
+          6,
+          1
+        ]
+      ]
+    },
+    {
+      "source": "US20250255992",
+      "n": 25,
+      "active": 13,
+      "inactive": 12,
+      "correct": 13,
+      "confusion_matrix": [
+        [
+          0,
+          12
+        ],
+        [
+          0,
+          13
+        ]
+      ]
+    }
+  ],
+  "reasons": [
+    "Balanced accuracy must be finite and strictly greater than 0.60",
+    "ROC-AUC must be finite and at least 0.75",
+    "MCC must be finite and at least 0.25",
+    "95% scaffold-group bootstrap balanced-accuracy lower bound is not greater than .60"
+  ],
+  "finished_at": "2026-11-18T09:43:34.195210+00:00"
+}

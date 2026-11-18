@@ -1,0 +1,3 @@
+# Keep the frozen evidence bytes identical to their recorded SHA-256 digests.
+*.csv -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

@@ -1,0 +1,197 @@
+{
+  "checked_at": "2026-11-18T06:04:17.062848+00:00",
+  "status": "candidate_data_pending_protocol_review",
+  "training_performed": false,
+  "evaluated_model": false,
+  "source_version": "BindingDB 202611",
+  "source_license": "CC BY 3.0",
+  "license_url": "https://creativecommons.org/licenses/by/3.0/",
+  "attribution": "BindingDB curators and the original experimental authors identified in each record",
+  "reference_sha256": "b8282f6d0824fbdc685f256c8646903e1c6de8356762ef21e0472a0ba8057413",
+  "measurement_rows": 62,
+  "distinct_compounds": 60,
+  "class_counts": {
+    "active": 24,
+    "inactive": 36
+  },
+  "scaffold_groups": 34,
+  "scaffold_overlap_with_reference": 0,
+  "shared_known_publication_rows_retained": 0,
+  "reviewed_assays": [
+    "13165_1",
+    "1436_3",
+    "2652_1",
+    "6146_3",
+    "6829_2",
+    "7086_1",
+    "7562_1",
+    "7870_1"
+  ],
+  "exclusions": {
+    "outside_reviewed_protocol_subset": 445,
+    "scaffold_seen_in_reference": 46,
+    "missing_or_nonexact_ic50": 19,
+    "target_context": 27
+  },
+  "min_external_test_per_class": 30,
+  "test_support_passed": false,
+  "remaining_review": [
+    "Cross-check experimental units and structures against original papers and patent tables",
+    "Separate different substrates and assay conditions where required",
+    "Check patent families and other source republications"
+  ],
+  "files": {
+    "candidate-measurements.csv": "d3fe62912d674bac4987c9612349b06cc01d8605f35464d003a579959d5745c7"
+  },
+  "original_archives": {
+    "BindingDB_BindingDB_Articles_202611_tsv.zip": {
+      "sha256": "423609987c3589ca204d59380da7087fe7c67fe0e73b411347e0698ed5fbbdc8",
+      "checked_measurement_ids": [
+        "41873",
+        "41878",
+        "41879",
+        "41880",
+        "41881",
+        "41885",
+        "41886",
+        "41894",
+        "41895",
+        "41896",
+        "41897",
+        "232844",
+        "294297",
+        "294298",
+        "294299",
+        "294300",
+        "294301",
+        "294302",
+        "294303",
+        "294304",
+        "294305",
+        "294306",
+        "294307",
+        "294308",
+        "294309",
+        "294310",
+        "294311",
+        "294312",
+        "294313",
+        "294314",
+        "359248",
+        "359249",
+        "359250",
+        "359251",
+        "359252"
+      ],
+      "checked_rows": 35,
+      "url": "https://www.bindingdb.org/rwd/bind/downloads/BindingDB_BindingDB_Articles_202611_tsv.zip"
+    },
+    "BindingDB_Patents_202611_tsv.zip": {
+      "sha256": "1fbe2093cea7a981f0c796010eb350e212d5f532afc2be375def94ea89a015c3",
+      "checked_measurement_ids": [
+        "647094",
+        "647095",
+        "647097",
+        "647098",
+        "647099",
+        "648108",
+        "648109",
+        "648110",
+        "648111",
+        "648112",
+        "648114",
+        "648115",
+        "648116",
+        "648117",
+        "648119",
+        "648120",
+        "648121",
+        "648122",
+        "648123",
+        "648124",
+        "648125",
+        "648126",
+        "648127",
+        "648128",
+        "648129",
+        "648130",
+        "648131"
+      ],
+      "checked_rows": 27,
+      "url": "https://www.bindingdb.org/rwd/bind/downloads/BindingDB_Patents_202611_tsv.zip"
+    }
+  },
+  "original_values_and_structures_rechecked": true,
+  "unresolved_patent_compounds": [
+    {
+      "patent": "US11478464B1",
+      "compound": 1,
+      "ic50_uM": "0.068",
+      "ic50_nM": "68.0",
+      "bindingdb_reactant_set_id": "1218802",
+      "numeric_value_matches": true,
+      "experimental_species_confirmed": false
+    },
+    {
+      "patent": "US11478464B1",
+      "compound": 2,
+      "ic50_uM": "0.048",
+      "ic50_nM": "48.0",
+      "bindingdb_reactant_set_id": "1218804",
+      "numeric_value_matches": true,
+      "experimental_species_confirmed": false
+    },
+    {
+      "patent": "US11786535B1",
+      "compound": 1,
+      "ic50_uM": "0.21",
+      "ic50_nM": "210",
+      "bindingdb_reactant_set_id": "1336956",
+      "numeric_value_matches": true,
+      "experimental_species_confirmed": false
+    },
+    {
+      "patent": "US11786535B1",
+      "compound": 2,
+      "ic50_uM": "0.08",
+      "ic50_nM": "80.0",
+      "bindingdb_reactant_set_id": "1336958",
+      "numeric_value_matches": true,
+      "experimental_species_confirmed": false
+    },
+    {
+      "patent": "US11786535B1",
+      "compound": 3,
+      "ic50_uM": "0.06",
+      "ic50_nM": "60.0",
+      "bindingdb_reactant_set_id": "1336960",
+      "numeric_value_matches": true,
+      "experimental_species_confirmed": false
+    },
+    {
+      "patent": "US11786535B1",
+      "compound": 4,
+      "ic50_uM": "0.097",
+      "ic50_nM": "97.0",
+      "bindingdb_reactant_set_id": "1336962",
+      "numeric_value_matches": true,
+      "experimental_species_confirmed": false
+    }
+  ],
+  "patent_fetches": [
+    {
+      "patent": "US11478464B1",
+      "url": "https://patents.google.com/patent/US11478464B1/en",
+      "file": "US11478464B1.html",
+      "sha256": "4ccc2316d7157b875d45248adb0919e6504077e2daa883d007044006270e25df",
+      "checked_at": "2026-11-18T06:01:58.459703+00:00"
+    },
+    {
+      "patent": "US11786535B1",
+      "url": "https://patents.google.com/patent/US11786535B1/en",
+      "file": "US11786535B1.html",
+      "sha256": "03281b85b3c05cdbc6ee2c8d90f2a3a3df1dfd9b2c3039d2f1211e921d08cdf0",
+      "checked_at": "2026-11-18T06:01:58.769967+00:00"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "created_at": "2026-11-18T09:41:37.265184+00:00",
+  "before_fit_and_prediction": true,
+  "original_plan_sha256": "b448bdfae34ec73fe8e5f99a593b1bc29f6ade9f451c577d1fd81aa42fc61940",
+  "field": "algorithm.class_weight",
+  "correction": "balanced_subsample",
+  "reason": "Exact existing qsar_core._forest parameter; the original plan referred to that implementation but shortened its descriptive class-weight name to balanced. No algorithm, seed, data, threshold or quality gate is changed."
+}

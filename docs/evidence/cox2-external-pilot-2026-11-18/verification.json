@@ -1,0 +1,17 @@
+{
+  "checked_at": "2026-11-18",
+  "verified": true,
+  "unique_external_compounds": 62,
+  "confusion_counts": {
+    "tn": 15,
+    "fp": 17,
+    "fn": 10,
+    "tp": 20
+  },
+  "balanced_accuracy": 0.5677083333333333,
+  "roc_auc_by_all_positive_negative_pairs": 0.5916666666666667,
+  "mcc": 0.1379548169928529,
+  "all_seven_new_paper_measurements_match_original_table": true,
+  "no_accepted_artifact_or_activation": true,
+  "external_data_sha256": "3f95dc084b3bf69aad61286a8a2ee5c03a579f16f70a62e63a9769fa2156f617"
+}

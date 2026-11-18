@@ -1,0 +1,1268 @@
+[
+  {
+    "smiles": "CN(C)c1ccc(/C=C/C(=O)c2ccc3c(c2)OCCO3)c2ccccc12",
+    "scaffold": "O=C(C=Cc1cccc2ccccc12)c1ccc2c(c1)OCCO2",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294300",
+        "smiles": "CN(C)c1ccc(/C=C/C(=O)c2ccc3c(c2)OCCO3)c2ccccc12",
+        "label": 0,
+        "ic50_nM": 24480.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153283&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(C=Cc1cccc2ccccc12)c1ccc2c(c1)OCCO2"
+      }
+    ]
+  },
+  {
+    "smiles": "CN(C)c1ccc(C2CC(c3cc4ccccc4o3)=NN2C(=O)Nc2ccc(Cl)cc2)c2ccccc12",
+    "scaffold": "O=C(Nc1ccccc1)N1N=C(c2cc3ccccc3o2)CC1c1cccc2ccccc12",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294309",
+        "smiles": "CN(C)c1ccc(C2CC(c3cc4ccccc4o3)=NN2C(=O)Nc2ccc(Cl)cc2)c2ccccc12",
+        "label": 0,
+        "ic50_nM": 9100.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153292&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Nc1ccccc1)N1N=C(c2cc3ccccc3o2)CC1c1cccc2ccccc12"
+      }
+    ]
+  },
+  {
+    "smiles": "CN(C)c1ccc(C2CC(c3cc4ccccc4o3)=NN2C(N)=S)c2ccccc12",
+    "scaffold": "c1ccc2oc(C3=NNC(c4cccc5ccccc45)C3)cc2c1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294303",
+        "smiles": "CN(C)c1ccc(C2CC(c3cc4ccccc4o3)=NN2C(N)=S)c2ccccc12",
+        "label": 0,
+        "ic50_nM": 14550.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153286&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "c1ccc2oc(C3=NNC(c4cccc5ccccc45)C3)cc2c1"
+      }
+    ]
+  },
+  {
+    "smiles": "CN(C)c1ccc(C2CC(c3ccc4c(c3)OCCO4)=NN2C(=O)Nc2ccc(Cl)cc2)c2ccccc12",
+    "scaffold": "O=C(Nc1ccccc1)N1N=C(c2ccc3c(c2)OCCO3)CC1c1cccc2ccccc12",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294312",
+        "smiles": "CN(C)c1ccc(C2CC(c3ccc4c(c3)OCCO4)=NN2C(=O)Nc2ccc(Cl)cc2)c2ccccc12",
+        "label": 0,
+        "ic50_nM": 9720.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153295&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Nc1ccccc1)N1N=C(c2ccc3c(c2)OCCO3)CC1c1cccc2ccccc12"
+      }
+    ]
+  },
+  {
+    "smiles": "CN(C)c1ccc(C2CC(c3ccc4c(c3)OCCO4)=NN2C(N)=S)c2ccccc12",
+    "scaffold": "c1ccc2c(C3CC(c4ccc5c(c4)OCCO5)=NN3)cccc2c1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294306",
+        "smiles": "CN(C)c1ccc(C2CC(c3ccc4c(c3)OCCO4)=NN2C(N)=S)c2ccccc12",
+        "label": 0,
+        "ic50_nM": 13170.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153289&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "c1ccc2c(C3CC(c4ccc5c(c4)OCCO5)=NN3)cccc2c1"
+      }
+    ]
+  },
+  {
+    "smiles": "CN(O)c1ccc(/C=C/C(=O)c2cc3ccccc3o2)c2ccccc12",
+    "scaffold": "O=C(C=Cc1cccc2ccccc12)c1cc2ccccc2o1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294297",
+        "smiles": "CN(O)c1ccc(/C=C/C(=O)c2cc3ccccc3o2)c2ccccc12",
+        "label": 0,
+        "ic50_nM": 25530.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153280&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(C=Cc1cccc2ccccc12)c1cc2ccccc2o1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1cc(C=CC(=O)CC(=O)C=Cc2ccc(O)c(OC)c2)ccc1O",
+    "scaffold": "O=C(C=Cc1ccccc1)CC(=O)C=Cc1ccccc1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:232844",
+        "smiles": "COc1cc(C=CC(=O)CC(=O)C=Cc2ccc(O)c(OC)c2)ccc1O",
+        "label": 0,
+        "ic50_nM": 96360.0,
+        "source_group": "10.1111/cbdd.12280",
+        "doi": "10.1111/cbdd.12280",
+        "patent": "",
+        "assay": "6146_3",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=29532&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(C=Cc1ccccc1)CC(=O)C=Cc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1cc2ccccc2c(/C=C/C(=O)c2cc3ccccc3o2)c1OC",
+    "scaffold": "O=C(C=Cc1cccc2ccccc12)c1cc2ccccc2o1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294299",
+        "smiles": "COc1cc2ccccc2c(/C=C/C(=O)c2cc3ccccc3o2)c1OC",
+        "label": 0,
+        "ic50_nM": 12240.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153282&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(C=Cc1cccc2ccccc12)c1cc2ccccc2o1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1cc2ccccc2c(/C=C/C(=O)c2ccc3c(c2)OCCO3)c1OC",
+    "scaffold": "O=C(C=Cc1cccc2ccccc12)c1ccc2c(c1)OCCO2",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294302",
+        "smiles": "COc1cc2ccccc2c(/C=C/C(=O)c2ccc3c(c2)OCCO3)c1OC",
+        "label": 0,
+        "ic50_nM": 12450.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153285&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(C=Cc1cccc2ccccc12)c1ccc2c(c1)OCCO2"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1cc2ccccc2c(C2CC(c3cc4ccccc4o3)=NN2C(=O)Nc2ccc(Cl)cc2)c1OC",
+    "scaffold": "O=C(Nc1ccccc1)N1N=C(c2cc3ccccc3o2)CC1c1cccc2ccccc12",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294311",
+        "smiles": "COc1cc2ccccc2c(C2CC(c3cc4ccccc4o3)=NN2C(=O)Nc2ccc(Cl)cc2)c1OC",
+        "label": 0,
+        "ic50_nM": 5020.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153294&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Nc1ccccc1)N1N=C(c2cc3ccccc3o2)CC1c1cccc2ccccc12"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1cc2ccccc2c(C2CC(c3cc4ccccc4o3)=NN2C(N)=S)c1OC",
+    "scaffold": "c1ccc2oc(C3=NNC(c4cccc5ccccc45)C3)cc2c1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294305",
+        "smiles": "COc1cc2ccccc2c(C2CC(c3cc4ccccc4o3)=NN2C(N)=S)c1OC",
+        "label": 0,
+        "ic50_nM": 10280.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153288&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "c1ccc2oc(C3=NNC(c4cccc5ccccc45)C3)cc2c1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1cc2ccccc2c(C2CC(c3ccc4c(c3)OCCO4)=NN2C(=O)Nc2ccc(Cl)cc2)c1OC",
+    "scaffold": "O=C(Nc1ccccc1)N1N=C(c2ccc3c(c2)OCCO3)CC1c1cccc2ccccc12",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294313",
+        "smiles": "COc1cc2ccccc2c(C2CC(c3ccc4c(c3)OCCO4)=NN2C(=O)Nc2ccc(Cl)cc2)c1OC",
+        "label": 0,
+        "ic50_nM": 12320.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153296&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Nc1ccccc1)N1N=C(c2ccc3c(c2)OCCO3)CC1c1cccc2ccccc12"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1cc2ccccc2c(C2CC(c3ccc4c(c3)OCCO4)=NN2C(N)=S)c1OC",
+    "scaffold": "c1ccc2c(C3CC(c4ccc5c(c4)OCCO5)=NN3)cccc2c1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294307",
+        "smiles": "COc1cc2ccccc2c(C2CC(c3ccc4c(c3)OCCO4)=NN2C(N)=S)c1OC",
+        "label": 0,
+        "ic50_nM": 17790.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153290&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "c1ccc2c(C3CC(c4ccc5c(c4)OCCO5)=NN3)cccc2c1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc(-c2cc(CCCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648110",
+        "smiles": "COc1ccc(-c2cc(CCCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+        "label": 1,
+        "ic50_nM": 60.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764458&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc(-c2cc(COCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648120",
+        "smiles": "COc1ccc(-c2cc(COCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+        "label": 1,
+        "ic50_nM": 540.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764468&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc(-c2cc(COCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648119",
+        "smiles": "COc1ccc(-c2cc(COCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 4510.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764467&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(OC)ccc(/C=C/C(=O)c3cc4ccccc4o3)c2c1",
+    "scaffold": "O=C(C=Cc1cccc2ccccc12)c1cc2ccccc2o1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294298",
+        "smiles": "COc1ccc2c(OC)ccc(/C=C/C(=O)c3cc4ccccc4o3)c2c1",
+        "label": 0,
+        "ic50_nM": 19140.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153281&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(C=Cc1cccc2ccccc12)c1cc2ccccc2o1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(OC)ccc(/C=C/C(=O)c3ccc4c(c3)OCCO4)c2c1",
+    "scaffold": "O=C(C=Cc1cccc2ccccc12)c1ccc2c(c1)OCCO2",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294301",
+        "smiles": "COc1ccc2c(OC)ccc(/C=C/C(=O)c3ccc4c(c3)OCCO4)c2c1",
+        "label": 0,
+        "ic50_nM": 18480.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153284&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(C=Cc1cccc2ccccc12)c1ccc2c(c1)OCCO2"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(OC)ccc(C3CC(c4cc5ccccc5o4)=NN3C(=O)Nc3ccc(Cl)cc3)c2c1",
+    "scaffold": "O=C(Nc1ccccc1)N1N=C(c2cc3ccccc3o2)CC1c1cccc2ccccc12",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294310",
+        "smiles": "COc1ccc2c(OC)ccc(C3CC(c4cc5ccccc5o4)=NN3C(=O)Nc3ccc(Cl)cc3)c2c1",
+        "label": 0,
+        "ic50_nM": 11070.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153293&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Nc1ccccc1)N1N=C(c2cc3ccccc3o2)CC1c1cccc2ccccc12"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(OC)ccc(C3CC(c4cc5ccccc5o4)=NN3C(N)=S)c2c1",
+    "scaffold": "c1ccc2oc(C3=NNC(c4cccc5ccccc45)C3)cc2c1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294304",
+        "smiles": "COc1ccc2c(OC)ccc(C3CC(c4cc5ccccc5o4)=NN3C(N)=S)c2c1",
+        "label": 0,
+        "ic50_nM": 12320.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153287&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "c1ccc2oc(C3=NNC(c4cccc5ccccc45)C3)cc2c1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(OC)ccc(C3CC(c4ccc5c(c4)OCCO5)=NN3C(=O)Nc3ccc(Cl)cc3)c2c1",
+    "scaffold": "O=C(Nc1ccccc1)N1N=C(c2ccc3c(c2)OCCO3)CC1c1cccc2ccccc12",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294314",
+        "smiles": "COc1ccc2c(OC)ccc(C3CC(c4ccc5c(c4)OCCO5)=NN3C(=O)Nc3ccc(Cl)cc3)c2c1",
+        "label": 0,
+        "ic50_nM": 11950.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153297&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Nc1ccccc1)N1N=C(c2ccc3c(c2)OCCO3)CC1c1cccc2ccccc12"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(OC)ccc(C3CC(c4ccc5c(c4)OCCO5)=NN3C(N)=S)c2c1",
+    "scaffold": "c1ccc2c(C3CC(c4ccc5c(c4)OCCO5)=NN3)cccc2c1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:294308",
+        "smiles": "COc1ccc2c(OC)ccc(C3CC(c4ccc5c(c4)OCCO5)=NN3C(N)=S)c2c1",
+        "label": 0,
+        "ic50_nM": 12550.0,
+        "source_group": "10.1111/cbdd.12457",
+        "doi": "10.1111/cbdd.12457",
+        "patent": "",
+        "assay": "6829_2",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=153291&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "c1ccc2c(C3CC(c4ccc5c(c4)OCCO5)=NN3)cccc2c1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(c1)c(CC(=O)NCCc1ccccc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+    "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)NCCc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41885",
+        "smiles": "COc1ccc2c(c1)c(CC(=O)NCCc1ccccc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+        "label": 1,
+        "ic50_nM": 60.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22966&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)NCCc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(c1)c(CC(=O)Nc1ccc(F)cc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+    "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)Nc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41880",
+        "smiles": "COc1ccc2c(c1)c(CC(=O)Nc1ccc(F)cc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+        "label": 1,
+        "ic50_nM": 60.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22961&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)Nc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(c1)c(CC(=O)Nc1ccc(NC(C)=O)cc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+    "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)Nc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41873",
+        "smiles": "COc1ccc2c(c1)c(CC(=O)Nc1ccc(NC(C)=O)cc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+        "label": 1,
+        "ic50_nM": 120.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22954&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)Nc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(c1)c(CC(=O)Nc1ccc(SC)cc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+    "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)Nc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41879",
+        "smiles": "COc1ccc2c(c1)c(CC(=O)Nc1ccc(SC)cc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+        "label": 1,
+        "ic50_nM": 120.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22960&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)Nc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(c1)c(CC(=O)Nc1cccnc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+    "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)Nc1cccnc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41881",
+        "smiles": "COc1ccc2c(c1)c(CC(=O)Nc1cccnc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+        "label": 1,
+        "ic50_nM": 50.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22962&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)Nc1cccnc1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(c1)c(CC(=O)OCCc1ccccc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+    "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)OCCc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41886",
+        "smiles": "COc1ccc2c(c1)c(CC(=O)OCCc1ccccc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+        "label": 1,
+        "ic50_nM": 50.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22967&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)OCCc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "COc1ccc2c(c1)c(CC(=O)Oc1cccnc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+    "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)Oc1cccnc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41878",
+        "smiles": "COc1ccc2c(c1)c(CC(=O)Oc1cccnc1)c(C)n2C(=O)c1ccc(Cl)cc1",
+        "label": 1,
+        "ic50_nM": 50.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22959&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(Cc1cn(C(=O)c2ccccc2)c2ccccc12)Oc1cccnc1"
+      }
+    ]
+  },
+  {
+    "smiles": "Cc1ccc(-c2cc(CCCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648111",
+        "smiles": "Cc1ccc(-c2cc(CCCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 4490.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764459&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "Cc1ccc(-c2cc(COCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648121",
+        "smiles": "Cc1ccc(-c2cc(COCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)nn2-c2ccc(S(N)(=O)=O)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 2480.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764469&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "Cc1ccc(Cl)c(Nc2ccccc2C(=O)NCCOc2ccccc2)c1Cl",
+    "scaffold": "O=C(NCCOc1ccccc1)c1ccccc1Nc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41894",
+        "smiles": "Cc1ccc(Cl)c(Nc2ccccc2C(=O)NCCOc2ccccc2)c1Cl",
+        "label": 1,
+        "ic50_nM": 150.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22975&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(NCCOc1ccccc1)c1ccccc1Nc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "Cc1ccc(Cl)c(Nc2ccccc2C(=O)NCCc2ccccc2)c1Cl",
+    "scaffold": "O=C(NCCc1ccccc1)c1ccccc1Nc1ccccc1",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41897",
+        "smiles": "Cc1ccc(Cl)c(Nc2ccccc2C(=O)NCCc2ccccc2)c1Cl",
+        "label": 0,
+        "ic50_nM": 4500.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22978&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(NCCc1ccccc1)c1ccccc1Nc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "Cc1ccc(Cl)c(Nc2ccccc2C(=O)NOCc2ccc([N+](=O)[O-])cc2)c1Cl",
+    "scaffold": "O=C(NOCc1ccccc1)c1ccccc1Nc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41896",
+        "smiles": "Cc1ccc(Cl)c(Nc2ccccc2C(=O)NOCc2ccc([N+](=O)[O-])cc2)c1Cl",
+        "label": 1,
+        "ic50_nM": 200.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22977&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(NOCc1ccccc1)c1ccccc1Nc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "Cc1ccc(Cl)c(Nc2ccccc2C(=O)NOCc2ccccc2)c1Cl",
+    "scaffold": "O=C(NOCc1ccccc1)c1ccccc1Nc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:41895",
+        "smiles": "Cc1ccc(Cl)c(Nc2ccccc2C(=O)NOCc2ccccc2)c1Cl",
+        "label": 1,
+        "ic50_nM": 1000.0,
+        "source_group": "10.1073/pnas.97.2.925",
+        "doi": "10.1073/pnas.97.2.925",
+        "patent": "",
+        "assay": "2652_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=22976&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C(NOCc1ccccc1)c1ccccc1Nc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2CCCCCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648128",
+        "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2CCCCCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+        "label": 1,
+        "ic50_nM": 19.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764476&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2CCCCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648125",
+        "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2CCCCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+        "label": 1,
+        "ic50_nM": 40.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764473&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2CCCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648127",
+        "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2CCCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+        "label": 1,
+        "ic50_nM": 70.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764475&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3"
+      },
+      {
+        "source_id": "BindingDB:648129",
+        "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2CCCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+        "label": 1,
+        "ic50_nM": 60.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764477&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2CCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648126",
+        "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2CCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+        "label": 1,
+        "ic50_nM": 160.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764474&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2COCCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCOCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648131",
+        "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2COCCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+        "label": 1,
+        "ic50_nM": 110.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764479&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCOCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2COCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCOCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648130",
+        "smiles": "NS(=O)(=O)c1ccc(-c2c(-c3ccccc3)noc2COCCCCC[N+]23CC[S][Re]24(=[O])[S]CC[N]4CC3)cc1",
+        "label": 0,
+        "ic50_nM": 6050.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764478&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCOCc1onc(-c2ccccc2)c1-c1ccccc1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(C(F)(F)CCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648124",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(C(F)(F)CCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 1390.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764472&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5C(=O)C4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "O=C1C[N+]2(CCCCCCCCCc3cc(-c4ccccc4)n(-c4ccccc4)n3)CC[S][Re]23(=[O])[S]CC[N]13",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648112",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5C(=O)C4)cc2-c2ccc(F)cc2)cc1",
+        "label": 1,
+        "ic50_nM": 60.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764460&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C1C[N+]2(CCCCCCCCCc3cc(-c4ccccc4)n(-c4ccccc4)n3)CC[S][Re]23(=[O])[S]CC[N]13"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(Cl)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648108",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(Cl)cc2)cc1",
+        "label": 1,
+        "ic50_nM": 190.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764456&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:647098",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+        "label": 1,
+        "ic50_nM": 130.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764453&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(Cl)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648109",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(Cl)cc2)cc1",
+        "label": 1,
+        "ic50_nM": 110.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764457&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:647097",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+        "label": 1,
+        "ic50_nM": 590.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764452&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(Cl)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:647099",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(Cl)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 3310.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764454&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:647094",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 1210.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764449&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      },
+      {
+        "source_id": "BindingDB:647095",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(CCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 1330.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764450&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5C(=O)C4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "O=C1C[N+]2(CCCCCCCOCc3cc(-c4ccccc4)n(-c4ccccc4)n3)CC[S][Re]23(=[O])[S]CC[N]13",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648122",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5C(=O)C4)cc2-c2ccc(F)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 4410.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764470&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "O=C1C[N+]2(CCCCCCCOCc3cc(-c4ccccc4)n(-c4ccccc4)n3)CC[S][Re]23(=[O])[S]CC[N]13"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648116",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+        "label": 1,
+        "ic50_nM": 310.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764464&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648114",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 2360.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764462&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCCOCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCOCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648123",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCCOCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 4430.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764471&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCOCCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648115",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 2370.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764463&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCOCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+    "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCOCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3",
+    "label": 0,
+    "measurements": [
+      {
+        "source_id": "BindingDB:648117",
+        "smiles": "NS(=O)(=O)c1ccc(-n2nc(COCCCOCCC[N+]34CC[S][Re]35(=[O])[S]CC[N]5CC4)cc2-c2ccc(F)cc2)cc1",
+        "label": 0,
+        "ic50_nM": 4150.0,
+        "source_group": "US20250255992",
+        "doi": "",
+        "patent": "US20250255992",
+        "assay": "13165_1",
+        "source_url": "http://www.bindingdb.org/rwd/jsp/dbsearch/PrimarySearch_ki.jsp?energyterm=kJ/mole&tag=r21&monomerid=764465&enzyme=Prostaglandin+G%2FH+synthase+2&column=ki&startPg=0&Increment=50&submit=Search",
+        "license": "CC BY 3.0",
+        "scaffold": "[O]=[Re]123[S]CC[N]1CC[N+]2(CCCOCCCOCc1cc(-c2ccccc2)n(-c2ccccc2)n1)CC[S]3"
+      }
+    ]
+  },
+  {
+    "smiles": "O=C(O)COc1ccc(Br)cc1C=NNC(=O)CNC(=O)c1ccccc1",
+    "scaffold": "O=C(CNC(=O)c1ccccc1)NN=Cc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "Molecules2024:13b",
+        "smiles": "O=C(O)COc1ccc(Br)cc1C=NNC(=O)CNC(=O)c1ccccc1",
+        "label": 1,
+        "ic50_nM": 130.0,
+        "source_group": "10.3390/molecules29061309",
+        "doi": "10.3390/molecules29061309",
+        "patent": "",
+        "assay": "Table 1, human COX-2 / Cayman 560131",
+        "source_url": "https://doi.org/10.3390/molecules29061309",
+        "license": "CC BY 4.0",
+        "scaffold": "O=C(CNC(=O)c1ccccc1)NN=Cc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "O=C(O)COc1ccc(Br)cc1C=NNC(=O)CNc1ccccc1",
+    "scaffold": "O=C(CNc1ccccc1)NN=Cc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "Molecules2024:10d",
+        "smiles": "O=C(O)COc1ccc(Br)cc1C=NNC(=O)CNc1ccccc1",
+        "label": 1,
+        "ic50_nM": 80.0,
+        "source_group": "10.3390/molecules29061309",
+        "doi": "10.3390/molecules29061309",
+        "patent": "",
+        "assay": "Table 1, human COX-2 / Cayman 560131",
+        "source_url": "https://doi.org/10.3390/molecules29061309",
+        "license": "CC BY 4.0",
+        "scaffold": "O=C(CNc1ccccc1)NN=Cc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "O=C(O)COc1ccc(Br)cc1C=NNC(=O)Cc1ccccc1",
+    "scaffold": "O=C(Cc1ccccc1)NN=Cc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "Molecules2024:7b",
+        "smiles": "O=C(O)COc1ccc(Br)cc1C=NNC(=O)Cc1ccccc1",
+        "label": 1,
+        "ic50_nM": 60.0,
+        "source_group": "10.3390/molecules29061309",
+        "doi": "10.3390/molecules29061309",
+        "patent": "",
+        "assay": "Table 1, human COX-2 / Cayman 560131",
+        "source_url": "https://doi.org/10.3390/molecules29061309",
+        "license": "CC BY 4.0",
+        "scaffold": "O=C(Cc1ccccc1)NN=Cc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "O=C(O)COc1ccccc1C=NNC(=O)CNC(=O)c1ccccc1",
+    "scaffold": "O=C(CNC(=O)c1ccccc1)NN=Cc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "Molecules2024:13a",
+        "smiles": "O=C(O)COc1ccccc1C=NNC(=O)CNC(=O)c1ccccc1",
+        "label": 1,
+        "ic50_nM": 230.0,
+        "source_group": "10.3390/molecules29061309",
+        "doi": "10.3390/molecules29061309",
+        "patent": "",
+        "assay": "Table 1, human COX-2 / Cayman 560131",
+        "source_url": "https://doi.org/10.3390/molecules29061309",
+        "license": "CC BY 4.0",
+        "scaffold": "O=C(CNC(=O)c1ccccc1)NN=Cc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "O=C(O)COc1ccccc1C=NNC(=O)CNc1ccc(Cl)cc1",
+    "scaffold": "O=C(CNc1ccccc1)NN=Cc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "Molecules2024:10c",
+        "smiles": "O=C(O)COc1ccccc1C=NNC(=O)CNc1ccc(Cl)cc1",
+        "label": 1,
+        "ic50_nM": 70.0,
+        "source_group": "10.3390/molecules29061309",
+        "doi": "10.3390/molecules29061309",
+        "patent": "",
+        "assay": "Table 1, human COX-2 / Cayman 560131",
+        "source_url": "https://doi.org/10.3390/molecules29061309",
+        "license": "CC BY 4.0",
+        "scaffold": "O=C(CNc1ccccc1)NN=Cc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "O=C(O)COc1ccccc1C=NNC(=O)CNc1ccccc1",
+    "scaffold": "O=C(CNc1ccccc1)NN=Cc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "Molecules2024:10a",
+        "smiles": "O=C(O)COc1ccccc1C=NNC(=O)CNc1ccccc1",
+        "label": 1,
+        "ic50_nM": 500.0,
+        "source_group": "10.3390/molecules29061309",
+        "doi": "10.3390/molecules29061309",
+        "patent": "",
+        "assay": "Table 1, human COX-2 / Cayman 560131",
+        "source_url": "https://doi.org/10.3390/molecules29061309",
+        "license": "CC BY 4.0",
+        "scaffold": "O=C(CNc1ccccc1)NN=Cc1ccccc1"
+      }
+    ]
+  },
+  {
+    "smiles": "O=C(O)COc1ccccc1C=NNC(=O)Cc1ccccc1",
+    "scaffold": "O=C(Cc1ccccc1)NN=Cc1ccccc1",
+    "label": 1,
+    "measurements": [
+      {
+        "source_id": "Molecules2024:7a",
+        "smiles": "O=C(O)COc1ccccc1C=NNC(=O)Cc1ccccc1",
+        "label": 1,
+        "ic50_nM": 130.0,
+        "source_group": "10.3390/molecules29061309",
+        "doi": "10.3390/molecules29061309",
+        "patent": "",
+        "assay": "Table 1, human COX-2 / Cayman 560131",
+        "source_url": "https://doi.org/10.3390/molecules29061309",
+        "license": "CC BY 4.0",
+        "scaffold": "O=C(Cc1ccccc1)NN=Cc1ccccc1"
+      }
+    ]
+  }
+]

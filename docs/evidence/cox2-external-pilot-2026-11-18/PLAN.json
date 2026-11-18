@@ -1,0 +1,48 @@
+{
+  "created_at": "2026-11-18T09:40:05.153471+00:00",
+  "status": "frozen_before_fit_or_prediction",
+  "experiment": "new_external_research_pilot",
+  "old_failed_experiment": "The previous train-only model failed the old internal test AUC gate (.733 < .75). This result is not overwritten.",
+  "training": "All 2740 previously curated ChEMBL37 compounds; the former internal validation/test rows are now training data, explicitly, for this new phase only.",
+  "algorithm": "Previously validation-selected random forest, 200 trees, class_weight balanced, seed 42, one CPU thread; app qsar_core.fit_model train-only sigmoid calibration with 3 scaffold folds",
+  "selection": "One fixed algorithm; no new candidate/seed/threshold search; external set not used for selection/calibration/fitting",
+  "label": "Exact reported mean IC50 <= 1000 nM is active; no missing-value or censored-value label imputation",
+  "threshold": 0.5,
+  "y_randomization": "Permute training labels once, seed42; 3 outer StratifiedGroupKFold folds; same fitting procedure; AUC <= .60; external test unused on failure",
+  "gates": {
+    "balanced_accuracy": "strictly > .60",
+    "roc_auc": ">= .75",
+    "mcc": ">= .25",
+    "pr_auc": "better than train-fitted prior classifier",
+    "minimum_external_compounds_per_class": 30,
+    "uncertainty": "95% percentile interval from 5000 nonchiral-Murcko group bootstrap replicates must have balanced-accuracy lower bound > .60"
+  },
+  "report": "Single external evaluation, including all failed gates, confusion counts, source groups and uncertainty; no hyperparameter changes after seeing outcomes",
+  "scientific_limitations": [
+    "Small retrospective curated external benchmark; not prospective or population-representative",
+    "Assay protocols differ in preincubation and detection even though human COX-2 and arachidonic acid endpoint are matched",
+    "Data provenance and chemical identity reviewed; experimental results have not been independently reproduced",
+    "Source/class confounding and structural-domain limits must be reported; no claim about APAP rescue or root growth"
+  ],
+  "exclusions": [
+    "ADHP fluorescence assay 7562_1 excluded to avoid pooling a distinct readout",
+    "Phenoxy compounds 5a-f share old training scaffolds",
+    "10b excluded: named/drawn structure and published formula/mass disagree",
+    "10e and 10f excluded: Table 1 and discussion exchange numeric values",
+    "Unspecified hydrazone E/Z stereochemistry not invented"
+  ],
+  "support": {
+    "training": 2740,
+    "external": 62,
+    "active": 30,
+    "inactive": 32,
+    "external_groups": 35,
+    "measurements": 64
+  },
+  "sha256": {
+    "training": "b8282f6d0824fbdc685f256c8646903e1c6de8356762ef21e0472a0ba8057413",
+    "external": "3f95dc084b3bf69aad61286a8a2ee5c03a579f16f70a62e63a9769fa2156f617",
+    "measurements": "6de715a2fc6cd7eff261028a158c1dce2ea8ff2b4a96bc45909e2132f6862a53",
+    "source_review": "c0540f2c32ca794946e3a1667bed3d50b21635a5fdab1106442e024ce9357fbd"
+  }
+}
