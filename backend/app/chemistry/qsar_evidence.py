@@ -1,6 +1,7 @@
 """Admission for retrospectively held-out human IC50 QSAR models."""
 import numpy as np
 from app.model_quality import classification_reasons, finite, held_out_quality, valid_count
+from app.chemistry.qsar_assay_context import evidence_reasons
 
 FEATURE_CONFIG = dict(morgan_bits=2048, morgan_radius=2, chirality=False,
                       standardization="single fragment; uncharge; canonical isomeric SMILES",
@@ -52,12 +53,13 @@ def admission(meta):
     result["reasons"] += classification_reasons(scores, min_auc=.75, min_mcc=.25)
     provenance = meta.get("provenance")
     provenance = provenance if isinstance(provenance, dict) else {}
-    if (meta.get("schema_version") != 2 or meta.get("feature_config") != FEATURE_CONFIG
+    if (meta.get("schema_version") != 3 or meta.get("feature_config") != FEATURE_CONFIG
             or provenance.get("source") != "ChEMBL" or provenance.get("target_id") != meta.get("target_id")
             or provenance.get("organism") != "Homo sapiens" or provenance.get("endpoint") != "IC50"
             or provenance.get("units") != "nM" or provenance.get("license") != "CC-BY-SA-3.0"
             or not provenance.get("version")):
-        result["reasons"].append("Traceable schema-2 human IC50 source and feature contract required; revalidation of legacy artifacts is required")
+        result["reasons"].append("Traceable schema-3 human IC50 source and feature contract required; revalidation of legacy artifacts is required")
+    result["reasons"] += evidence_reasons(provenance, meta.get("target_id"))
     evaluation = evaluation if isinstance(evaluation, dict) else {}
     support = evaluation.get("support")
     support = support if isinstance(support, dict) else {}

@@ -27,10 +27,12 @@ from app.ai_research_agent.evaluation import metrics as evaluate, scaffold_split
 from app.ai_research_agent.security import write_json
 from app.chemistry import fingerprints as fp, qsar_core as core
 from app.chemistry.qsar_evidence import FEATURE_CONFIG, admission, describe_model
+from app.chemistry.qsar_assay_context import PROFILE, incompatibility, source_record
 from app.model_quality import classification_reasons
 
 ALGORITHMS = ("random_forest", "logistic_regression", "gradient_boosting")
-PLAN = dict(schema_version=2, seed=42, target_id="CHEMBL230", source_version="ChEMBL_37", assay_id="panel",
+PLAN = dict(schema_version=3, seed=42, target_id="CHEMBL230", source_version="ChEMBL_37", assay_id="panel",
+            assay_context=PROFILE,
             algorithms=list(ALGORITHMS), forest_trees=200, logistic_C=1., logistic_max_iter=2000,
             boosting_trees=100, boosting_depth=2, cpu_threads=1,
             label="Measured standard_value IC50 in nM <= 1000; exact relations only; missing outcomes excluded",
@@ -42,7 +44,8 @@ PLAN = dict(schema_version=2, seed=42, target_id="CHEMBL230", source_version="Ch
             y_randomization="Selected procedure; train-only permuted labels, three outer scaffold folds; AUC <= .60; no test data",
             test_gate="Same accuracy/AUC/MCC gates plus complete support and PR-AUC better than train-fitted prior baseline",
             final_fit="Save the exact train-only fitted selected object; no validation/test refit",
-            scientific_status="Retrospective internal holdout of a previously studied panel, not independent external/prospective evidence")
+            development_history="This ChEMBL37 panel was used in previous mixed-context experiments, including a full-panel fit. Context curation follows source annotations, not model predictions. The previously evaluated 62-compound external benchmark is not new independent validation and is not used in this run.",
+            scientific_status="Retrospective internal holdout of a previously studied/trained panel, not new independent external/prospective evidence")
 
 
 def snapshot(source, output):
@@ -69,8 +72,12 @@ def snapshot(source, output):
     catalog = payloads["assays.json"]
     if len(catalog["assays"]) != catalog["page_meta"]["total_count"]:
         raise ValueError("Incomplete assay catalog")
-    allowed = {a["assay_chembl_id"] for a in catalog["assays"]
-               if a.get("target_chembl_id") == PLAN["target_id"] and a.get("assay_type") == "B" and a.get("confidence_score") == 9}
+    if len({a.get("assay_chembl_id") for a in catalog["assays"]}) != len(catalog["assays"]):
+        raise ValueError("Duplicate assay catalog identifiers")
+    compatible = [a for a in catalog["assays"] if incompatibility(a, PLAN["target_id"]) is None]
+    allowed = {a["assay_chembl_id"] for a in compatible}
+    context_exclusions = Counter(incompatibility(a, PLAN["target_id"]) for a in catalog["assays"]
+                                 if incompatibility(a, PLAN["target_id"]) is not None)
     records, total = [], None
     for name in sorted(key for key in payloads if key.startswith("activities-")):
         page = payloads[name]
@@ -82,7 +89,11 @@ def snapshot(source, output):
     if len(records) != total or len({r["activity_id"] for r in records}) != len(records):
         raise ValueError("Incomplete/duplicate frozen activity rows")
     return records, allowed, dict(original, sources=files, source_provenance_sha256=hashlib.sha256((source / "provenance.json").read_bytes()).hexdigest(),
-                                  curation_version="3.2.9", curation_time=datetime.now(timezone.utc).isoformat()), target
+                                  curation_version=PROFILE["profile_id"], assay_context=dict(PROFILE),
+                                  assays=[source_record(a) for a in compatible],
+                                  catalog_assay_count=len(catalog["assays"]), compatible_assay_count=len(compatible),
+                                  assay_context_exclusions=dict(context_exclusions),
+                                  curation_time=datetime.now(timezone.utc).isoformat()), target
 
 
 def curate(records, allowed):
@@ -188,6 +199,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-dir", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--curate-only", action="store_true",
+                        help="Prepare context-specific source data without fitting or evaluating any model")
     args = parser.parse_args()
     root = args.output_dir
     root.mkdir(parents=True, exist_ok=True)
@@ -199,17 +212,27 @@ def main():
         print(stage, flush=True)
     records, allowed, provenance, target = snapshot(args.source_dir, root)
     rows, excluded = curate(records, allowed)
+    used_assays = {measurement["assay_id"] for row in rows for measurement in row["measurements"]}
+    provenance["assays"] = [a for a in provenance["assays"] if a["assay_chembl_id"] in used_assays]
+    provenance["contributing_assay_count"] = len(provenance["assays"])
     write_json(root / "curated.json", rows)
     write_json(root / "provenance.json", provenance)
     print(json.dumps(dict(raw=len(records), accepted=len(rows), excluded=excluded)), flush=True)
+    if args.curate_only:
+        write_json(root / "manifest.json", dict(models=[]))
+        write_json(root / "report.json", dict(status="curated_only", accepted=False,
+                   training_performed=False, evaluation_performed=False, raw_rows=len(records),
+                   unique_compounds=len(rows), excluded=excluded, provenance=provenance, plan=PLAN))
+        write_json(root / "state.json", dict(status="prepared", stage="curated_without_training"))
+        return 0
     model, evaluation, reason, X, y, groups = experiment(rows, checkpoint)
     np.savez_compressed(root / "features.npz", X=X, y=y, groups=groups)
     report = dict(accepted=False, raw_rows=len(records), unique_compounds=len(rows), excluded=excluded, evaluation=evaluation,
                   provenance=provenance, plan=PLAN, reasons=[reason] if reason else [])
     if model is not None:
         tr = evaluation["split"]["train"]
-        meta = dict(schema_version=2, model_id="CHEMBL230-panel-3.2.9", model_version="3.2.9", target_id="CHEMBL230",
-                    assay_id="panel", label="COX-2 · IC50 ≤ 1000 nM · panel", chembl_name=target["pref_name"],
+        meta = dict(schema_version=3, model_id="CHEMBL230-panel-human-single-protein-v1", model_version="assay-context-v1", target_id="CHEMBL230",
+                    assay_id="panel", label="COX-2 · IC50 ≤ 1000 nM · тесты на белке человека", chembl_name=target["pref_name"],
                     active_pchembl=6., active_threshold_nM=1000., n_total=len(rows), n_train=len(tr), n_test=evaluation["support"]["test"]["molecules"],
                     n_active=evaluation["support"]["train"]["positive"], n_inactive=evaluation["support"]["train"]["negative"],
                     metrics=evaluation["test"], evaluation=evaluation, provenance=provenance, feature_config=FEATURE_CONFIG,
@@ -219,7 +242,7 @@ def main():
         meta["quality"] = admission(meta)
         report["reasons"] = meta["quality"]["reasons"]
         if meta["quality"]["passed"]:
-            model_file = "CHEMBL230-panel-3.2.9.joblib"
+            model_file = "CHEMBL230-panel-human-single-protein-v1.joblib"
             packed = core.pack_bits(X[tr])
             joblib.dump(dict(model=model, meta=meta, train_packed=packed, train_popcount=core.popcounts(packed), train_groups=groups[tr]), root / model_file, compress=3)
             digest = hashlib.sha256((root / model_file).read_bytes()).hexdigest()

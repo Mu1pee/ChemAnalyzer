@@ -1,0 +1,2 @@
+# Preserve the exact bytes used in the recorded scientific checksums.
+*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

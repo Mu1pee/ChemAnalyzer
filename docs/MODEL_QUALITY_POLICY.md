@@ -1,4 +1,4 @@
-# Model admission policy (ChemAnalyzer 3.2.14, updated 2026-11-17)
+# Model admission policy (ChemAnalyzer 3.2.15, updated 2026-11-18)
 
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
@@ -41,6 +41,18 @@ The stored `beats_baseline` flag alone cannot establish this comparison.
 Missing, malformed, equal or worse baseline evidence prevents review,
 activation and prediction. Existing valid numerical evidence needs no refit;
 the nine reviewed classifiers and FreeSolv regressor retain their artifacts.
+
+Target QSAR source schema 3 additionally records the original assay organism,
+BAO format, cell/tissue/fraction and variant annotations. A human single-protein
+target or a Binding (B) assay type alone cannot establish a single-protein
+experimental format. The current profile excludes incompatible or unknown
+formats, cellular/tissue/fraction contexts and reported variants. Descriptions
+mentioning blood require separate protocol review even when structured fields
+say single protein. Both acquisition/revalidation paths use the same context
+check, which is recomputed during artifact admission. Source descriptions and
+the exact contributing assay IDs remain in provenance; catalog-compatible and
+actually contributing assay counts are recorded separately. This does not
+establish identical substrates, detection methods or exposure conditions.
 
 ## Specialized binary training, version 3.2.8
 
@@ -93,7 +105,7 @@ validation or human approval. See CATALOG_CONTRACT_3.2.11.md.
 
 | Application system | Evidence / status |
 | --- | --- |
-| Target QSAR, human COX-2 IC50 | Previous ChEMBL 37 bundle: 2,776 compounds and historical 5-fold scaffold CV BA 0.7081, ROC-AUC 0.7867, MCC 0.4160; not evidence for the shipped final object. Fixed-seed scaffold holdout revalidation selected RF on validation but test ROC-AUC was 0.733 (<0.75 gate); replacement withheld and legacy artifact rejected. See COX2_REVALIDATION_2026-11-11.md. |
+| Target QSAR, human COX-2 single-protein IC50 | Version 3.2.15: source-context curation retains 2,111 compounds; the exact train-only calibrated RF fits 1,351 and passes a retrospective internal 422-compound scaffold holdout: BA 0.762168, ROC-AUC 0.822185, MCC 0.524005. Bootstrap 95% BA interval 0.711791–0.808532. Previously studied/trained source panel; no new independent external validation. Earlier mixed-context internal AUC 0.733 and external BA 0.567708 remain failed results; the previously evaluated external set was not reused for this experiment. See COX2_CONTEXT_VALIDATION_3.2.15.md and COX2_EXTERNAL_PILOT_2026-11-18_RU.md. |
 | Hydration free energy | Real FreeSolv data; updated split and model evaluated separately in the release report. Experimental; not antidote or plant activity. |
 | Antidote: acetaminophen rescue | No eligible curated training table has been integrated. Remains not_trained. General liver toxicity is not an antidote label. |
 | Arabidopsis primary-root growth/control | No eligible curated training table has been integrated. Remains not_trained. Auxin receptor binding is not root growth. |

@@ -1,0 +1,22 @@
+{
+  "source": "ChEMBL 37, EMBL-EBI",
+  "license": "CC-BY-SA-3.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+  "raw_activity_rows": 6027,
+  "catalog_assays": 981,
+  "metadata_compatible_assays": 719,
+  "actually_contributing_assays": 298,
+  "measurements": 2146,
+  "unique_compounds": 2111,
+  "curated_sha256": "dacacf0e8fbc70692854e03f44e0ec98a5ccac438f00f8c1fd65e748e2ac9f7b",
+  "context_exclusions": {
+    "assay_format_unknown_or_different": 203,
+    "description_requires_context_review": 13,
+    "cellular_tissue_or_fraction_context": 46
+  },
+  "all_measurements_linked_to_contributing_assays": true,
+  "prepared_data_hash_reproduced": true,
+  "previous_external_62_not_reused": true,
+  "independent_external_validation": false,
+  "development_history": "This ChEMBL37 panel was used in previous mixed-context experiments, including a full-panel fit. Context curation follows source annotations, not model predictions. The previously evaluated 62-compound external benchmark is not new independent validation and is not used in this run."
+}

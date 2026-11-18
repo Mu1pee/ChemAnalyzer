@@ -1,0 +1,48 @@
+{
+  "schema_version": 3,
+  "seed": 42,
+  "target_id": "CHEMBL230",
+  "source_version": "ChEMBL_37",
+  "assay_id": "panel",
+  "assay_context": {
+    "profile_id": "human_single_protein_ic50_v1",
+    "organism": "Homo sapiens",
+    "bao_format": "BAO_0000357",
+    "assay_type": "B",
+    "confidence_score": 9,
+    "description_conflicts": "Descriptions mentioning blood require separate protocol review.",
+    "limitations": "Single-protein format is not proof of identical substrate, detection or incubation protocols."
+  },
+  "algorithms": [
+    "random_forest",
+    "logistic_regression",
+    "gradient_boosting"
+  ],
+  "forest_trees": 200,
+  "logistic_C": 1.0,
+  "logistic_max_iter": 2000,
+  "boosting_trees": 100,
+  "boosting_depth": 2,
+  "cpu_threads": 1,
+  "label": "Measured standard_value IC50 in nM <= 1000; exact relations only; missing outcomes excluded",
+  "pchembl_consistency_tolerance": 0.011,
+  "curation": "Reject mixed fragments, >200 atoms, conflicting parent labels; uncharge; canonical isomeric SMILES",
+  "split": "Whole nonchiral Murcko groups by sizes only, seed42, .64/.16/.20; all acyclic molecules share one group",
+  "support": {
+    "train_per_class": 30,
+    "validation_per_class": 10,
+    "test_per_class": 30,
+    "min_groups_per_partition": 3
+  },
+  "validation_gate": {
+    "balanced_accuracy": "strictly >0.60",
+    "roc_auc": "at least .75",
+    "mcc": "at least .25"
+  },
+  "selection": "Highest validation PR-AUC among validation-qualified fixed candidates; no tuning or seed search",
+  "y_randomization": "Selected procedure; train-only permuted labels, three outer scaffold folds; AUC <= .60; no test data",
+  "test_gate": "Same accuracy/AUC/MCC gates plus complete support and PR-AUC better than train-fitted prior baseline",
+  "final_fit": "Save the exact train-only fitted selected object; no validation/test refit",
+  "development_history": "This ChEMBL37 panel was used in previous mixed-context experiments, including a full-panel fit. Context curation follows source annotations, not model predictions. The previously evaluated 62-compound external benchmark is not new independent validation and is not used in this run.",
+  "scientific_status": "Retrospective internal holdout of a previously studied/trained panel, not new independent external/prospective evidence"
+}

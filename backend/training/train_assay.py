@@ -14,6 +14,7 @@ from rdkit import Chem
 import sklearn
 
 from app.chemistry import fingerprints as fp, qsar_core as core
+from app.chemistry.qsar_assay_context import PROFILE, incompatibility, source_record
 
 BASE = "https://www.ebi.ac.uk/chembl/api/data"
 
@@ -58,7 +59,7 @@ def prepare(records, target, assay):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", default="CHEMBL230")
-    parser.add_argument("--assay", default="panel", help="ChEMBL assay ID, or panel for all confidence-9 IC50 binding assays")
+    parser.add_argument("--assay", default="panel", help="ChEMBL assay ID, or panel for human single-protein confidence-9 IC50 assays")
     parser.add_argument("--source-dir", type=Path, help="Optional previously downloaded assay/activity JSON snapshots")
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--seed", default=42, type=int)
@@ -109,6 +110,19 @@ def main():
                 or target.get("organism") != "Homo sapiens"
                 or target.get("target_type") != "SINGLE PROTEIN"):
             raise ValueError("Expected high-confidence human single-protein binding assay")
+        context_exclusions = defaultdict(int)
+        compatible = []
+        for candidate in assays:
+            reason = incompatibility(candidate, args.target)
+            if reason:
+                context_exclusions[reason] += 1
+            else:
+                compatible.append(candidate)
+        if args.assay != "panel" and not compatible:
+            raise ValueError("Requested assay does not have a verified human single-protein context")
+        assays = compatible
+        if not assays:
+            raise ValueError("No compatible human single-protein assays found; source annotations need review")
         records = []
         for offset in range(0, 10000, 1000):
             page = fetch(f"activities-{offset:05d}.json", "/activity.json", {
@@ -128,8 +142,12 @@ def main():
     eligible = [row for row in records if row["assay_chembl_id"] in allowed]
     rows, excluded = prepare(eligible, args.target, None if args.assay == "panel" else args.assay)
     excluded["assay_confidence"] = len(records) - len(eligible)
+    used_assays = {identifier for row in rows for identifier in row["assay_ids"]}
     provenance = dict(source="ChEMBL", version=status["chembl_db_version"], target_id=args.target,
-                      assay_id=args.assay, assays=[dict(id=a["assay_chembl_id"], description=a.get("description"), document=a.get("document_chembl_id")) for a in assays if a["assay_chembl_id"] in {r["assay_chembl_id"] for r in eligible}], endpoint="IC50", units="nM",
+                      assay_id=args.assay, assay_context=dict(PROFILE),
+                      compatible_assay_count=len(assays), contributing_assay_count=len(used_assays),
+                      assay_context_exclusions=dict(context_exclusions),
+                      assays=[source_record(a) for a in assays if a["assay_chembl_id"] in used_assays], endpoint="IC50", units="nM",
                       organism="Homo sapiens", retrieved_at=cached_provenance.get("retrieved_at", datetime.now(timezone.utc).isoformat()),
                       license="CC-BY-SA-3.0", license_url="https://creativecommons.org/licenses/by-sa/3.0/",
                       attribution="ChEMBL contributors, EMBL-EBI", sources=sources)

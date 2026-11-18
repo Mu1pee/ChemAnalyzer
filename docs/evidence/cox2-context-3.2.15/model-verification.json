@@ -1,0 +1,120 @@
+{
+  "verified": true,
+  "exact_saved_model_reproduced": true,
+  "no_refit": true,
+  "model_id": "CHEMBL230-panel-human-single-protein-v1",
+  "artifact_sha256": "d629d6d74e2a020b3db28daab5ef11c5dd5f933d8c4e33146c288b8bef362eb5",
+  "dataset_sha256": "dacacf0e8fbc70692854e03f44e0ec98a5ccac438f00f8c1fd65e748e2ac9f7b",
+  "support": {
+    "train": {
+      "molecules": 1351,
+      "positive": 721,
+      "negative": 630,
+      "scaffolds": 293
+    },
+    "validation": {
+      "molecules": 338,
+      "positive": 165,
+      "negative": 173,
+      "scaffolds": 214
+    },
+    "test": {
+      "molecules": 422,
+      "positive": 226,
+      "negative": 196,
+      "scaffolds": 228
+    }
+  },
+  "test_reproduced": {
+    "roc_auc": 0.8221848473902835,
+    "pr_auc": 0.8477973894363398,
+    "balanced_accuracy": 0.7621681415929203,
+    "mcc": 0.5240051582502677
+  },
+  "confusion_matrix": [
+    [
+      147,
+      49
+    ],
+    [
+      51,
+      175
+    ]
+  ],
+  "group_bootstrap": {
+    "replicates": 5000,
+    "valid_replicates": 5000,
+    "seed": 42,
+    "confidence": 0.95,
+    "balanced_accuracy_interval": [
+      0.7117912756176978,
+      0.8085324688397315
+    ],
+    "descriptive_only": true
+  },
+  "domain": {
+    "in_domain": 273,
+    "edge": 110,
+    "outside": 39
+  },
+  "ui_demonstration": {
+    "smiles": "C#CCOc1ccc(/C=C2\\SC(=O)NC2=O)cc1",
+    "result": {
+      "model_version": "random_forest \u00b7 \u043e\u0431\u0443\u0447\u0435\u043d\u0430 2026-11-18 \u00b7 \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u044b\u0439 \u0442\u0435\u0441\u0442 \u0431\u0435\u0437 \u043f\u0435\u0440\u0435\u043e\u0431\u0443\u0447\u0435\u043d\u0438\u044f",
+      "model_id": "CHEMBL230-panel-human-single-protein-v1",
+      "target_id": "CHEMBL230",
+      "target_name": "COX-2 \u00b7 IC50 \u2264 1000 nM \u00b7 \u0442\u0435\u0441\u0442\u044b \u043d\u0430 \u0431\u0435\u043b\u043a\u0435 \u0447\u0435\u043b\u043e\u0432\u0435\u043a\u0430",
+      "chembl_name": "Prostaglandin G/H synthase 2",
+      "probability": 0.618,
+      "domain": "\u043d\u0430 \u0433\u0440\u0430\u043d\u0438\u0446\u0435 \u043e\u0431\u043b\u0430\u0441\u0442\u0438",
+      "max_similarity": 0.474,
+      "metrics": {
+        "roc_auc": 0.8221848473902835,
+        "pr_auc": 0.8477973894363398,
+        "f1": 0.7777777777777778,
+        "precision": 0.78125,
+        "recall": 0.7743362831858407,
+        "balanced_accuracy": 0.7621681415929203,
+        "mcc": 0.5240051582502677,
+        "n_evaluated": 422
+      },
+      "validation_method": "\u0420\u0435\u0442\u0440\u043e\u0441\u043f\u0435\u043a\u0442\u0438\u0432\u043d\u044b\u0439 \u043e\u0442\u043b\u043e\u0436\u0435\u043d\u043d\u044b\u0439 \u0442\u0435\u0441\u0442 \u043f\u043e \u043a\u0430\u0440\u043a\u0430\u0441\u0430\u043c; \u043c\u043e\u0434\u0435\u043b\u044c \u043d\u0435 \u043f\u0435\u0440\u0435\u043e\u0431\u0443\u0447\u0430\u043b\u0430\u0441\u044c \u043f\u043e\u0441\u043b\u0435 \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0438; \u0432\u043d\u0435\u0448\u043d\u0435\u0439 \u0432\u0430\u043b\u0438\u0434\u0430\u0446\u0438\u0438 \u043d\u0435\u0442",
+      "n_train": 1351,
+      "n_test": 422,
+      "test_positive": 226,
+      "test_negative": 196,
+      "active_threshold_nM": 1000.0,
+      "active_pchembl": 6.0
+    }
+  },
+  "outside_prediction": {
+    "model_version": "random_forest \u00b7 \u043e\u0431\u0443\u0447\u0435\u043d\u0430 2026-11-18 \u00b7 \u043e\u0442\u0434\u0435\u043b\u044c\u043d\u044b\u0439 \u0442\u0435\u0441\u0442 \u0431\u0435\u0437 \u043f\u0435\u0440\u0435\u043e\u0431\u0443\u0447\u0435\u043d\u0438\u044f",
+    "model_id": "CHEMBL230-panel-human-single-protein-v1",
+    "target_id": "CHEMBL230",
+    "target_name": "COX-2 \u00b7 IC50 \u2264 1000 nM \u00b7 \u0442\u0435\u0441\u0442\u044b \u043d\u0430 \u0431\u0435\u043b\u043a\u0435 \u0447\u0435\u043b\u043e\u0432\u0435\u043a\u0430",
+    "chembl_name": "Prostaglandin G/H synthase 2",
+    "probability": null,
+    "domain": "\u0432\u043d\u0435 \u043e\u0431\u043b\u0430\u0441\u0442\u0438 \u043f\u0440\u0438\u043c\u0435\u043d\u0438\u043c\u043e\u0441\u0442\u0438",
+    "max_similarity": 0.023,
+    "metrics": {
+      "roc_auc": 0.8221848473902835,
+      "pr_auc": 0.8477973894363398,
+      "f1": 0.7777777777777778,
+      "precision": 0.78125,
+      "recall": 0.7743362831858407,
+      "balanced_accuracy": 0.7621681415929203,
+      "mcc": 0.5240051582502677,
+      "n_evaluated": 422
+    },
+    "validation_method": "\u0420\u0435\u0442\u0440\u043e\u0441\u043f\u0435\u043a\u0442\u0438\u0432\u043d\u044b\u0439 \u043e\u0442\u043b\u043e\u0436\u0435\u043d\u043d\u044b\u0439 \u0442\u0435\u0441\u0442 \u043f\u043e \u043a\u0430\u0440\u043a\u0430\u0441\u0430\u043c; \u043c\u043e\u0434\u0435\u043b\u044c \u043d\u0435 \u043f\u0435\u0440\u0435\u043e\u0431\u0443\u0447\u0430\u043b\u0430\u0441\u044c \u043f\u043e\u0441\u043b\u0435 \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0438; \u0432\u043d\u0435\u0448\u043d\u0435\u0439 \u0432\u0430\u043b\u0438\u0434\u0430\u0446\u0438\u0438 \u043d\u0435\u0442",
+    "n_train": 1351,
+    "n_test": 422,
+    "test_positive": 226,
+    "test_negative": 196,
+    "active_threshold_nM": 1000.0,
+    "active_pchembl": 6.0
+  },
+  "scientific_status": "Retrospective internal holdout of a previously studied/trained panel, not new independent external/prospective evidence",
+  "previous_external_failure_preserved": true,
+  "previously_evaluated_external_62_used": false
+}
