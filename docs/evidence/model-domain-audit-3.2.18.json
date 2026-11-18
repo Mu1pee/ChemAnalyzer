@@ -1,0 +1,750 @@
+{
+  "version": "3.2.18",
+  "release_commit": "af4583761f3f3f7fc9c8e2484f1a099e37cc30ba",
+  "source": "Published artifact digests and original, disjoint scaffold holdouts",
+  "scientific_status": "Post-hoc diagnostic of the current production applicability rules",
+  "external_validation": false,
+  "refit": false,
+  "thresholds_or_models_changed": false,
+  "reports": [
+    {
+      "endpoint": "human_hlm_stability_30min_ncats",
+      "model_id": "1862e76cebf14f81b353a45c2fab9326",
+      "kind": "classification",
+      "artifact_sha256": "573250c3b1e314872a8d0371496670089c445e136c1f676b07d97b5da61b33ef",
+      "domain_method": "max training Morgan Tanimoto >= 0.35 and train descriptor ranges; heuristic, not calibrated",
+      "all_test": {
+        "support": {
+          "n_compounds": 171,
+          "n_scaffolds": 171,
+          "negative": 69,
+          "positive": 102
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.74410343847684,
+          "pr_auc": 0.8196229820759606,
+          "balanced_accuracy": 0.7124893435635123,
+          "mcc": 0.41716839596383204,
+          "sensitivity": 0.6568627450980392,
+          "specificity": 0.7681159420289855
+        },
+        "confusion_matrix": [
+          [
+            53,
+            16
+          ],
+          [
+            35,
+            67
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 40,
+          "n_scaffolds": 40,
+          "negative": 14,
+          "positive": 26
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8324175824175823,
+          "pr_auc": 0.9030733196390859,
+          "balanced_accuracy": 0.7005494505494505,
+          "mcc": 0.38310314400755063,
+          "sensitivity": 0.6153846153846154,
+          "specificity": 0.7857142857142857
+        },
+        "confusion_matrix": [
+          [
+            11,
+            3
+          ],
+          [
+            10,
+            16
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_fraction": 0.23391812865497075,
+      "outside_domain_withheld": 131
+    },
+    {
+      "endpoint": "cyp2c19_inhibition_veith",
+      "model_id": "2d72179e73594e26a6ee8f4f4bcfcaff",
+      "kind": "classification",
+      "artifact_sha256": "1d5ad0e89ab674a58b66462c00c72c860fbe9d92ace356047b19203d9000609c",
+      "domain_method": "max training Morgan Tanimoto >= 0.35 and train descriptor ranges; heuristic, not calibrated",
+      "all_test": {
+        "support": {
+          "n_compounds": 2429,
+          "n_scaffolds": 2161,
+          "negative": 1059,
+          "positive": 1370
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8320519978219364,
+          "pr_auc": 0.8444266272641159,
+          "balanced_accuracy": 0.7531974800631362,
+          "mcc": 0.5275118979950074,
+          "sensitivity": 0.8737226277372263,
+          "specificity": 0.6326723323890463
+        },
+        "confusion_matrix": [
+          [
+            670,
+            389
+          ],
+          [
+            173,
+            1197
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 1983,
+          "n_scaffolds": 1789,
+          "negative": 843,
+          "positive": 1140
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8312470083869222,
+          "pr_auc": 0.8493870624653082,
+          "balanced_accuracy": 0.7530295935568458,
+          "mcc": 0.532751792754383,
+          "sensitivity": 0.8868421052631579,
+          "specificity": 0.6192170818505338
+        },
+        "confusion_matrix": [
+          [
+            522,
+            321
+          ],
+          [
+            129,
+            1011
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_fraction": 0.8163853437628654,
+      "outside_domain_withheld": 446
+    },
+    {
+      "endpoint": "hydration_free_energy",
+      "model_id": "35f7187c7a124876be58a08e1761a2ce",
+      "kind": "regression",
+      "artifact_sha256": "ec9565868830bfa95b56d4d2b38bc8c30d9ba55e9b98eee33239cc9df873c909",
+      "domain_method": "max training Morgan Tanimoto >= 0.35 and train descriptor ranges; heuristic, not calibrated",
+      "all_test": {
+        "support": {
+          "n_compounds": 154,
+          "n_scaffolds": 3
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "r2": 0.7290089761231271,
+          "mae": 1.2220149663335904
+        },
+        "r2_point_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 60,
+          "n_scaffolds": 2
+        },
+        "adequate_for_diagnostic": false,
+        "metrics": {
+          "r2": 0.7616313479057479,
+          "mae": 1.023530682365938
+        },
+        "r2_point_pass": null
+      },
+      "served_fraction": 0.38961038961038963,
+      "outside_domain_withheld": 94
+    },
+    {
+      "endpoint": "hepg2_cellloss_24h_toxcast",
+      "model_id": "3cb35799ee3e4e81971c9524ba5089b7",
+      "kind": "classification",
+      "artifact_sha256": "ba407a242aff9b3d0ae5eb71fe94fb6f9e85a414b4a22f3525457267736958c7",
+      "domain_method": "max training Morgan Tanimoto >= 0.35 and train descriptor ranges; heuristic, not calibrated",
+      "all_test": {
+        "support": {
+          "n_compounds": 185,
+          "n_scaffolds": 123,
+          "negative": 123,
+          "positive": 62
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.7703907684238134,
+          "pr_auc": 0.6340671605486313,
+          "balanced_accuracy": 0.712496721741411,
+          "mcc": 0.40383605622087365,
+          "sensitivity": 0.7258064516129032,
+          "specificity": 0.6991869918699187
+        },
+        "confusion_matrix": [
+          [
+            86,
+            37
+          ],
+          [
+            17,
+            45
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 70,
+          "n_scaffolds": 40,
+          "negative": 43,
+          "positive": 27
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.7553832902670112,
+          "pr_auc": 0.6486053187064744,
+          "balanced_accuracy": 0.7144702842377262,
+          "mcc": 0.41775583439831926,
+          "sensitivity": 0.7777777777777778,
+          "specificity": 0.6511627906976745
+        },
+        "confusion_matrix": [
+          [
+            28,
+            15
+          ],
+          [
+            6,
+            21
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_fraction": 0.3783783783783784,
+      "outside_domain_withheld": 115
+    },
+    {
+      "endpoint": "hiv_replication_inhibition_nci",
+      "model_id": "5655f098722e4602986f6185dfc46720",
+      "kind": "classification",
+      "artifact_sha256": "df62a203fe2dfb632194686698d9001991c6fb99ec22b1f675d92992deb06024",
+      "domain_method": "max training Morgan Tanimoto >= 0.35 and train descriptor ranges; heuristic, not calibrated",
+      "all_test": {
+        "support": {
+          "n_compounds": 7606,
+          "n_scaffolds": 5706,
+          "negative": 7369,
+          "positive": 237
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.761397529735985,
+          "pr_auc": 0.32639621694202964,
+          "balanced_accuracy": 0.6549772596227897,
+          "mcc": 0.38115646755488275,
+          "sensitivity": 0.3206751054852321,
+          "specificity": 0.9892794137603474
+        },
+        "confusion_matrix": [
+          [
+            7290,
+            79
+          ],
+          [
+            161,
+            76
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 6278,
+          "n_scaffolds": 4694,
+          "negative": 6066,
+          "positive": 212
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.7750911358702076,
+          "pr_auc": 0.35094169780304096,
+          "balanced_accuracy": 0.6728160050762368,
+          "mcc": 0.4036037002197147,
+          "sensitivity": 0.3584905660377358,
+          "specificity": 0.9871414441147379
+        },
+        "confusion_matrix": [
+          [
+            5988,
+            78
+          ],
+          [
+            136,
+            76
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_fraction": 0.8254009992111491,
+      "outside_domain_withheld": 1328
+    },
+    {
+      "endpoint": "cyp3a4_inhibition_veith",
+      "model_id": "6fd7449b0dc44577ac97645de8093d13",
+      "kind": "classification",
+      "artifact_sha256": "1cc229264967eee937d84c48f304fbaba8ccfce59d02da1c2ccffb125b0ac635",
+      "domain_method": "max training Morgan Tanimoto >= 0.35 and train descriptor ranges; heuristic, not calibrated",
+      "all_test": {
+        "support": {
+          "n_compounds": 2356,
+          "n_scaffolds": 2120,
+          "negative": 1255,
+          "positive": 1101
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8343425571103417,
+          "pr_auc": 0.8091344540939835,
+          "balanced_accuracy": 0.7467069053486328,
+          "mcc": 0.49242266075105734,
+          "sensitivity": 0.7547683923705722,
+          "specificity": 0.7386454183266933
+        },
+        "confusion_matrix": [
+          [
+            927,
+            328
+          ],
+          [
+            270,
+            831
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 1926,
+          "n_scaffolds": 1737,
+          "negative": 990,
+          "positive": 936
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8425785634118967,
+          "pr_auc": 0.8270171218093194,
+          "balanced_accuracy": 0.7566433566433567,
+          "mcc": 0.5143688900681224,
+          "sensitivity": 0.7991452991452992,
+          "specificity": 0.7141414141414142
+        },
+        "confusion_matrix": [
+          [
+            707,
+            283
+          ],
+          [
+            188,
+            748
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_fraction": 0.8174872665534805,
+      "outside_domain_withheld": 430
+    },
+    {
+      "endpoint": "cyp1a2_inhibition_veith",
+      "model_id": "d5f0453c32b444a496e7f069416736c6",
+      "kind": "classification",
+      "artifact_sha256": "87bf6caefe6118fc51fb497838bca5ccb0d1c98c43355c0152b5a794427b65a8",
+      "domain_method": "max training Morgan Tanimoto >= 0.35 and train descriptor ranges; heuristic, not calibrated",
+      "all_test": {
+        "support": {
+          "n_compounds": 2407,
+          "n_scaffolds": 2153,
+          "negative": 1335,
+          "positive": 1072
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8727514114819163,
+          "pr_auc": 0.8422202733361535,
+          "balanced_accuracy": 0.7862289675219408,
+          "mcc": 0.5737160924846089,
+          "sensitivity": 0.753731343283582,
+          "specificity": 0.8187265917602996
+        },
+        "confusion_matrix": [
+          [
+            1093,
+            242
+          ],
+          [
+            264,
+            808
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 1950,
+          "n_scaffolds": 1758,
+          "negative": 1081,
+          "positive": 869
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8822372840218484,
+          "pr_auc": 0.8561893002538328,
+          "balanced_accuracy": 0.7965698980933351,
+          "mcc": 0.5931397961866702,
+          "sensitivity": 0.7744533947065593,
+          "specificity": 0.818686401480111
+        },
+        "confusion_matrix": [
+          [
+            885,
+            196
+          ],
+          [
+            196,
+            673
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_fraction": 0.8101371001246365,
+      "outside_domain_withheld": 457
+    },
+    {
+      "endpoint": "cyp2d6_inhibition_veith",
+      "model_id": "d88b9d30b6914d4b9409a73faf99c55d",
+      "kind": "classification",
+      "artifact_sha256": "18e829fb1efd98350d90f73579999f532639d07fe82ca364283264cca1449204",
+      "domain_method": "max training Morgan Tanimoto >= 0.35 and train descriptor ranges; heuristic, not calibrated",
+      "all_test": {
+        "support": {
+          "n_compounds": 2516,
+          "n_scaffolds": 2228,
+          "negative": 2042,
+          "positive": 474
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8392109580662624,
+          "pr_auc": 0.6233881845916547,
+          "balanced_accuracy": 0.7276063427515838,
+          "mcc": 0.47551872956110275,
+          "sensitivity": 0.5379746835443038,
+          "specificity": 0.9172380019588638
+        },
+        "confusion_matrix": [
+          [
+            1873,
+            169
+          ],
+          [
+            219,
+            255
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 2089,
+          "n_scaffolds": 1861,
+          "negative": 1691,
+          "positive": 398
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8515700917360308,
+          "pr_auc": 0.6409211991455641,
+          "balanced_accuracy": 0.7321044905188272,
+          "mcc": 0.4859320091923375,
+          "sensitivity": 0.5452261306532663,
+          "specificity": 0.918982850384388
+        },
+        "confusion_matrix": [
+          [
+            1554,
+            137
+          ],
+          [
+            181,
+            217
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_fraction": 0.8302861685214626,
+      "outside_domain_withheld": 427
+    },
+    {
+      "endpoint": "cyp2c9_inhibition_veith",
+      "model_id": "e44bcf5d855b4eefbe594f073f9507bd",
+      "kind": "classification",
+      "artifact_sha256": "590327467bb757a53ad8875b06a62e5f38c991f199a1bdb261b85d0d42f9a6ae",
+      "domain_method": "max training Morgan Tanimoto >= 0.35 and train descriptor ranges; heuristic, not calibrated",
+      "all_test": {
+        "support": {
+          "n_compounds": 2311,
+          "n_scaffolds": 2053,
+          "negative": 1334,
+          "positive": 977
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8333668375638179,
+          "pr_auc": 0.7485191473618122,
+          "balanced_accuracy": 0.7552677090318709,
+          "mcc": 0.5050998342059668,
+          "sensitivity": 0.8208802456499488,
+          "specificity": 0.6896551724137931
+        },
+        "confusion_matrix": [
+          [
+            920,
+            414
+          ],
+          [
+            175,
+            802
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 1820,
+          "n_scaffolds": 1631,
+          "negative": 1032,
+          "positive": 788
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8332214319442806,
+          "pr_auc": 0.7531064812137608,
+          "balanced_accuracy": 0.7567755676228702,
+          "mcc": 0.5113665643476232,
+          "sensitivity": 0.8401015228426396,
+          "specificity": 0.6734496124031008
+        },
+        "confusion_matrix": [
+          [
+            695,
+            337
+          ],
+          [
+            126,
+            662
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_fraction": 0.7875378623972307,
+      "outside_domain_withheld": 491
+    },
+    {
+      "endpoint": "kinetic_low_solubility_10ugml_ncats_ph74",
+      "model_id": "f95957567a394c04bf9c6c0675e606d5",
+      "kind": "classification",
+      "artifact_sha256": "f486464227e2f0218ee82a7162003caa76ff3ed74d51ed190a8a324ce4ec746e",
+      "domain_method": "max training Morgan Tanimoto >= 0.35 and train descriptor ranges; heuristic, not calibrated",
+      "all_test": {
+        "support": {
+          "n_compounds": 487,
+          "n_scaffolds": 486,
+          "negative": 240,
+          "positive": 247
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8491565452091767,
+          "pr_auc": 0.8577558639446953,
+          "balanced_accuracy": 0.7820006747638326,
+          "mcc": 0.5648117994569087,
+          "sensitivity": 0.805668016194332,
+          "specificity": 0.7583333333333333
+        },
+        "confusion_matrix": [
+          [
+            182,
+            58
+          ],
+          [
+            48,
+            199
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 301,
+          "n_scaffolds": 300,
+          "negative": 128,
+          "positive": 173
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8695583453757225,
+          "pr_auc": 0.8979868534404027,
+          "balanced_accuracy": 0.7929010115606936,
+          "mcc": 0.5960373996352394,
+          "sensitivity": 0.8670520231213873,
+          "specificity": 0.71875
+        },
+        "confusion_matrix": [
+          [
+            92,
+            36
+          ],
+          [
+            23,
+            150
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_fraction": 0.6180698151950719,
+      "outside_domain_withheld": 186
+    },
+    {
+      "endpoint": "COX-2 human single protein IC50 <=1000 nM",
+      "model_id": "CHEMBL230-panel-human-single-protein-v1",
+      "kind": "classification",
+      "artifact_sha256": "d629d6d74e2a020b3db28daab5ef11c5dd5f933d8c4e33146c288b8bef362eb5",
+      "domain_method": "Serving at Tanimoto >=0.30; >=0.50 marked in-domain",
+      "all_test": {
+        "support": {
+          "n_compounds": 422,
+          "n_scaffolds": 228,
+          "negative": 196,
+          "positive": 226
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8221848473902835,
+          "pr_auc": 0.8477973894363398,
+          "balanced_accuracy": 0.7621681415929203,
+          "mcc": 0.5240051582502677,
+          "sensitivity": 0.7743362831858407,
+          "specificity": 0.75
+        },
+        "confusion_matrix": [
+          [
+            147,
+            49
+          ],
+          [
+            51,
+            175
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_test": {
+        "support": {
+          "n_compounds": 383,
+          "n_scaffolds": 206,
+          "negative": 177,
+          "positive": 206
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8378037408809171,
+          "pr_auc": 0.8608258193115284,
+          "balanced_accuracy": 0.7854615764357413,
+          "mcc": 0.5701418579918395,
+          "sensitivity": 0.7912621359223301,
+          "specificity": 0.7796610169491526
+        },
+        "confusion_matrix": [
+          [
+            138,
+            39
+          ],
+          [
+            43,
+            163
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "strictly_inside_test": {
+        "support": {
+          "n_compounds": 273,
+          "n_scaffolds": 147,
+          "negative": 133,
+          "positive": 140
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.8720461868958109,
+          "pr_auc": 0.8864065228474631,
+          "balanced_accuracy": 0.831203007518797,
+          "mcc": 0.6627264221256526,
+          "sensitivity": 0.8428571428571429,
+          "specificity": 0.8195488721804511
+        },
+        "confusion_matrix": [
+          [
+            109,
+            24
+          ],
+          [
+            22,
+            118
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "edge_test": {
+        "support": {
+          "n_compounds": 110,
+          "n_scaffolds": 72,
+          "negative": 44,
+          "positive": 66
+        },
+        "adequate_for_diagnostic": true,
+        "metrics": {
+          "roc_auc": 0.7176308539944903,
+          "pr_auc": 0.7799754105564937,
+          "balanced_accuracy": 0.6704545454545454,
+          "mcc": 0.33541019662496846,
+          "sensitivity": 0.6818181818181818,
+          "specificity": 0.6590909090909091
+        },
+        "confusion_matrix": [
+          [
+            29,
+            15
+          ],
+          [
+            21,
+            45
+          ]
+        ],
+        "ba_and_roc_points_pass": true
+      },
+      "served_fraction": 0.9075829383886256,
+      "outside_domain_withheld": 39
+    }
+  ]
+}

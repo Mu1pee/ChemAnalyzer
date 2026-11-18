@@ -1,0 +1,108 @@
+{
+  "model_id": "b92fc362fcf94bd99184a2c1a9ee6961",
+  "model_sha256": "e6142594aa32d78bc8e1b04932d36c569646276145daa9448d39e93af2b5b5fd",
+  "source": {
+    "raw_rows": 4200,
+    "excluded": {
+      "repeated_molecule_id": 10,
+      "assay_range_boundary": 5
+    },
+    "offered_for_structure_curation": 4185,
+    "source_archive_sha256": "33c203740555f96067710cdfc1c3c55d890660e5908ec5cbf5817492c290d281",
+    "sqlite_sha256": "4be13df3b68e25dcd0bff44bf094033b5aebe98f415acdc8c1cdf380e0c15142",
+    "exact_extracted_rows_sha256": "6db9e9cc1ecde58d496740f848ef7179290c3fc79a9788840c951a01c0ca5eb9",
+    "assay": {
+      "assay_id": 1369278,
+      "description": "ASTRAZENECA: Octan-1-ol/water (pH7.4) distribution coefficent measured  by a shake flask method described in J. Biomol. Screen. 2011, 16, 348-355. Experimental range -1.5 to 4.5",
+      "src_id": 27,
+      "assay_type": "P",
+      "doi": "10.6019/CHEMBL3301361",
+      "document": "CHEMBL3301361"
+    },
+    "method_doi": "10.1177/1087057110396372",
+    "attribution": "AstraZeneca; ChEMBL contributors, EMBL-EBI",
+    "license": "CC-BY-SA-3.0"
+  },
+  "preregistered_plan_sha256": "4d104875a9d668c9f7e8ec7cc885143f59a55d735761b705d2feb348de01b768",
+  "selected": "random_forest",
+  "only_frozen_model_evaluated": true,
+  "refit": false,
+  "trained_molecules": 2674,
+  "internal": {
+    "metrics": {
+      "r2": 0.48429970003279277,
+      "mae": 0.6757916817612212,
+      "rmse": 0.8733614336610739
+    },
+    "support": {
+      "n_compounds": 836,
+      "n_scaffolds": 727
+    },
+    "comparison_crippen_clogp": {
+      "r2": -1.143740202852622,
+      "mae": 1.3589706095715353,
+      "rmse": 1.7806616052267752
+    },
+    "baseline": {
+      "mae": 0.9938375836068037,
+      "rmse": 1.216539228867809,
+      "r2": -0.0006025362145267721
+    },
+    "served_fraction": 0.742822966507177,
+    "served_support": {
+      "n_compounds": 621,
+      "n_scaffolds": 543
+    },
+    "served_test": {
+      "r2": 0.5389023223288802,
+      "mae": 0.6220385438233265,
+      "rmse": 0.7965811953981102
+    }
+  },
+  "internal_quality": {
+    "policy_version": "2026-11-16",
+    "passed": false,
+    "metric": "r2",
+    "value": 0.48429970003279277,
+    "threshold": 0.6,
+    "strict": true,
+    "evidence": "internal held-out scaffolds; no external validation",
+    "reasons": [
+      "Held-out R2 must be finite and strictly greater than 0.60; R2 is not percent accuracy"
+    ]
+  },
+  "reserved_external_literature_panel": {
+    "source": {
+      "name": "logd74.tsv",
+      "sha256": "38a01a5fb484b21c9d3702601e56e4a02de7bf8e3acf28eacede2c1b5e9d8353",
+      "doi": "10.6084/m9.figshare.5596750.v1",
+      "source": "https://ndownloader.figshare.com/files/9737650"
+    },
+    "license": "CC-BY-4.0",
+    "raw_rows": 1130,
+    "excluded": {
+      "matched_connectivity": 213,
+      "structure_curation": 13,
+      "matched_scaffold": 153,
+      "duplicate_connectivity": 26
+    },
+    "published_reference": "10.1002/cem.2718",
+    "separate_literature_data": true,
+    "assay_limits": "Grouped literature measurements at pH 7.4 and 25 C. Original assay per row is not supplied.",
+    "no_overlap_filter": "Remove parent-connectivity and Murcko overlap with all 4200 raw AstraZeneca rows",
+    "novel_support": {
+      "n_compounds": 725,
+      "n_scaffolds": 367
+    },
+    "inside_current_domain_support": {
+      "n_compounds": 226,
+      "n_scaffolds": 152
+    },
+    "coverage_of_current_domain": 0.3117241379310345,
+    "frozen_panel_sha256": "1022ee240e2b6d068c25a0a391ea79077e6ae08635f17686b0d36fd3a639538e",
+    "model_performance_measured": false,
+    "for_future_evaluation_only": true
+  },
+  "production_prediction_denied": true,
+  "installed_in_product": false
+}

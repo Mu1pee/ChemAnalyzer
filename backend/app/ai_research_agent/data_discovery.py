@@ -26,6 +26,9 @@ CATALOG = [
     {"id": "freesolv", "name": "FreeSolv", "endpoint": "hydration_free_energy",
      "url": "https://github.com/MobleyLab/FreeSolv", "license": "CC-BY-4.0",
      "status": "supported_text_adapter"},
+    {"id": "chembl_az_logd", "name": "AstraZeneca / ChEMBL3301363 — LogD at pH 7.4",
+     "url": "https://www.ebi.ac.uk/chembl/explore/assay/CHEMBL3301363", "license": "CC-BY-SA-3.0",
+     "endpoint": "octanol_water_logd_ph74_az_chembl3301363", "status": "reviewed_experimental_source_manual_import"},
     {"id": "pubchem", "name": "PubChem BioAssay", "url": "https://pubchem.ncbi.nlm.nih.gov/",
      "status": "discovery_lead_requires_assay_and_license_review"},
     {"id": "chembl", "name": "ChEMBL", "url": "https://www.ebi.ac.uk/chembl/",
@@ -37,7 +40,7 @@ CATALOG = [
 
 def discover(endpoint: str):
     return {"endpoint": endpoint, "sources": CATALOG,
-            "message": "FreeSolv, TDC Veith CYP, NCI/MoleculeNet HIV, one ToxCast HepG2 assay, federal NCATS HLM AID 1963597 and kinetic solubility AID 1645848 have reviewed text adapters. Other sources are leads, not verified datasets."}
+            "message": "FreeSolv, TDC Veith CYP, NCI/MoleculeNet HIV, one ToxCast HepG2 assay, federal NCATS HLM AID 1963597 and kinetic solubility AID 1645848 have reviewed text adapters. AstraZeneca ChEMBL3301363 has reviewed experimental LogD data for manual CSV import. Entries marked as discovery leads are not verified datasets."}
 
 
 def _fetch(url, limit=4_000_000):

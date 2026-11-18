@@ -1,0 +1,71 @@
+{
+  "original_endpoint": "NCATS high passive permeability PAMPA pH 7.4",
+  "high_requires_strictly_greater_than_1e_minus_4_cm_s": true,
+  "qdb203": {
+    "archive_sha256": "d1f894ae0e6dccad027bc3a33e36fedff0f34c9727c4f1ccb6f6b1ebf3a404cb",
+    "license": "CC-BY-4.0",
+    "measurements": 238,
+    "value_range_log_cm_s": [
+      -8.53,
+      -3.79
+    ],
+    "high": 1,
+    "low_or_moderate": 237,
+    "diagnostic_score_computed": false,
+    "eligible_confirmatory_test": false,
+    "reason": "Different PAMPA protocol and fewer than 10 high measurements at the unchanged NCATS endpoint threshold",
+    "source": "https://qsardb.org/repository/handle/10967/203?show=full",
+    "assay_method": "https://dspace.ut.ee/server/api/core/bitstreams/8be1771f-53ed-4bee-8046-36fdb6f352f9/content"
+  },
+  "sbccg_624339": {
+    "source": "https://pubchem.ncbi.nlm.nih.gov/bioassay/624339",
+    "raw_sha256": "989fafe7a645c396d8f8000093762c76df7b158e31e5fb93cdbefa10c61426d5",
+    "metadata_sha256": "6a01b7742da85521d4174ca7a64cb3d4a2e3f212f918a156d04b0d8b1bf12e25",
+    "measurements": 89,
+    "source_concentration_uM": 100,
+    "ncats_concentration_uM": 50,
+    "extra_acetonitrile_excluded": true,
+    "unique_no_extra_acn": {
+      "low_or_moderate": 21,
+      "high": 59,
+      "compounds": 80,
+      "scaffolds": 79
+    },
+    "no_ncats_connectivity_overlap": {
+      "low_or_moderate": 18,
+      "high": 52,
+      "compounds": 70,
+      "scaffolds": 69
+    },
+    "no_ncats_scaffold_overlap": {
+      "low_or_moderate": 16,
+      "high": 45,
+      "compounds": 61,
+      "scaffolds": 61
+    },
+    "novel_scaffolds_inside_ncats_domain": {
+      "low_or_moderate": 3,
+      "high": 14,
+      "compounds": 17,
+      "scaffolds": 17
+    },
+    "exclusions": {
+      "ncats_unusable_structure": 22,
+      "external_unusable_structure": 2,
+      "additional_acetonitrile": 7,
+      "duplicate_connectivity": 0
+    },
+    "overlap_against_all_2530_ncats_rows": true,
+    "diagnostic_score_computed": false,
+    "eligible_confirmatory_test": false,
+    "reason": "SBCCG concentration differs from NCATS; analytical and source context do not establish equivalence"
+  },
+  "siramshetty_2021": {
+    "doi": "10.1177/24725552211017520",
+    "measured_pampa_cohort_reported": 186,
+    "supplement_s2_role": "Predicted outcomes, not experimentally measured labels",
+    "found_public_measured_comparable_cohort": false
+  },
+  "fitted_models": 0,
+  "activated_models": 0
+}

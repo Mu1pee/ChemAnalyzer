@@ -1,5 +1,7 @@
 # Model admission policy (ChemAnalyzer 3.2.16, updated 2026-11-18)
 
+[Model audit for the 3.2.18 release](MODEL_DOMAIN_AUDIT_3.2.18.md) reports the share of the original holdouts covered by the production applicability rules and the performance on that share. It also records the PAMPA external-source review and the separate LogD research trial.
+
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
 not claim that all catalog entries meet that goal.
