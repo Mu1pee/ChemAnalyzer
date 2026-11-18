@@ -155,6 +155,8 @@ export interface ChemblResponse {
   similar: ChemblSimilar[];
   message: string | null;
   source: string;
+  offline_release?: string | null;
+  offline_release_date?: string | null;
   cached: boolean;
   stale: boolean;
   partial: boolean;

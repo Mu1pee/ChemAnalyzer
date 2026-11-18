@@ -9,6 +9,7 @@ import math
 from urllib.parse import quote
 
 import httpx
+from .chembl_sqlite import configured_database, read_local_profile
 from .chembl_transport import (
     ChemblClient, FRESH_SECONDS, cache_key, is_complete_snapshot, read_cache, timestamp, write_cache,
 )
@@ -323,11 +324,15 @@ def _saved_profile(snapshot: dict, warnings: list[str], message: str) -> dict:
     }
 
 
-def _recover_missing_activity(key: str, profile: dict) -> dict | None:
+def _first_activity_failed(profile: dict) -> bool:
     coverage = profile["activity_coverage"]
-    if (not profile["found"] or coverage is None or coverage["complete"]
-            or coverage["retrieved_rows"] != 0
-            or not any(issue.startswith("activity:") for issue in profile["warnings"])):
+    return (profile["found"] and coverage is not None and not coverage["complete"]
+            and coverage["retrieved_rows"] == 0
+            and any(issue.startswith("activity:") for issue in profile["warnings"]))
+
+
+def _recover_missing_activity(key: str, profile: dict) -> dict | None:
+    if not _first_activity_failed(profile):
         return None
     saved = read_cache(key, prefer_complete=True)
     if saved is None:
@@ -342,13 +347,47 @@ def _recover_missing_activity(key: str, profile: dict) -> dict | None:
     )
 
 
+async def _recover_local_profile(profile: dict, inchikey: str | None) -> dict | None:
+    # Empty authoritative measurements and useful partial measurements keep
+    # their own live source. The local report is one separate dated snapshot.
+    exact_lookup_failed = not profile["found"] and any(issue.startswith("molecule:") for issue in profile["warnings"])
+    if not inchikey or not (exact_lookup_failed or _first_activity_failed(profile)):
+        return None
+    path = configured_database()
+    if path is None or not path.is_file():
+        return None
+    limit = ACTIVITY_LIMIT * MAX_ACTIVITY_PAGES
+    snapshot = await asyncio.to_thread(read_local_profile, path, inchikey, tuple(ACTIVITY_TYPES.split(",")), limit)
+    if snapshot is None or (profile["found"] and profile["chembl_id"] != snapshot.molecule["chembl_id"]):
+        return None
+    molecule_id = snapshot.molecule["chembl_id"]
+    size = len(snapshot.activities)
+    coverage = dict(retrieved_rows=size, total_rows=snapshot.total_activities,
+                    pages=1, complete=size == snapshot.total_activities, limit_rows=limit)
+    warnings = list(dict.fromkeys(profile["warnings"] + ["similarity: offline"]))
+    if not coverage["complete"]:
+        warnings.append(f"activity: row_limit ({size} of {snapshot.total_activities})")
+    return {
+        **profile, **snapshot.molecule, "available": True, "found": True,
+        "max_phase": _to_float(snapshot.molecule["max_phase"]),
+        "source_url": f"{CHEMBL_COMPOUND_URL}/{molecule_id}",
+        "source": "ChEMBL SQLite", "offline_release": snapshot.release,
+        "offline_release_date": snapshot.release_date,
+        "cached": False, "stale": False, "partial": True, "retrieved_at": None,
+        "mechanisms": snapshot.mechanisms, "indications": parse_indications({"drug_indications": snapshot.indications}),
+        "targets": aggregate_targets({"activities": snapshot.activities}), "similar": [],
+        "warnings": warnings, "activity_coverage": coverage,
+        "message": "Данные из локальной копии ChEMBL. Поиск аналогов доступен через онлайн-сервис.",
+    }
+
+
 async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
     key = cache_key(smiles, inchikey)
     cached = read_cache(key)
     if cached and cached[1] < (300 if cached[0]["partial"] else FRESH_SECONDS):
         result = cached[0]
         result["cached"] = True
-        return _recover_missing_activity(key, result) or result
+        return _recover_missing_activity(key, result) or await _recover_local_profile(result, inchikey) or result
     profile: dict = {
         "available": False,
         "found": False,
@@ -390,6 +429,14 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
         # A newer partial refresh must not erase the last complete response.
         # Display one dated snapshot, never a mixture of observations.
         cached = read_cache(key, prefer_complete=True)
+        if cached and is_complete_snapshot(cached[0]):
+            return _saved_profile(
+                cached[0], profile["warnings"],
+                "ChEMBL сейчас не отвечает. Показана сохранённая копия; проверьте дату получения.",
+            )
+        offline = await _recover_local_profile(profile, inchikey)
+        if offline:
+            return offline
         if cached:
             return _saved_profile(
                 cached[0], profile["warnings"],
@@ -398,7 +445,9 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
         profile["message"] = (
             "Не удалось получить ответ ChEMBL: " + "; ".join(profile["warnings"]) + ". Повторите запрос позже."
         )
-    elif profile["partial"]:
+        return profile
+
+    if profile["partial"]:
         profile["message"] = "ChEMBL ответил частично. Часть данных не загрузилась или ограничена объёмом: " + "; ".join(profile["warnings"])
     elif not profile["found"] and not similar:
         profile["message"] = (
@@ -409,7 +458,6 @@ async def fetch_chembl_profile(smiles: str, inchikey: str | None) -> dict:
             "Точного совпадения в ChEMBL нет — показаны близкие аналоги."
         )
 
-    if profile["available"]:
-        profile["retrieved_at"] = timestamp()
-        write_cache(key, profile)
-    return _recover_missing_activity(key, profile) or profile
+    profile["retrieved_at"] = timestamp()
+    write_cache(key, profile)
+    return _recover_missing_activity(key, profile) or await _recover_local_profile(profile, inchikey) or profile

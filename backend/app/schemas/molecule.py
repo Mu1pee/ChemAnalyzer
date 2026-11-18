@@ -227,6 +227,8 @@ class ChemblResponse(BaseModel):
     similar: list[ChemblSimilar] = []
     message: str | None = None
     source: str = "ChEMBL"
+    offline_release: str | None = None
+    offline_release_date: str | None = None
     cached: bool = False
     stale: bool = False
     partial: bool = False
