@@ -37,6 +37,8 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
   const [confirmed, setConfirmed] = useState(false);
   const [smiles, setSmiles] = useState("CCO");
   const [prediction, setPrediction] = useState<Json | null>(null);
+  const [externalModel, setExternalModel] = useState("");
+  const [externalReport, setExternalReport] = useState("");
 
   async function refresh() {
     const [t, r, m] = await Promise.all([request("/tasks"), request("/runs"), request("/models")]);
@@ -156,6 +158,23 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
       {detail && <details open><summary>Отчёт эксперимента</summary><pre>{JSON.stringify(detail, null, 2)}</pre></details>}
       <h3>Сравнение моделей</h3>
       <p>CV и validation выбирают алгоритм; test используется после выбора. Показатели разных endpoint и датасетов не сопоставимы напрямую.</p>
+      <details><summary>Записать независимую проверку</summary>
+        <p>Выберите модель и добавьте JSON-отчёт с результатами теста на сопоставимом независимом наборе, контрольными суммами модели и набора.</p>
+        <label>Модель для независимой проверки <select value={externalModel} onChange={e => setExternalModel(e.target.value)}>
+          <option value="">Выберите модель</option>
+          {models.filter(m => m.status !== "invalid").map(m => <option key={m.id} value={m.id}>{m.task.name} · {m.id.slice(0, 8)}</option>)}
+        </select></label>
+        <label>Отчёт независимого теста JSON <input type="file" accept=".json" onChange={e => {
+          setExternalReport("");
+          const file = e.target.files?.[0];
+          if (file && file.size <= 16000) file.text().then(setExternalReport).catch(e => setError(String(e)));
+          else if (file) setError("JSON превышает 16 KB");
+        }} /></label>
+        <button disabled={busy || !externalModel || !externalReport} onClick={() => act(async () => {
+          const updated = await request(`/models/${externalModel}/external-evaluation`, JSON.parse(externalReport));
+          setMessage(updated.quality.passed ? "Отчёт сохранён. Порог качества пройден." : "Отчёт сохранён. Прогнозы модели заблокированы.");
+        })}>Сохранить независимый тест</button>
+      </details>
       <label>Рецензент <input value={reviewer} onChange={e => setReviewer(e.target.value)} /></label>
       <label>Документированная независимая проверка <textarea rows={3} value={evidence} onChange={e => setEvidence(e.target.value)} /></label>
       <label><input type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)} />Подтверждаю активацию выбранной модели в исследовательском реестре</label>
@@ -168,6 +187,9 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
           {m.quality?.metric === "r2" ? " · R² не является процентом точности" : " · Требуется сбалансированная точность > 60%"}
         </p>
         {m.quality?.reasons?.length > 0 && <p>{m.quality.reasons.join("; ")}</p>}
+        {m.quality?.external_tests?.length > 0 && <ul>{m.quality.external_tests.map((report: Json) => <li key={report.dataset_sha256}>
+          {report.source} · {report.scope === "applicability_domain" ? "В области применимости" : "Вся выборка"} · {report.metric === "r2" ? "R²" : "BA"} {report.value ?? "—"} · {report.passed ? "Порог пройден" : "Порог не пройден"}
+        </li>)}</ul>}
         <button disabled={busy || !m.quality?.passed} onClick={() => act(async () => { setPrediction(await request(`/models/${m.id}/predict`, { smiles })); })}>Исследовательский прогноз</button>
         {m.status === "experimental" && <button disabled={busy || !m.quality?.passed || reviewer.length < 3 || evidence.length < 30} onClick={() => act(async () => {
           await request(`/models/${m.id}/review`, { reviewer, evidence });
@@ -176,7 +198,7 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
           await request(`/models/${m.id}/approve`, { reviewer, evidence, confirm_activation: confirmed }); setConfirmed(false);
         })}>Утвердить эту модель</button>}
       </article>)}
-      {prediction && <pre role="status">{JSON.stringify(prediction, null, 2)}</pre>}
+      {prediction && models.some(m => m.id === prediction.model_id && m.quality?.passed) && <pre role="status">{JSON.stringify(prediction, null, 2)}</pre>}
     </>}
   </section>;
 }

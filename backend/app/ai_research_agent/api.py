@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 from .config import FREESOLV_TASK, Provenance, TaskConfig, research_enabled
 from .data_discovery import discover
-from .model_registry import Registry, Review, Approval
+from .model_registry import Registry, Review, Approval, ExternalEvaluation
 from .orchestrator import ResearchAgent
 from .scheduler import Schedule, Scheduler
 from .security import read_json
@@ -159,6 +159,11 @@ def schedules():
 @router.post("/models/{identifier}/review")
 def review(identifier: str, body: Review):
     return call(lambda: Registry(agent().root).review(identifier, body))
+
+
+@router.post("/models/{identifier}/external-evaluation")
+def record_external_evaluation(identifier: str, body: ExternalEvaluation):
+    return call(lambda: Registry(agent().root).record_external_evaluation(identifier, body))
 
 
 @router.post("/models/{identifier}/approve")

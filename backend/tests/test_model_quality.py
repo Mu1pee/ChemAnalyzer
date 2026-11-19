@@ -1,10 +1,14 @@
 """Admission boundaries and legacy-model bypass prevention."""
+from concurrent.futures import ThreadPoolExecutor
+from types import SimpleNamespace
+
 import numpy as np
 import pytest
+from fastapi.testclient import TestClient
 
-from app.model_quality import classification_reasons, held_out_quality
+from app.model_quality import classification_reasons, held_out_quality, registry_quality
 from app.ai_research_agent.evaluation import scaffold_split
-from app.ai_research_agent.model_registry import Registry, Review, Approval
+from app.ai_research_agent.model_registry import Registry, Review, Approval, ExternalEvaluation
 from app.ai_research_agent.security import write_json
 from app.chemistry.qsar_core import quality_gate
 
@@ -91,6 +95,98 @@ def test_regression_r2_is_separate_from_accuracy_and_needs_scaffold_support():
     report["support"]["test"]["scaffolds"] = 5
     report["test"]["r2"] = .60
     assert not held_out_quality("regression", report)["passed"]
+
+
+def external(source, dataset, **fields):
+    return dict(source=source, dataset_sha256=dataset, artifact_sha256="a" * 64,
+                protocol="Technical comparison protocol fixture", independent_of_development=True,
+                scope="applicability_domain", evaluation=evaluation()) | fields
+
+
+def test_reviewed_external_regression_failure_blocks_review_approval_and_prediction(tmp_path, monkeypatch):
+    registry = Registry(tmp_path)
+
+    def regression(r2):
+        return dict(test=dict(r2=r2, mae=.7), baseline_test=dict(mae=1.3), beats_baseline=True,
+                    test_used_for_selection=False, support=dict(test=dict(molecules=31, scaffolds=24)))
+
+    good = external("Passing cohort", "b" * 64, evaluation=regression(.723))
+    metadata = dict(id="external-regression-fixture", status="experimental", task=dict(kind="regression"),
+                    artifact_sha256="a" * 64, dataset_sha256="d" * 64, evaluation=regression(.637),
+                    external_evaluations=[good])
+    path = tmp_path / "models" / metadata["id"] / "metadata.json"
+    write_json(path, metadata)
+    assert registry.metadata(metadata["id"])["quality"]["passed"]
+    metadata["external_evaluations"].append(external("Conflicting cohort", "c" * 64, evaluation=regression(.344)))
+    write_json(path, metadata)
+    quality = registry.metadata(metadata["id"])["quality"]
+    assert not quality["passed"] and quality["value"] == .637
+    assert [entry["passed"] for entry in quality["external_tests"]] == [True, False]
+    assert any("Conflicting cohort" in issue and "Held-out R2" in issue for issue in quality["reasons"])
+    monkeypatch.setattr(registry, "load", lambda *args: pytest.fail("Reject conflicting evidence before loading"))
+    review = Review(reviewer="Software fixture", evidence="Technical regression test for conflicting independent evidence.")
+    with pytest.raises(ValueError, match="Conflicting cohort"):
+        registry.review(metadata["id"], review)
+    with pytest.raises(ValueError, match="Conflicting cohort"):
+        registry.predict(metadata["id"], "CCO")
+    metadata["status"] = "validated"
+    write_json(path, metadata)
+    with pytest.raises(ValueError, match="Conflicting cohort"):
+        registry.approve(metadata["id"], Approval(**review.model_dump(), confirm_activation=True))
+
+
+@pytest.mark.parametrize("reports, reason", [
+    (None, "must be an array"),
+    ([external("Wrong artifact", "b" * 64, artifact_sha256="c" * 64)], "evaluated model artifact"),
+    ([external("Shared partition", "b" * 64, independent_of_development=False)], "development separation"),
+    ([external("Duplicate A", "b" * 64), external("Duplicate B", "b" * 64)], "duplicate dataset"),
+    ([external("Development set", "d" * 64)], "matches the development dataset"),
+    ([external("Missing score", "b" * 64, evaluation={})], "PR-AUC"),
+])
+def test_registry_rejects_unbound_or_incomplete_external_classification_evidence(reports, reason):
+    quality = registry_quality("classification", evaluation(), reports,
+                               artifact_sha256="a" * 64, training_dataset_sha256="d" * 64)
+    assert not quality["passed"]
+    assert any(reason in item for item in quality["reasons"])
+
+
+def test_external_report_import_persists_failure_and_retries_without_duplicates(tmp_path, monkeypatch):
+    from app.ai_research_agent import api
+    from app.main import app
+
+    registry = Registry(tmp_path)
+    meta = registry.register({}, dict(task=dict(kind="classification"), evaluation=evaluation(), dataset_sha256="d" * 64))
+    monkeypatch.setenv("CHEMANALYZER_RESEARCH_ENABLED", "1")
+    monkeypatch.setattr(api, "agent", lambda: SimpleNamespace(root=tmp_path))
+    client = TestClient(app)
+    path = f"/api/research/models/{meta['id']}/external-evaluation"
+    report = external("Independent assay", "b" * 64, artifact_sha256=meta["artifact_sha256"])
+    report["evaluation"].pop("beats_baseline")
+    report["evaluation"]["test"]["balanced_accuracy"] = .58
+    assert client.post(path, json=report | {"artifact_sha256": "a" * 64}).status_code == 400
+    first = client.post(path, json=report)
+    assert first.status_code == 200
+    assert first.json()["quality"]["external_tests"][0]["value"] == .58
+    assert first.json()["quality"]["passed"] is False
+    assert client.post(path, json=report).status_code == 200
+    assert client.post(path, json=report | {"source": "Changed report"}).status_code == 400
+    assert len(Registry(tmp_path).metadata(meta["id"])["external_evaluations"]) == 1
+    prediction = client.post(f"/api/research/models/{meta['id']}/predict", json={"smiles": "CCO"})
+    assert prediction.status_code == 400 and "Independent assay" in prediction.json()["detail"]
+
+
+def test_concurrent_reports_to_one_model_keep_both_sources(tmp_path):
+    meta = Registry(tmp_path).register({}, dict(task=dict(kind="classification"), evaluation=evaluation(), dataset_sha256="d" * 64))
+    reports = []
+    for source, dataset in (("Source A", "b" * 64), ("Source B", "c" * 64)):
+        report = external(source, dataset, artifact_sha256=meta["artifact_sha256"])
+        report["evaluation"].pop("beats_baseline")
+        reports.append(ExternalEvaluation.model_validate(report))
+    with ThreadPoolExecutor(max_workers=2) as workers:
+        list(workers.map(lambda report: Registry(tmp_path).record_external_evaluation(meta["id"], report), reports))
+    saved = Registry(tmp_path).metadata(meta["id"])
+    assert {row["source"] for row in saved["quality"]["external_tests"]} == {"Source A", "Source B"}
+    assert saved["quality"]["passed"]
 
 
 def test_legacy_model_without_evidence_cannot_review_approve_or_predict(tmp_path):

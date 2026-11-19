@@ -1,0 +1,310 @@
+{
+  "artifact_sha256": "ad7d120309c44e841b126cb8253b5f262d08818b3f3bf700c4b627be6aab8da3",
+  "artifact_admitted": false,
+  "packaged": false,
+  "prior_training_molecules": 2674,
+  "validation_audit": {
+    "winner": "direct_svr_kernel",
+    "validation": {
+      "mae": 0.536762871187083,
+      "rmse": 0.69240216975395,
+      "r2": 0.6399679259231885
+    },
+    "parametric_components": [
+      "svr_direct",
+      "kernel_direct"
+    ],
+    "artifact_sha256": "ad7d120309c44e841b126cb8253b5f262d08818b3f3bf700c4b627be6aab8da3",
+    "plan_sha256": "a383fd8bd238846abdf251c22a985ad1a8c322c23f74ae4c6ea49f04de8c0e2b",
+    "external_sha256": "1022ee240e2b6d068c25a0a391ea79077e6ae08635f17686b0d36fd3a639538e"
+  },
+  "historical_az_comparison": {
+    "all_compounds": {
+      "n_compounds": 836,
+      "n_scaffolds": 727,
+      "scores": {
+        "mae": 0.562211977137868,
+        "rmse": 0.7331990158703139,
+        "r2": 0.6365429391109032
+      },
+      "pass_gate": true,
+      "training_mean": {
+        "mae": 0.9938375836068037,
+        "rmse": 1.216539228867809,
+        "r2": -0.0006025362145267721
+      },
+      "unadjusted_clogp": {
+        "mae": 1.3589706100478487,
+        "rmse": 1.7806616060908673,
+        "r2": -1.1437402049331848
+      },
+      "r2_group_bootstrap_95ci": [
+        0.5870228024133376,
+        0.6770721126197686
+      ]
+    },
+    "in_domain": {
+      "n_compounds": 621,
+      "n_scaffolds": 543,
+      "scores": {
+        "mae": 0.5036937082071093,
+        "rmse": 0.6471252810723955,
+        "r2": 0.6956946637049923
+      },
+      "pass_gate": true,
+      "training_mean": {
+        "mae": 0.9577885693569737,
+        "rmse": 1.1753988054256446,
+        "r2": -0.00392975197486134
+      },
+      "unadjusted_clogp": {
+        "mae": 1.3706847020933994,
+        "rmse": 1.7714176820536818,
+        "r2": -1.2802096842670805
+      },
+      "r2_group_bootstrap_95ci": [
+        0.6524032171528138,
+        0.7316147932564601
+      ]
+    },
+    "in_domain_support_fraction": 0.742822966507177,
+    "excluded_by_domain": 215
+  },
+  "external_literature_test": {
+    "all_compounds": {
+      "n_compounds": 725,
+      "n_scaffolds": 367,
+      "scores": {
+        "mae": 0.8841958269780937,
+        "rmse": 1.1189227770854586,
+        "r2": 0.6651675981880092
+      },
+      "pass_gate": true,
+      "training_mean": {
+        "mae": 1.588412967786862,
+        "rmse": 1.9392886344775107,
+        "r2": -0.005801209315671407
+      },
+      "unadjusted_clogp": {
+        "mae": 1.2988864137931049,
+        "rmse": 1.688259000974756,
+        "r2": 0.23773602244183978
+      },
+      "r2_group_bootstrap_95ci": [
+        0.5478599594142591,
+        0.7354576261361168
+      ]
+    },
+    "in_domain": {
+      "n_compounds": 226,
+      "n_scaffolds": 152,
+      "scores": {
+        "mae": 0.820965034914231,
+        "rmse": 0.9970435530806327,
+        "r2": 0.7231198376813641
+      },
+      "pass_gate": true,
+      "training_mean": {
+        "mae": 1.660459852661817,
+        "rmse": 1.9696892956116372,
+        "r2": -0.08058523968455811
+      },
+      "unadjusted_clogp": {
+        "mae": 1.626261637168143,
+        "rmse": 1.9687624673139181,
+        "r2": -0.0795685500464014
+      },
+      "r2_group_bootstrap_95ci": [
+        0.6402496519820869,
+        0.771560370616309
+      ]
+    },
+    "in_domain_support_fraction": 0.3117241379310345,
+    "excluded_by_domain": 499
+  },
+  "external_literature_context": "Wang et al. literature panel at pH 7.4. Source method per molecule is unavailable. No overlapping parent connectivity or scaffolds.",
+  "external_laboratory_test": {
+    "artifact_sha256": "ad7d120309c44e841b126cb8253b5f262d08818b3f3bf700c4b627be6aab8da3",
+    "dataset_sha256": "1c1507b37e487d8d91a50de0ca43efefe8eaf56902f940737c9ca1bb1ba2a453",
+    "protocol": "https://doi.org/10.17504/protocols.io.e6nvw14kdlmk/v1",
+    "measured_assays": [
+      "CHEMBL5442686",
+      "CHEMBL5674855"
+    ],
+    "independent_of_training_and_previous_literature_evaluation": true,
+    "evaluation": {
+      "all_compounds": {
+        "n_compounds": 125,
+        "n_scaffolds": 90,
+        "scores": {
+          "mae": 1.0068893053225751,
+          "rmse": 1.208890858993592,
+          "r2": 0.10260463593520908
+        },
+        "pass_gate": false,
+        "training_mean": {
+          "mae": 1.1247854001495887,
+          "rmse": 1.312869954300511,
+          "r2": -0.0584078519154998
+        },
+        "unadjusted_clogp": {
+          "mae": 1.8495788800000015,
+          "rmse": 2.0829897652533975,
+          "r2": -1.664304794925151
+        },
+        "r2_group_bootstrap_95ci": [
+          -0.21359860101674358,
+          0.34192353974933315
+        ]
+      },
+      "in_domain": {
+        "n_compounds": 31,
+        "n_scaffolds": 24,
+        "scores": {
+          "mae": 0.7601863632100831,
+          "rmse": 0.9701583134399528,
+          "r2": 0.3437530342518631
+        },
+        "pass_gate": false,
+        "training_mean": {
+          "mae": 1.0140861823533671,
+          "rmse": 1.2246241230544863,
+          "r2": -0.04565329274812524
+        },
+        "unadjusted_clogp": {
+          "mae": 1.750151612903228,
+          "rmse": 1.9551282182094143,
+          "r2": -1.6652170142171654
+        },
+        "r2_group_bootstrap_95ci": [
+          -0.9520620030443687,
+          0.73958269415146
+        ]
+      },
+      "in_domain_support_fraction": 0.248,
+      "excluded_by_domain": 94
+    },
+    "refit": false
+  },
+  "external_laboratory_source": {
+    "database": "ChEMBL 37",
+    "sqlite_sha256": "4be13df3b68e25dcd0bff44bf094033b5aebe98f415acdc8c1cdf380e0c15142",
+    "license": "CC-BY-SA-3.0",
+    "source_attribution": "Aligning Science Across Parkinson’s (ASAP), Bienta Ltd.; ChEMBL contributors and EMBL-EBI",
+    "source_protocol": "https://doi.org/10.17504/protocols.io.e6nvw14kdlmk/v1",
+    "protocol_landing_page_sha256": "91d7f06d08f26e9eb9e809ca35757978cbf74d8f26b3f7c49cc4ee36e96368d9",
+    "assays": [
+      {
+        "assay_id": 2382022,
+        "chembl_id": "CHEMBL5442686",
+        "description": "LogD measurement of compound in a mixture of PBS buffer pH 7.4 and octanol using shake flask method. After dilution with acetonitrile and analysis by HPLC coupled tandem mass spectrometer, the partition ratio has been calculated. The assay has been performed by Enamine biological services, Bienta Ltd.The protocol is publicly available: dx.doi.org/10.17504/protocols.io.e6nvw14kdlmk/v1",
+        "doi": "10.6019/CHEMBL5442685",
+        "doc_chembl_id": "CHEMBL5442685"
+      },
+      {
+        "assay_id": 2537742,
+        "chembl_id": "CHEMBL5674855",
+        "description": "LogD measurement of compound in a mixture of PBS buffer pH 7.4 and octanol using shake flask method. After dilution with acetonitrile and analysis by HPLC coupled tandem mass spectrometer, the partition ratio has been calculated. The assay has been performed by Enamine biological services, Bienta Ltd.The protocol is publicly available: dx.doi.org/10.17504/protocols.io.e6nvw14kdlmk/v1",
+        "doi": "10.6019/CHEMBL5674854",
+        "doc_chembl_id": "CHEMBL5674854"
+      }
+    ],
+    "raw_rows": 233,
+    "excluding": {
+      "scaffold_overlap": 2,
+      "censored_or_flagged": 4,
+      "missing": 2,
+      "ambiguous_replicates_or_duplicate_parent": 100
+    },
+    "molecules": 125,
+    "groups": 90,
+    "by_assay": {
+      "CHEMBL5442686": 25,
+      "CHEMBL5674855": 100
+    },
+    "held_out_sha256": "1c1507b37e487d8d91a50de0ca43efefe8eaf56902f940737c9ca1bb1ba2a453",
+    "comparator_profiles": "4,200 AstraZeneca raw rows and all 725 reserved literature rows. Parent connectivity and Murcko groups checked.",
+    "scored": false,
+    "trained": false,
+    "used_for_model_selection": false
+  },
+  "source_level_gate": {
+    "policy_version": "2026-11-16",
+    "passed": false,
+    "metric": "r2",
+    "value": 0.6365429391109032,
+    "threshold": 0.6,
+    "strict": true,
+    "evidence": "internal held-out scaffolds and reviewed external evidence",
+    "reasons": [
+      "External test 2 (ASAP/Bienta CHEMBL5442686 and CHEMBL5674855): Held-out R2 must be finite and strictly greater than 0.60; R2 is not percent accuracy"
+    ],
+    "external_tests": [
+      {
+        "source": "Wang et al., 10.1002/cem.2718",
+        "dataset_sha256": "1022ee240e2b6d068c25a0a391ea79077e6ae08635f17686b0d36fd3a639538e",
+        "scope": "applicability_domain",
+        "metric": "r2",
+        "value": 0.7231198376813641,
+        "passed": true
+      },
+      {
+        "source": "ASAP/Bienta CHEMBL5442686 and CHEMBL5674855",
+        "dataset_sha256": "1c1507b37e487d8d91a50de0ca43efefe8eaf56902f940737c9ca1bb1ba2a453",
+        "scope": "applicability_domain",
+        "metric": "r2",
+        "value": 0.3437530342518631,
+        "passed": false
+      }
+    ]
+  },
+  "scientific_results_checked_in_registry": true,
+  "refit": false,
+  "attempt_two_validation": {
+    "candidates": {
+      "histogram_direct": {
+        "mae": 0.5823809601760639,
+        "rmse": 0.7464893910124418,
+        "r2": 0.5815229629864003
+      },
+      "svr_direct": {
+        "mae": 0.5536566050203983,
+        "rmse": 0.736051650755621,
+        "r2": 0.5931438040719468
+      },
+      "histogram_residual": {
+        "mae": 0.5872123344451871,
+        "rmse": 0.7631505208908851,
+        "r2": 0.5626342585429349
+      },
+      "svr_residual": {
+        "mae": 0.5862741685768416,
+        "rmse": 0.8114484930041934,
+        "r2": 0.5055228036720567
+      },
+      "kernel_residual": {
+        "mae": 0.5878038323728068,
+        "rmse": 0.7644293092686677,
+        "r2": 0.5611672692366265
+      },
+      "average_residual_histogram_and_svr": {
+        "mae": 0.5624623423543796,
+        "rmse": 0.7479259213468998,
+        "r2": 0.5799107943717815
+      },
+      "average_residual_histogram_and_kernel": {
+        "mae": 0.5644340214340471,
+        "rmse": 0.7317055626189984,
+        "r2": 0.5979342628219684
+      }
+    },
+    "baseline_train_mean": {
+      "mae": 0.9240599226566406,
+      "rmse": 1.1539536990415136,
+      "r2": -2.577454525365397e-06
+    },
+    "eligible": [],
+    "development_scaffolds_seen": 1674,
+    "old_and_external_test_evaluations": 0
+  }
+}

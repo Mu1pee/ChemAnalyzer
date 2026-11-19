@@ -2,6 +2,8 @@
 
 [Model audit for the 3.2.18 release](MODEL_DOMAIN_AUDIT_3.2.18.md) reports the share of the original holdouts covered by the production applicability rules and the performance on that share. It also records the PAMPA external-source review and the separate LogD research trial.
 
+[The independent evaluation format](EXTERNAL_MODEL_EVALUATION.md) records the 3.2.19 Research Lab import contract and the dissimilar performance of a single locked LogD artifact across independent cohorts.
+
 The requested goal is quality above 60% for every predictive system. A feature
 catalog is not evidence of an implemented or trained model. This release does
 not claim that all catalog entries meet that goal.

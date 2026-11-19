@@ -1,8 +1,10 @@
 """Versioned admission criteria; a probability is never a quality metric."""
 import math
+import re
 
 POLICY_VERSION = "2026-11-16"
 MIN_BALANCED_ACCURACY = 0.60
+SHA256 = re.compile(r"[0-9a-f]{64}")
 
 
 def finite(value):
@@ -82,3 +84,58 @@ def held_out_quality(kind, evaluation):
     return dict(policy_version=POLICY_VERSION, passed=not reasons, metric=metric,
                 value=scores.get(metric) if finite(scores.get(metric)) else None, threshold=0.60, strict=True,
                 evidence="internal held-out scaffolds; no external validation", reasons=reasons)
+
+
+def registry_quality(kind, evaluation, external_evaluations, *, artifact_sha256, training_dataset_sha256):
+    """Evaluate all curator-admitted independent tests of the same fitted artifact."""
+    result = held_out_quality(kind, evaluation)
+    if not isinstance(external_evaluations, list):
+        result["reasons"].append("Reviewed external evaluations must be an array")
+        result["passed"] = False
+        return result
+    if not external_evaluations:
+        return result
+    if not isinstance(training_dataset_sha256, str) or not SHA256.fullmatch(training_dataset_sha256):
+        result["reasons"].append("Reviewed external evaluations require a development dataset SHA-256")
+        result["passed"] = False
+        return result
+
+    seen = set()
+    external = []
+    for index, record in enumerate(external_evaluations, 1):
+        if not isinstance(record, dict):
+            result["reasons"].append(f"External test {index}: invalid evidence object")
+            continue
+        source = record.get("source")
+        dataset = record.get("dataset_sha256")
+        protocol = record.get("protocol")
+        if (not isinstance(source, str) or not 3 <= len(source.strip()) <= 200
+                or not isinstance(protocol, str) or not 10 <= len(protocol.strip()) <= 2000
+                or not isinstance(dataset, str) or not SHA256.fullmatch(dataset)):
+            result["reasons"].append(f"External test {index}: source, comparison protocol and dataset SHA-256 are required")
+            continue
+        source = source.strip()
+        if dataset == training_dataset_sha256:
+            result["reasons"].append(f"External test {index}: dataset SHA-256 matches the development dataset")
+            continue
+        if dataset in seen:
+            result["reasons"].append(f"External test {index}: duplicate dataset SHA-256")
+            continue
+        seen.add(dataset)
+        if (not isinstance(artifact_sha256, str) or not SHA256.fullmatch(artifact_sha256)
+                or artifact_sha256 != record.get("artifact_sha256")):
+            result["reasons"].append(f"External test {index}: evidence must identify the evaluated model artifact")
+            continue
+        if (record.get("independent_of_development") is not True
+                or record.get("scope") not in ("whole_cohort", "applicability_domain")):
+            result["reasons"].append(f"External test {index}: independent development separation and evaluation scope are required")
+            continue
+        quality = held_out_quality(kind, record.get("evaluation"))
+        external.append(dict(source=source, dataset_sha256=dataset, scope=record["scope"],
+                             metric=quality["metric"], value=quality["value"], passed=quality["passed"]))
+        result["reasons"].extend(f"External test {index} ({source}): {reason}" for reason in quality["reasons"])
+
+    result["external_tests"] = external
+    result["evidence"] = "internal held-out scaffolds and reviewed external evidence"
+    result["passed"] = not result["reasons"]
+    return result

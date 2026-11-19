@@ -1,10 +1,12 @@
 import json
 import logging
+from threading import Lock
+from typing import Literal
 from uuid import uuid4
 
 import joblib
-from pydantic import BaseModel, Field
-from app.model_quality import held_out_quality
+from pydantic import BaseModel, ConfigDict, Field, FiniteFloat
+from app.model_quality import held_out_quality, registry_quality
 
 from .applicability_domain import assess
 from .molecular_features import molecule, vector
@@ -14,6 +16,7 @@ from .security import checksum, read_json, safe_child, utcnow, write_json
 logger = logging.getLogger(__name__)
 TASK_FIELDS = ("endpoint", "context", "kind", "domain", "units")
 PREDICTABLE_STATES = ("experimental", "validated", "approved")
+_metadata_lock = Lock()
 
 
 def task_matches(meta, expected):
@@ -43,6 +46,33 @@ class Review(BaseModel):
 
 class Approval(Review):
     confirm_activation: bool = False
+
+
+class ExternalSupport(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    molecules: int = Field(ge=20)
+    scaffolds: int = Field(ge=3)
+    negative: int | None = Field(default=None, ge=10)
+    positive: int | None = Field(default=None, ge=10)
+
+
+class ExternalResult(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    test: dict[str, FiniteFloat] = Field(min_length=1, max_length=16)
+    baseline_test: dict[str, FiniteFloat] = Field(min_length=1, max_length=16)
+    support: dict[Literal["test"], ExternalSupport] = Field(min_length=1, max_length=1)
+    test_used_for_selection: Literal[False]
+
+
+class ExternalEvaluation(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True, str_strip_whitespace=True)
+    source: str = Field(min_length=3, max_length=200)
+    protocol: str = Field(min_length=10, max_length=2000)
+    dataset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    independent_of_development: Literal[True]
+    scope: Literal["whole_cohort", "applicability_domain"]
+    evaluation: ExternalResult
 
 
 class Registry:
@@ -92,7 +122,10 @@ class Registry:
         # Python's JSON reader accepts non-standard NaN/Infinity. Such records
         # cannot be served as JSON and must never disable the whole registry.
         json.dumps(meta, allow_nan=False)
-        meta["quality"] = held_out_quality(meta["task"]["kind"], meta.get("evaluation"))
+        meta["quality"] = registry_quality(
+            meta["task"]["kind"], meta.get("evaluation"), meta.get("external_evaluations", []),
+            artifact_sha256=meta.get("artifact_sha256"), training_dataset_sha256=meta.get("dataset_sha256"),
+        )
         meta["quality"]["reasons"] += root_metadata_reasons(meta)
         meta["quality"]["passed"] = not meta["quality"]["reasons"]
         return meta
@@ -115,36 +148,75 @@ class Registry:
         # Only agent-generated local artifacts; arbitrary uploaded pickle is never accepted.
         return joblib.load(path)
 
+    def record_external_evaluation(self, identifier, report: ExternalEvaluation):
+        with _metadata_lock:
+            meta = self.verify_artifact(identifier)
+            if report.artifact_sha256 != meta["artifact_sha256"] or report.dataset_sha256 == meta.get("dataset_sha256"):
+                raise ValueError("External evidence must identify this model and a different dataset")
+            packet = report.model_dump(exclude_none=True)
+            result = packet["evaluation"]
+            test, baseline = result["test"], result["baseline_test"]
+            support = result["support"]["test"]
+            if support["scaffolds"] > support["molecules"]:
+                raise ValueError("External scaffold count must not exceed the compound count")
+            if meta["task"]["kind"] == "classification":
+                if (any(key not in test or not 0 <= test[key] <= 1
+                        for key in ("balanced_accuracy", "roc_auc", "pr_auc"))
+                        or not 0 <= baseline.get("pr_auc", -1) <= 1
+                        or support.get("negative", 0) + support.get("positive", 0) != support["molecules"]
+                        or not all(key in support for key in ("negative", "positive"))):
+                    raise ValueError("External classification requires valid class counts, BA, ROC-AUC and both PR-AUC scores")
+                result["beats_baseline"] = test["pr_auc"] > baseline["pr_auc"]
+            else:
+                if "r2" not in test or test["r2"] > 1 or min(test.get("mae", -1), baseline.get("mae", -1)) < 0:
+                    raise ValueError("External regression requires R2 and both nonnegative MAE scores")
+                result["beats_baseline"] = test["mae"] < baseline["mae"]
+            existing = meta.setdefault("external_evaluations", [])
+            if not isinstance(existing, list) or any(not isinstance(row, dict) for row in existing):
+                raise ValueError("Existing external evidence is invalid")
+            current = next((row for row in existing if row.get("dataset_sha256") == report.dataset_sha256), None)
+            if current is not None:
+                if current != packet:
+                    raise ValueError("A different evaluation for this dataset is already recorded")
+                return meta
+            existing.append(packet)
+            meta.pop("quality")
+            write_json(safe_child(self.root, identifier) / "metadata.json", meta)
+            return self.metadata(identifier)
+
     def review(self, identifier, review: Review):
-        meta = self.metadata(identifier)
-        if meta["status"] != "experimental":
-            raise ValueError("Only experimental models can be reviewed")
-        self.require_quality(meta)
-        self.load(identifier)
-        meta.update(status="validated", review=dict(review.model_dump(), at=utcnow()))
-        write_json(safe_child(self.root, identifier) / "metadata.json", meta)
-        return meta
+        with _metadata_lock:
+            meta = self.metadata(identifier)
+            if meta["status"] != "experimental":
+                raise ValueError("Only experimental models can be reviewed")
+            self.require_quality(meta)
+            self.load(identifier)
+            meta.update(status="validated", review=dict(review.model_dump(), at=utcnow()))
+            write_json(safe_child(self.root, identifier) / "metadata.json", meta)
+            return meta
 
     def approve(self, identifier, approval: Approval):
         if not approval.confirm_activation:
             raise ValueError("Explicit activation confirmation is required")
-        meta = self.metadata(identifier)
-        if meta["status"] != "validated":
-            raise ValueError("Documented review required before approval")
-        self.require_quality(meta)
-        self.load(identifier)
-        meta.update(status="approved", approval=dict(approval.model_dump(), at=utcnow()))
-        write_json(safe_child(self.root, identifier) / "metadata.json", meta)
-        # Separate endpoint-specific pointer; never modifies legacy QSAR manifests.
-        write_json(self.active_path(meta["task"]["endpoint"], meta["task"]["context"]), dict(model_id=identifier))
-        return meta
+        with _metadata_lock:
+            meta = self.metadata(identifier)
+            if meta["status"] != "validated":
+                raise ValueError("Documented review required before approval")
+            self.require_quality(meta)
+            self.load(identifier)
+            meta.update(status="approved", approval=dict(approval.model_dump(), at=utcnow()))
+            write_json(safe_child(self.root, identifier) / "metadata.json", meta)
+            # Separate endpoint-specific pointer; never modifies legacy QSAR manifests.
+            write_json(self.active_path(meta["task"]["endpoint"], meta["task"]["context"]), dict(model_id=identifier))
+            return meta
 
     def predict(self, identifier, smiles):
-        meta = self.metadata(identifier)
-        self.require_quality(meta)
-        bundle = self.load(identifier)
-        if meta["status"] == "archived":
-            raise ValueError("Archived model cannot be used for prediction")
+        with _metadata_lock:
+            meta = self.metadata(identifier)
+            self.require_quality(meta)
+            if meta["status"] == "archived":
+                raise ValueError("Archived model cannot be used for prediction")
+            bundle = self.load(identifier)
         x = vector(molecule(smiles))
         applicability = assess(bundle["domain"], x)
         in_domain = applicability["in_domain"]
@@ -157,10 +229,11 @@ class Registry:
         return result
 
     def archive(self, identifier):
-        meta = self.metadata(identifier)
-        meta.update(status="archived", archived_at=utcnow())
-        write_json(safe_child(self.root, identifier) / "metadata.json", meta)
-        return meta
+        with _metadata_lock:
+            meta = self.metadata(identifier)
+            meta.update(status="archived", archived_at=utcnow())
+            write_json(safe_child(self.root, identifier) / "metadata.json", meta)
+            return meta
 
     def predict_active(self, endpoint, context, smiles):
         path = self.active_path(endpoint, context)
