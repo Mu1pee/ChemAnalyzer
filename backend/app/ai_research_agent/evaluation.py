@@ -32,6 +32,13 @@ def scaffold_split(y, groups, seed):
     return train, valid, test
 
 
+def partition_support(y, groups, kind):
+    support = dict(molecules=len(y), scaffolds=len(np.unique(groups)))
+    if kind == "classification":
+        support.update(negative=int((y == 0).sum()), positive=int((y == 1).sum()))
+    return support
+
+
 def metrics(model, X, y, kind):
     pred = model.predict(X)
     if kind == "regression":

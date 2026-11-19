@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 
-from app.model_quality import classification_reasons, held_out_quality, registry_quality
+from app.model_quality import classification_reasons, held_out_quality, registry_quality, research_quality
 from app.ai_research_agent.evaluation import scaffold_split
 from app.ai_research_agent.model_registry import Registry, Review, Approval, ExternalEvaluation
 from app.ai_research_agent.security import write_json
@@ -95,6 +95,24 @@ def test_regression_r2_is_separate_from_accuracy_and_needs_scaffold_support():
     report["support"]["test"]["scaffolds"] = 5
     report["test"]["r2"] = .60
     assert not held_out_quality("regression", report)["passed"]
+
+
+@pytest.mark.parametrize("scope, passed, reason", [
+    ({"molecules": 20, "scaffolds": 3}, True, None),
+    ({"molecules": 20, "scaffolds": 2}, False, "3 distinct scaffold groups"),
+    ({"molecules": 41, "scaffolds": 3}, False, "subset"),
+])
+def test_covered_regression_support_is_checked_separately(scope, passed, reason):
+    report = dict(test=dict(r2=.729, mae=1.2), baseline_test=dict(mae=2),
+                  test_used_for_selection=False, beats_baseline=True,
+                  support=dict(test=dict(molecules=40, scaffolds=4)))
+    assert research_quality("regression", report)["applicability_domain"]["status"] == "not_recorded"
+    report["applicability_domain_test"] = report | dict(test=dict(r2=.762, mae=1), support=dict(test=scope))
+    result = research_quality("regression", report)
+    assert result["value"] == .729 and result["applicability_domain"]["value"] == .762
+    assert result["passed"] is passed
+    if reason:
+        assert any(item.startswith("Applicability domain:") and reason in item for item in result["reasons"])
 
 
 def external(source, dataset, **fields):

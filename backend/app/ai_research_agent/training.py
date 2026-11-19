@@ -7,8 +7,9 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from threadpoolctl import threadpool_limits
 
-from .evaluation import metrics, scaffold_split
-from app.model_quality import held_out_quality, classification_reasons
+from .applicability_domain import fit_domain, membership_mask
+from .evaluation import metrics, scaffold_split, partition_support
+from app.model_quality import research_quality, classification_reasons
 from .root_protocol import require_root_protocol
 
 
@@ -66,18 +67,33 @@ def train(X, y, groups, task, checkpoint=lambda stage: None):
         baseline.fit(X[tr], y[tr])
         test_metrics = metrics(model, X[te], y[te], task.kind)
         baseline_metrics = metrics(baseline, X[te], y[te], task.kind)
+        checkpoint("evaluating:applicability_domain")
+        served = te[membership_mask(fit_domain(X[tr]), X[te])]
+        domain_test = evaluate_covered_test(model, baseline, X, y, groups, served, task.kind)
     better = (test_metrics[selection] < baseline_metrics[selection] if task.kind == "regression"
               else test_metrics[selection] > baseline_metrics[selection])
     report = dict(candidates=results, selected=results[winner]["algorithm"], test=test_metrics,
                   baseline_test=baseline_metrics, beats_baseline=bool(better),
+                  applicability_domain_test=domain_test,
                   split={"train": tr.tolist(), "validation": va.tolist(), "test": te.tolist()},
                   split_method="scaffold groups; acyclic molecules share one group; train-only 3-fold CV",
                   scientific_status="experimental; no external validation", test_used_for_selection=False)
-    report["support"] = {}
-    for name, indices in (("train", tr), ("validation", va), ("test", te)):
-        support = dict(molecules=len(indices), scaffolds=len(np.unique(groups[indices])))
-        if task.kind == "classification":
-            support.update(negative=int((y[indices] == 0).sum()), positive=int((y[indices] == 1).sum()))
-        report["support"][name] = support
-    report["quality"] = held_out_quality(task.kind, report)
+    report["support"] = {name: partition_support(y[indices], groups[indices], task.kind)
+                         for name, indices in (("train", tr), ("validation", va), ("test", te))}
+    report["quality"] = research_quality(task.kind, report)
     return model, X[tr], report
+
+
+def evaluate_covered_test(model, baseline, X, y, groups, indices, kind):
+    labels = y[indices]
+    report = dict(support={"test": partition_support(labels, groups[indices], kind)},
+                  test_used_for_selection=False, test={}, baseline_test={}, beats_baseline=False)
+    if len(np.unique(labels)) < 2:
+        return report
+    report["test"] = metrics(model, X[indices], labels, kind)
+    report["baseline_test"] = metrics(baseline, X[indices], labels, kind)
+    if kind == "regression":
+        report["beats_baseline"] = report["test"]["mae"] < report["baseline_test"]["mae"]
+    else:
+        report["beats_baseline"] = report["test"]["pr_auc"] > report["baseline_test"]["pr_auc"]
+    return report

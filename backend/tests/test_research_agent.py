@@ -14,7 +14,7 @@ from app.ai_research_agent.data_discovery import discover, fetch_freesolv
 from app.ai_research_agent.evaluation import scaffold_split
 from app.ai_research_agent.molecular_features import prepare, vector, molecule
 from app.ai_research_agent.training import train
-from app.ai_research_agent.applicability_domain import fit_domain, assess
+from app.ai_research_agent.applicability_domain import fit_domain, assess, membership_mask
 from app.ai_research_agent.model_registry import Registry, Approval, Review
 from app.ai_research_agent.orchestrator import ResearchAgent
 from app.ai_research_agent.security import safe_child, write_json
@@ -120,6 +120,7 @@ def trained_fixture():
     # Numerical synthetic features test the trainer, not any chemical endpoint.
     rng = np.random.default_rng(8)
     X = rng.integers(0, 2, (120, 1030)).astype(np.float32)
+    X[:, :512] = 1  # Shared synthetic fingerprint bits keep the holdout in scope.
     y = X[:, -1] * 5 + rng.normal(0, .01, 120)
     task = TaskConfig(**FREESOLV_TASK)
     model, train_X, report = train(X, y, np.repeat(np.arange(30), 4), task)
@@ -132,6 +133,24 @@ def test_training_selection_and_holdout(trained_fixture):
     assert report["beats_baseline"]
     assert report["test_used_for_selection"] is False
     assert set(report["test"]) == {"mae", "rmse", "r2"}
+    covered = report["applicability_domain_test"]
+    assert covered["support"]["test"] == report["support"]["test"]
+    assert covered["test"] == report["test"]
+    assert covered["baseline_test"] == report["baseline_test"]
+
+
+def test_domain_membership_uses_the_prediction_boundary():
+    training = np.zeros((2, 1030))
+    training[1, :20] = 1
+    domain = fit_domain(training)
+    incoming = np.zeros((4, 1030))
+    incoming[0, :7] = 1
+    incoming[1, :6] = 1
+    incoming[2, :20] = 1
+    incoming[2, -1] = 1
+    expected = [assess(domain, row)["in_domain"] for row in incoming]
+    assert expected == [True, False, False, False]
+    assert membership_mask(domain, incoming).tolist() == expected
 
 
 def test_registry_integrity_and_explicit_approval(tmp_path, trained_fixture):

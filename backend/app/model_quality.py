@@ -36,6 +36,12 @@ def classification_reasons(metrics, min_auc=0.70, min_mcc=None):
     return reasons
 
 
+def test_counts(evaluation):
+    support = evaluation.get("support") if isinstance(evaluation, dict) else None
+    support = support.get("test") if isinstance(support, dict) else None
+    return support if isinstance(support, dict) else {}
+
+
 def held_out_quality(kind, evaluation):
     """Recomputed at review, activation and inference, including legacy artifacts."""
     evaluation = evaluation if isinstance(evaluation, dict) else {}
@@ -43,9 +49,7 @@ def held_out_quality(kind, evaluation):
     scores = scores if isinstance(scores, dict) else {}
     baseline = evaluation.get("baseline_test")
     baseline = baseline if isinstance(baseline, dict) else {}
-    support = evaluation.get("support")
-    support = support.get("test") if isinstance(support, dict) else None
-    support = support if isinstance(support, dict) else {}
+    support = test_counts(evaluation)
     reasons = []
     if evaluation.get("test_used_for_selection") is not False:
         reasons.append("A test set excluded from model selection must be documented")
@@ -86,9 +90,36 @@ def held_out_quality(kind, evaluation):
                 evidence="internal held-out scaffolds; no external validation", reasons=reasons)
 
 
+def research_quality(kind, evaluation):
+    """Check the full test and the exact subset on which the Lab serves values."""
+    result = held_out_quality(kind, evaluation)
+    if not isinstance(evaluation, dict) or "applicability_domain_test" not in evaluation:
+        result["applicability_domain"] = {"status": "not_recorded"}
+        return result
+
+    covered = evaluation["applicability_domain_test"]
+    domain = held_out_quality(kind, covered)
+    accepted, whole = test_counts(covered), test_counts(evaluation)
+    fields = ("molecules", "scaffolds")
+    if kind == "classification":
+        fields += ("negative", "positive")
+    if not all(valid_count(accepted.get(key)) and valid_count(whole.get(key))
+               and accepted[key] <= whole[key] for key in fields):
+        domain["reasons"].append("Domain test counts must describe a subset of the held-out test")
+
+    result["applicability_domain"] = dict(
+        status="failed" if domain["reasons"] else "passed",
+        metric=domain["metric"], value=domain["value"],
+        molecules=accepted.get("molecules"), scaffolds=accepted.get("scaffolds"),
+        total_molecules=whole.get("molecules"))
+    result["reasons"].extend("Applicability domain: " + reason for reason in domain["reasons"])
+    result["passed"] = not result["reasons"]
+    return result
+
+
 def registry_quality(kind, evaluation, external_evaluations, *, artifact_sha256, training_dataset_sha256):
     """Evaluate all curator-admitted independent tests of the same fitted artifact."""
-    result = held_out_quality(kind, evaluation)
+    result = research_quality(kind, evaluation)
     if not isinstance(external_evaluations, list):
         result["reasons"].append("Reviewed external evaluations must be an array")
         result["passed"] = False

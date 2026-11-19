@@ -181,11 +181,21 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
       <label>SMILES для исследовательского прогноза <input value={smiles} onChange={e => setSmiles(e.target.value)} /></label>
       {models.map(m => <article key={m.id}>
         <strong>{m.task.name}</strong> · {m.status} · {m.evaluation.selected} · {m.id.slice(0, 8)}
-        <p>Test: {JSON.stringify(m.evaluation.test)} · Baseline: {JSON.stringify(m.evaluation.baseline_test)}</p>
+        <p>Весь отложенный тест · {JSON.stringify(m.evaluation.test)} · Базовый результат {JSON.stringify(m.evaluation.baseline_test)}</p>
         <p>{m.quality?.passed ? "Порог качества пройден" : "Порог качества не пройден"}
           {" · "}{m.quality?.metric}: {m.quality?.value ?? "нет оценки"}
           {m.quality?.metric === "r2" ? " · R² не является процентом точности" : " · Требуется сбалансированная точность > 60%"}
         </p>
+        {m.quality?.applicability_domain && (
+          m.quality.applicability_domain.status === "not_recorded"
+            ? <p>Отдельная оценка в области применимости отсутствует.</p>
+            : <p>
+              В области применимости · {m.quality.applicability_domain.molecules ?? "—"} из {m.quality.applicability_domain.total_molecules ?? "—"} молекул
+              {" · "}Групп каркасов {m.quality.applicability_domain.scaffolds ?? "—"}
+              {" · "}{m.quality.applicability_domain.metric === "r2" ? "R²" : "BA"} {m.quality.applicability_domain.value ?? "—"}
+              {" · "}{m.quality.applicability_domain.status === "passed" ? "Порог пройден" : "Порог не пройден"}
+            </p>
+        )}
         {m.quality?.reasons?.length > 0 && <p>{m.quality.reasons.join("; ")}</p>}
         {m.quality?.external_tests?.length > 0 && <ul>{m.quality.external_tests.map((report: Json) => <li key={report.dataset_sha256}>
           {report.source} · {report.scope === "applicability_domain" ? "В области применимости" : "Вся выборка"} · {report.metric === "r2" ? "R²" : "BA"} {report.value ?? "—"} · {report.passed ? "Порог пройден" : "Порог не пройден"}
