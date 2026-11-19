@@ -1,7 +1,9 @@
 """Admission for retrospectively held-out human IC50 QSAR models."""
 import numpy as np
-from app.model_quality import classification_reasons, finite, held_out_quality, valid_count
+from app.model_quality import classification_reasons, finite, research_quality, valid_count
+from app.served_holdouts import reviewed_evaluation
 from app.chemistry.qsar_assay_context import evidence_reasons
+from app.chemistry.qsar_core import DOMAIN_EDGE
 
 FEATURE_CONFIG = dict(morgan_bits=2048, morgan_radius=2, chirality=False,
                       standardization="single fragment; uncharge; canonical isomeric SMILES",
@@ -47,10 +49,15 @@ def describe_model(model, train_groups=None):
 
 def admission(meta):
     meta = meta if isinstance(meta, dict) else {}
-    evaluation = meta.get("evaluation")
-    result = held_out_quality("classification", evaluation)
+    evaluation = reviewed_evaluation(meta, "qsar", serving_threshold=DOMAIN_EDGE)
+    result = research_quality("classification", evaluation)
     scores = meta.get("metrics")
     result["reasons"] += classification_reasons(scores, min_auc=.75, min_mcc=.25)
+    if isinstance(evaluation, dict) and isinstance(covered := evaluation.get("applicability_domain_test"), dict):
+        reasons = classification_reasons(covered.get("test"), min_auc=.75, min_mcc=.25)
+        if reasons:
+            result["applicability_domain"]["status"] = "failed"
+            result["reasons"].extend("Applicability domain: " + reason for reason in reasons)
     provenance = meta.get("provenance")
     provenance = provenance if isinstance(provenance, dict) else {}
     if (meta.get("schema_version") != 3 or meta.get("feature_config") != FEATURE_CONFIG

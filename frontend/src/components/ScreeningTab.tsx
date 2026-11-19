@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchScreening } from "../api/chemistry";
 import type { AsyncState, ScreeningResponse } from "../types/molecule";
 import ScoreBar from "./ScoreBar";
+import ApplicabilityTestSummary from "./ApplicabilityTestSummary";
 
 export default function ScreeningTab({ smiles, endpointKey }: { smiles: string; endpointKey?: "hlm" | "solubility" }) {
   const [state, setState] = useState<AsyncState<ScreeningResponse>>({ data: null, loading: true, error: "" });
@@ -35,8 +36,9 @@ export default function ScreeningTab({ smiles, endpointKey }: { smiles: string; 
         <div className="activity-support">{p.key === "hlm" ? "Некалиброванная оценка стабильности T½ > 30 минут" : p.key === "solubility" ? "Некалиброванная оценка низкой растворимости ≤10 мкг/мл" : "Некалиброванная оценка положительного исхода этого теста"}</div>
       </>}
       {p.model_id && <>
-        <div className="activity-support">Сбалансированная точность теста: {(100 * p.metrics.balanced_accuracy).toFixed(2)}%
+        <div className="activity-support">Весь отложенный тест · BA {(100 * p.metrics.balanced_accuracy).toFixed(2)}%
           {" · ROC-AUC: "}{p.metrics.roc_auc.toFixed(3)}{" · PR-AUC: "}{p.metrics.pr_auc.toFixed(3)}</div>
+        <ApplicabilityTestSummary test={p.applicability_test} />
         <div className="activity-support">Чувствительность: {(100 * p.metrics.recall).toFixed(1)}%
           {" · Точность положительных прогнозов: "}{(100 * p.metrics.precision).toFixed(1)}%</div>
         <div className="activity-support">Обучение: {p.n_train} · Отложенный тест: {p.n_test}

@@ -45,6 +45,7 @@ def predict_cyp(smiles):
                                     status="ready" if domain["in_domain"] else "out_of_domain",
                                     model_id=meta["id"], model_status=meta["status"], probability=result["probability"],
                                     max_similarity=domain["max_similarity"], metrics=meta["evaluation"]["test"],
+                                    applicability_test=meta["quality"].get("applicability_domain"),
                                     n_train=meta["evaluation"]["support"]["train"]["molecules"],
                                     n_test=meta["evaluation"]["support"]["test"]["molecules"],
                                     trained_at=meta.get("trained_at"),

@@ -64,6 +64,7 @@ def predict_screening(smiles):
                               model_id=meta["id"], model_status=meta["status"],
                               probability=result["probability"] if domain["in_domain"] else None,
                               max_similarity=domain["max_similarity"], metrics=meta["evaluation"]["test"],
+                              applicability_test=meta["quality"].get("applicability_domain"),
                               n_train=support["train"]["molecules"], n_test=support["test"]["molecules"],
                               test_positive=support["test"]["positive"], test_negative=support["test"]["negative"],
                               trained_at=meta.get("trained_at"), message=None if domain["in_domain"] else "Структура вне области применимости этой модели.")

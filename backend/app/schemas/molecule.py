@@ -126,6 +126,15 @@ class Druglikeness(BaseModel):
     disclaimer: str
 
 
+class ApplicabilityTest(BaseModel):
+    status: str
+    metric: str | None = None
+    value: float | None = None
+    molecules: int | None = None
+    scaffolds: int | None = None
+    total_molecules: int | None = None
+
+
 class QsarPrediction(BaseModel):
     model_id: str | None = None
     model_version: str | None = None
@@ -136,6 +145,7 @@ class QsarPrediction(BaseModel):
     domain: str
     max_similarity: float
     metrics: dict[str, float]
+    applicability_test: ApplicabilityTest | None = None
     validation_method: str
     n_train: int
     n_test: int
@@ -387,6 +397,7 @@ class CypPrediction(BaseModel):
     probability: float | None = None
     max_similarity: float | None = None
     metrics: dict[str, float] = Field(default_factory=dict)
+    applicability_test: ApplicabilityTest | None = None
     n_train: int = 0
     n_test: int = 0
     trained_at: str | None = None
@@ -409,6 +420,7 @@ class ScreeningPrediction(BaseModel):
     probability: float | None = None
     max_similarity: float | None = None
     metrics: dict[str, float] = Field(default_factory=dict)
+    applicability_test: ApplicabilityTest | None = None
     n_train: int = 0
     n_test: int = 0
     test_positive: int = 0

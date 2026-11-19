@@ -11,6 +11,7 @@ from pathlib import Path
 import ssl
 
 datas, binaries, hiddenimports = [], [], []
+datas.append(("app/served_holdouts.json", "app"))
 
 # This Python distribution augments SSLContext with a public CA rejection list.
 # Frozen ssl.__file__ lives in _internal; preserve its adjacent runtime resource.

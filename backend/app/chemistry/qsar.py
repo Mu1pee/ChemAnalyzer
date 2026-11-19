@@ -76,7 +76,8 @@ def _load_models():
                     continue
                 bundle = joblib.load(path)
                 meta = bundle["meta"]
-                check = admission(meta)
+                # The checksum covers the serialized bundle and lives in the manifest.
+                check = admission(dict(meta, artifact_sha256=expected_hash))
                 if not check["passed"]:
                     rejected.append(dict(target_id=meta.get("target_id"), evidence="incompatible_bundle", reasons=check["reasons"]))
                     continue
@@ -163,6 +164,7 @@ def predict_qsar(smiles: str) -> dict:
                 "domain": core.domain_label(similarity),
                 "max_similarity": round(similarity, 3),
                 "metrics": meta["metrics"],
+                "applicability_test": bundle.get("quality", {}).get("applicability_domain"),
                 "validation_method": "Ретроспективный отложенный тест по каркасам; модель не переобучалась после проверки; внешней валидации нет",
                 "n_train": meta["n_train"],
                 "n_test": meta["n_test"],

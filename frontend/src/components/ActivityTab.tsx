@@ -1,5 +1,6 @@
 import type { ActivityResponse, AsyncState } from "../types/molecule";
 import ScoreBar from "./ScoreBar";
+import ApplicabilityTestSummary from "./ApplicabilityTestSummary";
 
 interface Props {
   state: AsyncState<ActivityResponse>;
@@ -67,9 +68,10 @@ export default function ActivityTab({ state, onTrainQsar }: Props) {
                   {" "}{p.n_test} (активных {p.test_positive}, неактивных {p.test_negative})
                 </div>
                 <div className="activity-support">
-                  Тест по каркасам: BA {(p.metrics.balanced_accuracy * 100).toFixed(1)}% ·
+                  Весь отложенный тест по каркасам · BA {(p.metrics.balanced_accuracy * 100).toFixed(1)}% ·
                   ROC-AUC {p.metrics.roc_auc.toFixed(2)} · PR-AUC {p.metrics.pr_auc.toFixed(2)}
                 </div>
+                <ApplicabilityTestSummary test={p.applicability_test} />
                 <div className="activity-support">{p.validation_method}</div>
                 {p.model_version && (
                   <div className="activity-support">

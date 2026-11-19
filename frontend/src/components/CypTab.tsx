@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchCyp } from "../api/chemistry";
 import type { AsyncState, CypResponse } from "../types/molecule";
 import ScoreBar from "./ScoreBar";
+import ApplicabilityTestSummary from "./ApplicabilityTestSummary";
 
 export default function CypTab({ smiles }: { smiles: string }) {
   const [state, setState] = useState<AsyncState<CypResponse>>({ data: null, loading: true, error: "" });
@@ -25,8 +26,9 @@ export default function CypTab({ smiles }: { smiles: string }) {
         <span className="activity-score">{(100 * p.probability).toFixed(1)}%</span></div>}
       {p.probability !== null && <div className="activity-support">Оценка вероятности ингибирования по разметке TDC/Veith</div>}
       {p.model_id && <>
-        <div className="activity-support">Сбалансированная точность теста: {(100 * p.metrics.balanced_accuracy).toFixed(2)}%
+        <div className="activity-support">Весь отложенный тест · BA {(100 * p.metrics.balanced_accuracy).toFixed(2)}%
           {" · ROC-AUC: "}{p.metrics.roc_auc.toFixed(3)}{" · PR-AUC: "}{p.metrics.pr_auc.toFixed(3)}</div>
+        <ApplicabilityTestSummary test={p.applicability_test} />
         <div className="activity-support">Обучение: {p.n_train} молекул · Отложенный тест: {p.n_test}
           {" · Сходство: "}{p.max_similarity?.toFixed(2)}{" · "}{p.model_status === "approved" ? "Утверждена в реестре" : "Экспериментальная модель"}</div>
         <div className="activity-support">Чувствительность к ингибиторам: {(100 * p.metrics.recall).toFixed(1)}%

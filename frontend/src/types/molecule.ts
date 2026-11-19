@@ -205,6 +205,15 @@ export interface CapabilitiesResponse {
   checked_at: string;
 }
 
+export interface ApplicabilityTest {
+  status: "not_recorded" | "passed" | "failed";
+  metric?: "balanced_accuracy" | "r2" | null;
+  value?: number | null;
+  molecules?: number | null;
+  scaffolds?: number | null;
+  total_molecules?: number | null;
+}
+
 export interface QsarPrediction {
   model_id: string | null;
   model_version: string | null;
@@ -215,6 +224,7 @@ export interface QsarPrediction {
   domain: string;
   max_similarity: number;
   metrics: Record<string, number>;
+  applicability_test?: ApplicabilityTest | null;
   validation_method: string;
   n_train: number;
   n_test: number;
@@ -406,6 +416,7 @@ export interface CypPrediction {
   probability: number | null;
   max_similarity: number | null;
   metrics: Record<string, number>;
+  applicability_test?: ApplicabilityTest | null;
   n_train: number;
   n_test: number;
   trained_at: string | null;

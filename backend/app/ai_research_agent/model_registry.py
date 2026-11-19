@@ -7,6 +7,7 @@ from uuid import uuid4
 import joblib
 from pydantic import BaseModel, ConfigDict, Field, FiniteFloat
 from app.model_quality import held_out_quality, registry_quality
+from app.served_holdouts import reviewed_evaluation
 
 from .applicability_domain import assess
 from .molecular_features import molecule, vector
@@ -123,7 +124,7 @@ class Registry:
         # cannot be served as JSON and must never disable the whole registry.
         json.dumps(meta, allow_nan=False)
         meta["quality"] = registry_quality(
-            meta["task"]["kind"], meta.get("evaluation"), meta.get("external_evaluations", []),
+            meta["task"]["kind"], reviewed_evaluation(meta, "registry"), meta.get("external_evaluations", []),
             artifact_sha256=meta.get("artifact_sha256"), training_dataset_sha256=meta.get("dataset_sha256"),
         )
         meta["quality"]["reasons"] += root_metadata_reasons(meta)
