@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Ketcher } from "ketcher-core";
-import { Activity, Atom, BookOpen, Database, FlaskConical, History, Layers3, Microscope, Network, ScanLine, ShieldCheck, Sparkles } from "lucide-react";
+import { Activity, ArrowDownToLine, Atom, Beaker, BookOpen, ChevronRight, CircleHelp, Cuboid, Database, FlaskConical, History, Layers3, Menu, Microscope, PanelTop, Play, ScanLine, ShieldCheck, Sparkles, X } from "lucide-react";
 
 import AboutDialog from "./components/AboutDialog";
-import EditorToolbar, { EXAMPLES } from "./components/EditorToolbar";
+import EditorToolbar from "./components/EditorToolbar";
 import KetcherEditor from "./components/KetcherEditor";
 import MenuBar, { type MenuDef } from "./components/MenuBar";
+import { IconLogo } from "./components/Icons";
 import ResultsPanel, { TABS, type Tab } from "./components/ResultsPanel";
 import StatusBar, { type ApiStatus } from "./components/StatusBar";
 import {
@@ -49,7 +50,16 @@ import type {
 
 const FALLBACK_VERSION = __APP_VERSION__;
 const TAB_ICONS = { bioactivity: Layers3, props: Atom, adme: FlaskConical, ident: ScanLine, drug: ShieldCheck,
-  activity: Activity, antidote: Microscope, chembl: Database, cyp: FlaskConical, screening: Microscope, metabolism: FlaskConical, solubility: FlaskConical, "3d": Network, history: History, research: Sparkles, assistant: BookOpen };
+  activity: Activity, antidote: Beaker, chembl: Database, cyp: FlaskConical, screening: Microscope, metabolism: FlaskConical, solubility: Beaker, "3d": Cuboid, history: History, research: Sparkles, assistant: BookOpen };
+const NAV_GROUPS: { label: string; tabs: Tab[] }[] = [
+  { label: "Структура", tabs: ["props", "ident", "3d", "history"] },
+  { label: "Анализ", tabs: ["adme", "drug", "activity", "cyp", "screening", "metabolism", "solubility", "antidote"] },
+  { label: "Данные и исследования", tabs: ["bioactivity", "chembl", "research", "assistant"] }
+];
+const TAB_LABELS = Object.fromEntries(TABS.map(({ id, label }) => [id, label])) as Record<Tab, string>;
+TAB_LABELS["3d"] = "3D-структура";
+TAB_LABELS.history = "История анализов";
+const FULL_WORKSPACES = new Set<Tab>(["bioactivity", "research", "history", "assistant"]);
 
 // Пустой molfile надёжнее, чем setMolecule("").
 const EMPTY_MOLFILE =
@@ -99,7 +109,8 @@ function App() {
   const [activity, setActivity] = useState<AsyncState<ActivityResponse>>(idle);
   const [chembl, setChembl] = useState<AsyncState<ChemblResponse>>(idle);
 
-  const [tab, setTab] = useState<Tab>("bioactivity");
+  const [tab, setTab] = useState<Tab>("props");
+  const [navigationOpen, setNavigationOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>("dark");
   const [apiStatus, setApiStatus] = useState<ApiStatus>("checking");
   const [version, setVersion] = useState(FALLBACK_VERSION);
@@ -113,6 +124,19 @@ function App() {
   const historyLoaded = useRef(false);
   const themeLoaded = useRef(false);
   const importRef = useRef<HTMLInputElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const fullWorkspace = FULL_WORKSPACES.has(tab);
+
+  const openTab = useCallback((section: Tab) => {
+    contentRef.current?.scrollTo({ top: 0, behavior: "instant" });
+    setTab(section);
+    setNavigationOpen(false);
+  }, []);
+
+  function focusImport() {
+    if (fullWorkspace) openTab("props");
+    requestAnimationFrame(() => importRef.current?.focus());
+  }
 
   // ---------------------------------------------------------- служебное
 
@@ -303,6 +327,7 @@ function App() {
 
   const analyzeFromEditor = useCallback(async () => {
     if (!ketcher || working) return;
+    if (fullWorkspace) openTab("props");
     setWorking(true);
     try {
       const smiles = await ketcher.getSmiles();
@@ -323,7 +348,7 @@ function App() {
     }
     // handleAnalyze использует только стабильные setState и refs
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ketcher, working]);
+  }, [ketcher, working, fullWorkspace, openTab]);
 
   // Ctrl+Enter — анализ.
   useEffect(() => {
@@ -366,7 +391,7 @@ function App() {
     if (!ketcher) return;
     if (await importSmiles(item.smiles)) {
       await handleAnalyze(item.smiles);
-      setTab("props");
+      openTab("props");
     }
   }
 
@@ -477,24 +502,23 @@ function App() {
 
   // ---------------------------------------------------------- меню
 
-  const menus: MenuDef[] = useMemo(() => {
-    const hasResult = Boolean(result);
-    const goTab = (t: Tab) => () => setTab(t);
-
-    return [
+  const exportEntries: MenuDef["entries"] = [
+    { type: "item", label: "SMILES (.smi)", onClick: exportSmiles },
+    { type: "item", label: "JSON", onClick: exportJson },
+    { type: "item", label: "CSV", onClick: exportCsv },
+    { type: "item", label: "Изображение SVG", onClick: exportSvg },
+    { type: "item", label: "Изображение PNG", onClick: exportPng },
+    { type: "item", label: "PDF-отчёт", onClick: exportPdf }
+  ];
+  const menus: MenuDef[] = [
       {
-        label: "File",
+        label: "Файл",
         entries: [
           { type: "item", label: "Новая структура", onClick: clearEditor, disabled: !ketcher },
-          { type: "item", label: "Импорт SMILES…", onClick: () => importRef.current?.focus(), disabled: !ketcher },
+          { type: "item", label: "Импорт SMILES…", onClick: focusImport, disabled: !ketcher },
           { type: "separator" },
           { type: "header", label: "Экспорт" },
-          { type: "item", label: "SMILES (.smi)", onClick: exportSmiles, disabled: !hasResult },
-          { type: "item", label: "JSON", onClick: exportJson, disabled: !hasResult },
-          { type: "item", label: "CSV", onClick: exportCsv, disabled: !hasResult },
-          { type: "item", label: "Изображение SVG", onClick: exportSvg, disabled: !hasResult },
-          { type: "item", label: "Изображение PNG", onClick: exportPng, disabled: !hasResult },
-          { type: "item", label: "PDF-отчёт", onClick: exportPdf, disabled: !hasResult },
+          ...exportEntries.map((entry) => ({ ...entry, disabled: !result })),
           ...(isDesktop
             ? ([
                 { type: "separator" },
@@ -504,133 +528,137 @@ function App() {
         ]
       },
       {
-        label: "Edit",
+        label: "Правка",
         entries: [
           { type: "item", label: "Очистить холст", onClick: clearEditor, disabled: !ketcher },
-          { type: "item", label: "Копировать SMILES", onClick: copySmiles, disabled: !hasResult },
+          { type: "item", label: "Копировать SMILES", onClick: copySmiles, disabled: !result },
           { type: "separator" },
+          { type: "item", label: "Анализировать", hint: "Ctrl+Enter", onClick: analyzeFromEditor, disabled: !ketcher || working },
           { type: "header", label: "Отмена / повтор: Ctrl+Z, Ctrl+Y (в редакторе)" }
         ]
       },
       {
-        label: "Structure",
-        entries: [
-          { type: "item", label: "Анализировать", hint: "Ctrl+Enter", onClick: analyzeFromEditor, disabled: !ketcher || working },
-          { type: "separator" },
-          { type: "header", label: "Примеры" },
-          ...EXAMPLES.map((example) => ({
-            type: "item" as const,
-            label: example.name,
-            onClick: () => importSmiles(example.smiles),
-            disabled: !ketcher
-          }))
-        ]
-      },
-      {
-        label: "Analysis",
-        entries: [
-          { type: "item", label: "Каталог биоактивности", onClick: goTab("bioactivity") },
-          { type: "item", label: "Свойства", onClick: goTab("props") },
-          { type: "item", label: "ADME / BOILED-Egg", onClick: goTab("adme") },
-          { type: "item", label: "Идентификация", onClick: goTab("ident") },
-          { type: "item", label: "Drug-likeness", onClick: goTab("drug") },
-          { type: "item", label: "Активность / QSAR", onClick: goTab("activity") },
-          { type: "item", label: "ПК «Антидот-Прогноз»", onClick: goTab("antidote") },
-          { type: "item", label: "ChEMBL", onClick: goTab("chembl") },
-          { type: "item", label: "3D-структура", onClick: goTab("3d") },
-          { type: "item", label: "Ассистент Claude", onClick: goTab("assistant") }
-        ]
-      },
-      {
-        label: "View",
+        label: "Вид",
         entries: [
           { type: "item", label: "Тёмная тема", checked: theme === "dark", onClick: () => setTheme("dark") },
           { type: "item", label: "Светлая тема", checked: theme === "light", onClick: () => setTheme("light") },
           { type: "separator" },
-          { type: "item", label: "История анализов", onClick: goTab("history") }
+          { type: "item", label: "История анализов", onClick: () => openTab("history") }
         ]
       },
       {
-        label: "Settings",
+        label: "Настройки",
         entries: [
-          { type: "item", label: "Тема: тёмная", checked: theme === "dark", onClick: () => setTheme("dark") },
-          { type: "item", label: "Тема: светлая", checked: theme === "light", onClick: () => setTheme("light") },
           ...(isDesktop
             ? ([
-                { type: "separator" },
                 { type: "item", label: "Открыть папку данных (ключ API, модели)", onClick: () => bridge?.openDataFolder() }
               ] as const)
             : []),
-          { type: "separator" },
           { type: "item", label: "Очистить историю", onClick: clearHistory, disabled: history.length === 0 }
         ]
-      },
-      {
-        label: "Help",
-        entries: [
-          { type: "item", label: "О программе", onClick: () => setAboutOpen(true) },
-          { type: "item", label: "Источники данных и ограничения", onClick: () => setAboutOpen(true) }
-        ]
       }
-    ];
-    // Действия зависят от актуальных данных; пересборка дешёвая.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result, ketcher, working, theme, history.length, identification.data, adme.data, activity.data, chembl.data, version]);
+  ];
 
   return (
     <div className="app-shell">
-      <MenuBar menus={menus} />
+      <header className="workbench-header">
+        <div className="workbench-brand">
+          <button type="button" className="shell-icon nav-toggle" aria-controls="workspace-navigation" aria-expanded={navigationOpen}
+            aria-label={navigationOpen ? "Скрыть разделы" : "Показать разделы"} onClick={() => setNavigationOpen(!navigationOpen)}>
+            {navigationOpen ? <X size={19} /> : <Menu size={19} />}
+          </button>
+          <span className="workbench-logo"><IconLogo size={23} /></span>
+          <strong>ChemAnalyzer</strong>
+          <span className="workbench-version">{version}</span>
+        </div>
+        <MenuBar menus={menus} />
+        <button type="button" className="shell-icon workbench-help" aria-label="Справка о программе"
+          title="Справка о программе" onClick={() => setAboutOpen(true)}><CircleHelp size={18} /></button>
+      </header>
 
-      <main className={`desk${tab === "bioactivity" || tab === "research" ? " desk-catalog" : ""}`}>
-        <nav className="workspace-sidebar" aria-label="Разделы анализа">
-          <div className="workspace-brand">ChemAnalyzer <small>{version}</small></div>
-          {TABS.map((item) => {
-            const TabIcon = TAB_ICONS[item.id];
-            return (
-            <button key={item.id} type="button" aria-current={tab === item.id ? "page" : undefined}
-              className={tab === item.id ? "selected" : ""} onClick={() => setTab(item.id)}>
-              <TabIcon size={16} /><span>{item.label}</span>
-            </button>
-          ); })}
-        </nav>
-        <section className="desk-editor">
-          <EditorToolbar
-            ready={Boolean(ketcher)}
-            working={working}
-            inputRef={importRef}
-            onAnalyze={analyzeFromEditor}
-            onClear={clearEditor}
-            onImport={importSmiles}
-            onExample={(smiles) => importSmiles(smiles)}
-          />
-
-          <KetcherEditor onReady={setKetcher} />
-
-          {error && (
-            <div className="error-banner" role="alert">
-              <strong>Ошибка</strong>
-              <span>{error}</span>
-              <button type="button" className="text-button" onClick={() => setError("")}>
-                Скрыть
-              </button>
+      <div className="workbench-frame">
+        <nav id="workspace-navigation" className={`workspace-sidebar${navigationOpen ? " is-open" : ""}`} aria-label="Разделы анализа">
+          {NAV_GROUPS.map((group) => (
+            <div className="navigation-group" key={group.label}>
+              <div className="navigation-group-label">{group.label}</div>
+              {group.tabs.map((item) => {
+                const TabIcon = TAB_ICONS[item];
+                return <button key={item} type="button" aria-current={tab === item ? "page" : undefined}
+                  className={tab === item ? "selected" : ""} onClick={() => openTab(item)}>
+                  <TabIcon size={16} aria-hidden="true" /><span>{TAB_LABELS[item]}</span>
+                </button>;
+              })}
             </div>
-          )}
-        </section>
-
-        <ResultsPanel
-          tab={tab}
-          onTab={setTab}
-          result={result}
-          loading={loading}
-          identification={identification}
-          adme={adme}
-          activity={activity}
-          chembl={chembl}
-          history={history}
-          onSelectHistory={selectHistory}
-          onClearHistory={clearHistory}
-        />
-      </main>
+          ))}
+        </nav>
+        <main className="workbench-main" ref={contentRef}>
+          <div className="workbench-content">
+            <div className="workbench-location">
+              <PanelTop size={14} aria-hidden="true" />
+              <span>Рабочая область</span>
+              <ChevronRight size={13} aria-hidden="true" />
+              <strong>{TAB_LABELS[tab]}</strong>
+            </div>
+            {!fullWorkspace && (
+              <div className="molecule-heading">
+                <div>
+                  <h1>Молекулярный анализ</h1>
+                  <p>Редактируйте структуру и изучайте её свойства.</p>
+                </div>
+                <div className="molecule-heading-actions">
+                  <MenuBar label="Экспорт" buttonIcon={<ArrowDownToLine size={15} aria-hidden="true" />}
+                    menus={[{ label: "Экспорт", disabled: !result, entries: exportEntries }]} />
+                  <button id="analyze-structure" type="button" className="primary-button with-icon"
+                    disabled={!ketcher || working} onClick={analyzeFromEditor}
+                    aria-keyshortcuts="Control+Enter Meta+Enter" title="Анализировать структуру (Ctrl+Enter)">
+                    <Play size={15} aria-hidden="true" /> {working ? "Анализ…" : "Анализировать"}
+                  </button>
+                </div>
+              </div>
+            )}
+            <div className={`molecule-workspace${fullWorkspace ? " is-wide" : ""}`}>
+              <section className="desk-editor" aria-labelledby="editor-heading" hidden={fullWorkspace}>
+                <header className="editor-heading">
+                  <span className="editor-heading-icon"><Atom size={19} aria-hidden="true" /></span>
+                  <div><h2 id="editor-heading">Редактор структуры</h2><span>Двумерный холст Ketcher</span></div>
+                  <button className="ghost-button with-icon editor-view" type="button" onClick={() => openTab(tab === "3d" ? "props" : "3d")}>
+                    {tab === "3d" ? <PanelTop size={15} aria-hidden="true" /> : <Cuboid size={15} aria-hidden="true" />}
+                    {tab === "3d" ? "Свойства" : "3D-вид"}
+                  </button>
+                </header>
+                {error && (
+                  <div className="error-banner" role="alert">
+                    <strong>Ошибка</strong>
+                    <span>{error}</span>
+                    <button type="button" className="text-button" onClick={() => setError("")}>Скрыть</button>
+                  </div>
+                )}
+                <KetcherEditor onReady={setKetcher} />
+                <EditorToolbar
+                  ready={Boolean(ketcher)}
+                  inputRef={importRef}
+                  onClear={clearEditor}
+                  onImport={importSmiles}
+                  onExample={(smiles) => importSmiles(smiles)}
+                />
+              </section>
+              <ResultsPanel
+                tab={tab}
+                onTab={openTab}
+                result={result}
+                loading={loading}
+                identification={identification}
+                adme={adme}
+                activity={activity}
+                chembl={chembl}
+                history={history}
+                onSelectHistory={selectHistory}
+                onClearHistory={clearHistory}
+              />
+            </div>
+          </div>
+        </main>
+      </div>
 
       <StatusBar
         apiStatus={apiStatus}

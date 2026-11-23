@@ -1,18 +1,18 @@
 import { useState, type RefObject } from "react";
-import { IconPlay, IconTrash, IconUpload } from "./Icons";
+import { ArrowDownToLine, Trash2 } from "lucide-react";
+
+export const DEFAULT_STRUCTURE = "Cn1cnc2c1c(=O)n(C)c(=O)n2C";
 
 export const EXAMPLES: Array<{ name: string; smiles: string }> = [
   { name: "Этанол", smiles: "CCO" },
   { name: "Бензол", smiles: "c1ccccc1" },
   { name: "Аспирин", smiles: "CC(=O)Oc1ccccc1C(=O)O" },
-  { name: "Кофеин", smiles: "Cn1cnc2c1c(=O)n(C)c(=O)n2C" }
+  { name: "Кофеин", smiles: DEFAULT_STRUCTURE }
 ];
 
 interface Props {
   ready: boolean;
-  working: boolean;
   inputRef: RefObject<HTMLInputElement | null>;
-  onAnalyze: () => void;
   onClear: () => void;
   onImport: (smiles: string) => Promise<boolean>;
   onExample: (smiles: string) => void;
@@ -20,9 +20,7 @@ interface Props {
 
 export default function EditorToolbar({
   ready,
-  working,
   inputRef,
-  onAnalyze,
   onClear,
   onImport,
   onExample
@@ -36,69 +34,33 @@ export default function EditorToolbar({
   }
 
   return (
-    <div className="toolbar">
-      <button
-        type="button"
-        className="primary-button with-icon"
-        disabled={!ready || working}
-        onClick={onAnalyze}
-        title="Анализировать структуру (Ctrl+Enter)"
-      >
-        <IconPlay size={14} />
-        {working ? "Анализ…" : "Анализировать"}
-      </button>
-
-      <button
-        type="button"
-        className="ghost-button with-icon"
-        disabled={!ready}
-        onClick={onClear}
-      >
-        <IconTrash size={15} />
-        Очистить
-      </button>
-
-      <span className="toolbar-sep" />
-
-      <div className="import-box">
+    <div className="editor-controls">
+      <form className="editor-import" onSubmit={(event) => { event.preventDefault(); void submitImport(); }}>
+        <label htmlFor="structure-smiles">SMILES</label>
         <input
           ref={inputRef}
+          id="structure-smiles"
           value={value}
           maxLength={10000}
           spellCheck={false}
-          placeholder="Импорт SMILES, например CCO"
+          placeholder="Введите строку, например CCO"
           disabled={!ready}
-          onChange={(e: { target: { value: string } }) => setValue(e.target.value)}
-          onKeyDown={(e: { key: string }) => {
-            if (e.key === "Enter") submitImport();
-          }}
+          onChange={(event) => setValue(event.target.value)}
         />
-        <button
-          type="button"
-          className="ghost-button with-icon"
-          disabled={!ready || !value.trim()}
-          onClick={submitImport}
-        >
-          <IconUpload size={15} />
-          Импорт
+        <button type="submit" className="ghost-button with-icon" disabled={!ready || !value.trim()}>
+          <ArrowDownToLine size={15} aria-hidden="true" /> Импорт
         </button>
-      </div>
-
-      <span className="toolbar-spacer" />
-
-      <div className="examples">
-        <span>Примеры:</span>
+      </form>
+      <div className="editor-examples" aria-label="Примеры структур">
+        <span>Примеры</span>
         {EXAMPLES.map((example) => (
-          <button
-            key={example.name}
-            type="button"
-            className="chip chip-button"
-            disabled={!ready}
-            onClick={() => onExample(example.smiles)}
-          >
+          <button key={example.name} type="button" disabled={!ready} onClick={() => onExample(example.smiles)}>
             {example.name}
           </button>
         ))}
+        <button type="button" className="ghost-button with-icon editor-clear" disabled={!ready} onClick={onClear}>
+          <Trash2 size={14} aria-hidden="true" /> Очистить
+        </button>
       </div>
     </div>
   );

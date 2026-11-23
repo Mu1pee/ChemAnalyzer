@@ -232,8 +232,8 @@ export default function AssistantPanel({
     <section className="assistant-panel" id="assistant">
       <div className="assistant-head">
         <div>
-          <div className="section-label">Ассистент Claude</div>
-          <h2>Проверка анализа и помощь в изучении</h2>
+          <h1>Ассистент Claude</h1>
+          <p>Проверка анализа и помощь в изучении</p>
         </div>
         <div className="mode-switch" role="tablist">
           {(["review", "learn"] as AssistantMode[]).map((m) => (

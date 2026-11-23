@@ -16,14 +16,14 @@ const LABEL: Record<ApiStatus, string> = {
 export default function StatusBar({ apiStatus, version, desktop, busy }: Props) {
   return (
     <footer className="statusbar">
-      <span className={`status-dot status-${apiStatus}`}>
-        <i />
+      <span className={`status-dot status-${apiStatus}`} role="status">
+        <i aria-hidden="true" />
         {LABEL[apiStatus]}
       </span>
       {busy && <span className="status-busy">Выполняется анализ…</span>}
       <span className="status-spacer" />
-      <span>{desktop ? "Desktop" : "Браузер"}</span>
-      <span>v{version}</span>
+      <span>{desktop ? "Приложение Windows" : "Браузер"}</span>
+      <span className="status-version">v{version}</span>
     </footer>
   );
 }

@@ -17,9 +17,7 @@ export default function HistoryTab({ items, onSelect, onClear }: Props) {
   return (
     <div>
       <div className="history-head">
-        <div className="section-label" style={{ margin: 0 }}>
-          Последние анализы
-        </div>
+        <h1>История анализов</h1>
         {items.length > 0 && (
           <button type="button" className="text-button" onClick={onClear}>
             Очистить историю

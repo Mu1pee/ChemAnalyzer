@@ -30,6 +30,6 @@ export const API_URL = `${API_ORIGIN}/api/molecules`;
 /** Сообщение о недоступности backend: для desktop и для разработки оно разное. */
 export const NETWORK_ERROR_MESSAGE: string = bridge
   ? "Локальный движок (RDKit) не отвечает. Закройте и снова откройте ChemAnalyzer. " +
-    "Подробности — в файле logs\\backend.log в папке данных (Settings → «Открыть папку данных»)."
+    "Подробности — в файле logs\\backend.log в папке данных (Настройки → «Открыть папку данных»)."
   : "Не удалось связаться с сервером. Проверьте, что backend запущен " +
     "(python -m uvicorn app.main:app --reload).";

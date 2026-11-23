@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { IconLogo } from "./Icons";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { ChevronDown } from "lucide-react";
 
 export type MenuEntry =
   | { type: "item"; label: string; onClick: () => void; disabled?: boolean; hint?: string; checked?: boolean }
@@ -9,15 +9,19 @@ export type MenuEntry =
 export interface MenuDef {
   label: string;
   entries: MenuEntry[];
+  disabled?: boolean;
 }
 
 interface Props {
   menus: MenuDef[];
+  label?: string;
+  buttonIcon?: ReactNode;
 }
 
-export default function MenuBar({ menus }: Props) {
+export default function MenuBar({ menus, label = "Меню приложения", buttonIcon }: Props) {
   const [open, setOpen] = useState<number | null>(null);
   const barRef = useRef<HTMLDivElement | null>(null);
+  const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Закрытие по клику вне меню и по Escape.
   useEffect(() => {
@@ -29,7 +33,10 @@ export default function MenuBar({ menus }: Props) {
       }
     };
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(null);
+      if (event.key === "Escape") {
+        setOpen(null);
+        if (barRef.current?.contains(document.activeElement)) buttonsRef.current[open]?.focus();
+      }
     };
     document.addEventListener("mousedown", onPointer);
     document.addEventListener("keydown", onKey);
@@ -40,28 +47,25 @@ export default function MenuBar({ menus }: Props) {
   }, [open]);
 
   return (
-    <div className="menubar" ref={barRef} role="menubar">
-      <div className="menubar-brand">
-        <IconLogo size={20} />
-        <strong>ChemAnalyzer</strong>
-      </div>
-
+    <div className={`menubar${buttonIcon ? " menubar-action" : ""}`} ref={barRef}
+      role="group" aria-label={label}
+      onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setOpen(null); }}>
       {menus.map((menu, index) => (
         <div className="menu" key={menu.label}>
           <button
             type="button"
-            role="menuitem"
-            aria-haspopup="true"
             aria-expanded={open === index}
+            disabled={menu.disabled}
+            ref={(element) => { buttonsRef.current[index] = element; }}
             className={`menu-button${open === index ? " open" : ""}`}
             onClick={() => setOpen(open === index ? null : index)}
             onMouseEnter={() => open !== null && setOpen(index)}
           >
-            {menu.label}
+            {buttonIcon}{menu.label}{buttonIcon && <ChevronDown size={13} aria-hidden="true" />}
           </button>
 
           {open === index && (
-            <div className="menu-list" role="menu">
+            <div className="menu-list" role="group" aria-label={menu.label}>
               {menu.entries.map((entry, i) => {
                 if (entry.type === "separator") {
                   return <div className="menu-sep" key={i} role="separator" />;
@@ -77,7 +81,6 @@ export default function MenuBar({ menus }: Props) {
                   <button
                     key={i}
                     type="button"
-                    role="menuitem"
                     className="menu-item"
                     disabled={entry.disabled}
                     onClick={() => {
@@ -85,7 +88,7 @@ export default function MenuBar({ menus }: Props) {
                       entry.onClick();
                     }}
                   >
-                    <span className="menu-check">{entry.checked ? "✓" : ""}</span>
+                    <span className="menu-check" aria-hidden="true">{entry.checked ? "✓" : ""}</span>
                     <span className="menu-label">{entry.label}</span>
                     {entry.hint && <span className="menu-hint">{entry.hint}</span>}
                   </button>

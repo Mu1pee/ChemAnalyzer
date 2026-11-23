@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Editor } from "ketcher-react";
 import type { Ketcher } from "ketcher-core";
 import { StandaloneStructServiceProvider } from "ketcher-standalone";
+import { DEFAULT_STRUCTURE } from "./EditorToolbar";
 
 import "ketcher-react/dist/index.css";
 
@@ -25,7 +26,7 @@ export default function KetcherEditor({ onReady }: Props) {
         disableMacromoleculesEditor
         onInit={(instance: Ketcher) => {
           onReady(instance);
-          instance.setMolecule("CCO").catch(() => {
+          instance.setMolecule(DEFAULT_STRUCTURE).catch(() => {
             // Начальный пример необязателен.
           });
         }}

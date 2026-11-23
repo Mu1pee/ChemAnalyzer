@@ -149,7 +149,9 @@ export function fetchSpecializedActivity(
 export async function checkHealth(): Promise<boolean> {
   try {
     const response = await fetch(`${API_ORIGIN}/health`);
-    return response.ok;
+    if (!response.ok) return false;
+    const health = await response.json();
+    return health?.application === "ChemAnalyzer" && health?.status === "healthy";
   } catch {
     return false;
   }

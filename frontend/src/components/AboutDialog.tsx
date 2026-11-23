@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface Props {
   open: boolean;
@@ -9,25 +9,22 @@ interface Props {
 }
 
 export default function AboutDialog({ open, onClose, version, desktop, dataDir }: Props) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+    const dialog = dialogRef.current;
+    dialog?.showModal();
+    return () => dialog?.close();
+  }, [open]);
 
   if (!open) return null;
 
   return (
-    <div className="modal-backdrop" onMouseDown={onClose}>
-      <div
+      <dialog
+        ref={dialogRef}
         className="modal"
-        role="dialog"
-        aria-modal="true"
         aria-label="О программе"
-        onMouseDown={(event: { stopPropagation(): void }) => event.stopPropagation()}
+        onCancel={(event) => { event.preventDefault(); onClose(); }}
       >
         <div className="modal-head">
           <div>
@@ -74,7 +71,6 @@ export default function AboutDialog({ open, onClose, version, desktop, dataDir }
             </>
           )}
         </div>
-      </div>
-    </div>
+      </dialog>
   );
 }

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { ArrowUpRight, Atom, Check, Copy, FlaskConical, LoaderCircle } from "lucide-react";
 import type {
   ActivityResponse,
   AdmeResponse,
@@ -16,7 +17,6 @@ import CypTab from "./CypTab";
 import ScreeningTab from "./ScreeningTab";
 import DruglikenessTab from "./DruglikenessTab";
 import HistoryTab from "./HistoryTab";
-import { IconCopy } from "./Icons";
 import IdentificationTab from "./IdentificationTab";
 import PropertiesTab from "./PropertiesTab";
 import StructureTab from "./StructureTab";
@@ -24,6 +24,7 @@ import AntidotePredictionTab from "./AntidotePredictionTab";
 import ResearchLabTab from "./ResearchLabTab";
 import BioactivityWorkspace from "./BioactivityWorkspace";
 import type { ResearchPreset } from "../lib/bioactivity";
+import "../styles/results-workspace.css";
 
 export type Tab =
   | "bioactivity"
@@ -76,7 +77,12 @@ interface Props {
   onClearHistory: () => void;
 }
 
-const NEEDS_RESULT: Tab[] = ["props", "adme", "ident", "drug", "activity", "antidote", "chembl", "cyp", "screening", "metabolism", "solubility", "3d"];
+const FULL_WIDTH_TABS: readonly Tab[] = ["history", "research", "assistant"];
+const PANE_TITLES: Partial<Record<Tab, string>> = {
+  activity: "Активность / QSAR",
+  props: "Свойства",
+  "3d": "3D-структура"
+};
 
 export default function ResultsPanel({
   tab,
@@ -91,9 +97,15 @@ export default function ResultsPanel({
   onSelectHistory,
   onClearHistory
 }: Props) {
-  const [copied, setCopied] = useState(false);
+  const [copyNotice, setCopyNotice] = useState<string | null>(null);
   const [researchPreset, setResearchPreset] = useState<"default" | "qsar">("default");
   const [researchTask, setResearchTask] = useState<ResearchPreset | undefined>();
+
+  useEffect(() => {
+    if (!copyNotice) return;
+    const timer = window.setTimeout(() => setCopyNotice(null), 1800);
+    return () => window.clearTimeout(timer);
+  }, [copyNotice]);
 
   function openResearch(preset?: ResearchPreset) {
     setResearchTask(preset);
@@ -104,10 +116,9 @@ export default function ResultsPanel({
   async function copySmiles(value: string) {
     try {
       await navigator.clipboard.writeText(value);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
+      setCopyNotice("SMILES скопирован");
     } catch {
-      // Буфер обмена недоступен — ничего страшного.
+      setCopyNotice("Не удалось скопировать SMILES");
     }
   }
 
@@ -141,31 +152,32 @@ export default function ResultsPanel({
       );
     }
 
-    if (NEEDS_RESULT.includes(tab)) {
-      if (loading) {
-        return (
-          <div className="loading-box">
-            <div className="spinner" />
-            <h3>Анализируем структуру</h3>
-            <p>RDKit считает дескрипторы.</p>
+    if (loading) {
+      return (
+        <div className="analysis-start" role="status">
+          <div className="analysis-illustration">
+            <LoaderCircle className="analysis-spinner" size={32} aria-hidden="true" />
           </div>
-        );
-      }
-      if (!result) {
-        return (
-          <div className="empty-result">
-            <div className="empty-orb">⌬</div>
-            <h3>Здесь появятся результаты</h3>
-            <p>
-              Нарисуйте молекулу в редакторе и нажмите «Анализировать»
-              (Ctrl+Enter).
-            </p>
+          <h3>Анализируем структуру</h3>
+          <p>RDKit рассчитывает дескрипторы молекулы.</p>
+        </div>
+      );
+    }
+    if (!result) {
+      return (
+        <div className="analysis-start">
+          <div className="analysis-illustration">
+            <Atom size={33} strokeWidth={1.5} aria-hidden="true" />
           </div>
-        );
-      }
+          <h3>Запустите анализ структуры</h3>
+          <p>Нарисуйте молекулу или импортируйте SMILES, затем запустите расчёт.</p>
+          <a className="analysis-start__link" href="#analyze-structure">
+            К кнопке анализа <ArrowUpRight size={14} aria-hidden="true" />
+          </a>
+        </div>
+      );
     }
 
-    if (!result) return null;
     switch (tab) {
       case "props":
         return <PropertiesTab result={result} />;
@@ -208,46 +220,46 @@ export default function ResultsPanel({
 
   if (tab === "bioactivity") return <BioactivityWorkspace onTab={onTab} onResearch={openResearch} activity={activity} hasMolecule={Boolean(result)} />;
 
+  const paneTitle = PANE_TITLES[tab] ?? TABS.find((item) => item.id === tab)?.label;
+  if (FULL_WIDTH_TABS.includes(tab)) {
+    return (
+      <section className={`analysis-pane analysis-pane--wide analysis-pane--${tab}`} aria-label={paneTitle}>
+        <div className="tab-body">{body()}</div>
+      </section>
+    );
+  }
+
   return (
-    <aside className="results-panel">
+    <section className="analysis-pane" aria-labelledby="analysis-pane-title">
+      <header className="analysis-pane__header">
+        <span className="analysis-pane__icon"><FlaskConical size={17} aria-hidden="true" /></span>
+        <h2 id="analysis-pane-title">{paneTitle}</h2>
+      </header>
+
       {result && !loading && (
-        <div className="result-heading">
-          <div className="result-title-row">
-            <h2>{title ?? result.formula}</h2>
+        <div className="analysis-molecule">
+          <div className="analysis-molecule__heading">
+            <div className="analysis-molecule__identity">
+              {title && <strong className="analysis-molecule__name">{title}</strong>}
+              <span className="analysis-molecule__formula" title="Молекулярная формула">{result.formula}</span>
+            </div>
             <button
-              className="ghost-button with-icon"
+              className="analysis-molecule__copy"
               type="button"
+              aria-label="Копировать канонический SMILES"
               onClick={() => copySmiles(result.canonical_smiles)}
             >
-              <IconCopy size={14} />
-              {copied ? "Скопировано" : "SMILES"}
+              {copyNotice === "SMILES скопирован" ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
+              SMILES
             </button>
           </div>
-          <span className="result-sub">
-            {title ? `${result.formula} · ` : ""}
-            MW {result.molecular_weight}
-            {connectivityName ? ` · по связности возможно: ${connectivityName}` : ""}
-          </span>
-          <code>{result.canonical_smiles}</code>
+          {connectivityName && <span className="analysis-molecule__match">Возможное совпадение по связности: {connectivityName}</span>}
+          {tab !== "props" && <code>{result.canonical_smiles}</code>}
+          <span className="analysis-copy-status" role="status">{copyNotice}</span>
         </div>
       )}
 
-      <div className="tabs" role="tablist">
-        {TABS.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            role="tab"
-            aria-selected={tab === item.id}
-            className={`tab-button${tab === item.id ? " active" : ""}`}
-            onClick={() => onTab(item.id)}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-
       <div className="tab-body">{body()}</div>
-    </aside>
+    </section>
   );
 }

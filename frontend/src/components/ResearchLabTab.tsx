@@ -68,7 +68,7 @@ export default function ResearchLabTab({ initialPreset = "default", initialTask 
   const running = runs.some(r => ["running", "queued"].includes(r.status));
 
   return <section className="research-lab">
-    <h2>AI Research Lab</h2>
+    <h1>AI Research Lab</h1>
     <p>Исследовательские прогнозы требуют экспериментальной проверки. Новые модели сохраняются как experimental.</p>
     {error && <p role="alert" className="research-error">{error}</p>}
     {message && <p role="status">{message}</p>}
